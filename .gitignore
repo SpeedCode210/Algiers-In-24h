@@ -1,0 +1,26 @@
+# Byte-code files
+*.pyc
+__pycache__/
+
+# Virtual environment
+.venv/
+env/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Editor/IDE-specific files
+.vscode/        # VS Code
+.idea/          # PyCharm
+
+# Miscellaneous
+build/
+dist/
+logs/
+*.log
+.env            # Environment variables (sensitive data)
+
+report/*.out
+report/*.aux
+report/*.toc
+report/*.pdf
