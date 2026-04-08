@@ -11,12 +11,28 @@ class Day(IntEnum):
     FRIDAY = 5
     SATURDAY = 6
 
+    @classmethod
+    def from_string(cls, day_str: str) -> "Day":
+        try:
+            return cls[day_str.strip().upper()]
+        except KeyError:
+            valid = [d.name.lower() for d in cls]
+            raise ValueError(
+                f"'{day_str}' is not a valid day name. "
+                f"Expected one of: {valid}.")
+
 
 @dataclass(frozen=True)
 class TimeSlot:
 
     open_time: int
     close_time: int
+
+    def __post_init__(self) -> None:
+        if self.open_time >= self.close_time:
+            raise ValueError(
+                f"open_time ({self.open_time}) must be strictly less than "
+                f"close_time ({self.close_time}).")
 
     def contains(self, arrival: int, duration: int) -> bool:
         return self.open_time <= arrival and (arrival + duration) <= self.close_time
@@ -56,6 +72,14 @@ class Landmark:
     def coordinates(self) -> tuple[float, float]:
         return (self.latitude, self.longitude)
     
+    def __str__(self) -> str: #helps for printing
+        return (
+            f"{self.name} "
+            f"[{self.category}] "
+            f"score={self.interest_score:.1f} "
+            f"visit={self.visit_duration} min"
+        )
+    
 
 import pandas as pd
 from utils.time import timeInMinutes
@@ -63,7 +87,7 @@ from utils.time import timeInMinutes
 
 def loadLandmarks(filepath: str) -> list[Landmark]:
 
-    df = pd.read_csv(filepath)
+    df = pd.read_csv("../data/data.csv")
 
     landmarks = []
 
