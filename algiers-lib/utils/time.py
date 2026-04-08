@@ -1,0 +1,19 @@
+def timeInMinutes(time_str: str) -> int:
+    try:
+        hours, minutes = map(int, time_str.split(':'))
+        if 0 <= hours < 24 and 0 <= minutes < 60:
+            return hours * 60 + minutes
+        else:
+            raise ValueError("Invalid time format")
+    except ValueError:
+        raise ValueError("Invalid time format")
+
+def TimeInString(minutes: int) -> str:
+    try:
+        if minutes < 0:
+            raise ValueError("Minutes cannot be negative")
+        hours = minutes // 60
+        remaining_minutes = minutes % 60
+        return f"{hours:02d}:{remaining_minutes:02d}"
+    except ValueError:
+        raise ValueError("Invalid minutes value")
