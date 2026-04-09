@@ -1,3 +1,4 @@
+import csv
 from dataclasses import dataclass, field
 from enum import IntEnum
 from typing import Optional
@@ -85,9 +86,9 @@ import pandas as pd
 from utils.time import timeInMinutes
 
 
-def loadLandmarks(filepath: str) -> list[Landmark]:
+def loadLandmarks(filepath: str = "../data/data.csv") -> list[Landmark]:
 
-    df = pd.read_csv("../data/data.csv")
+    df = pd.read_csv(filepath)
 
     landmarks = []
 
@@ -118,3 +119,23 @@ def loadLandmarks(filepath: str) -> list[Landmark]:
         landmarks.append(landmark)
 
     return landmarks
+
+
+def loadHotel(hotel_path: str = "../data/hotel.csv") -> Landmark:
+    df = pd.read_csv(hotel_path)
+    row = df.iloc[0]
+
+    full_day_slot = TimeSlot(open_time=0, close_time=1439)
+    slots = {day: [full_day_slot] for day in Day}
+    schedule = WeeklySchedule(slots=slots)
+
+    return Landmark(
+        id=str(row["id"]).strip(),
+        name=str(row["name"]).strip(),
+        latitude=float(row["latitude"]),
+        longitude=float(row["longitude"]),
+        interest_score=0.0,
+        visit_duration=0,
+        schedule=schedule,
+        category="hotel",
+    )
