@@ -1,4 +1,4 @@
-def timeInMinutes(time_str: str) -> int:
+def time_in_minutes(time_str: str) -> int:
     try:
         hours, minutes = map(int, time_str.split(':'))
         if 0 <= hours < 24 and 0 <= minutes < 60:
@@ -8,7 +8,7 @@ def timeInMinutes(time_str: str) -> int:
     except ValueError:
         raise ValueError("Invalid time format")
 
-def TimeInString(minutes: int) -> str:
+def time_in_string(minutes: int) -> str:
     try:
         if minutes < 0:
             raise ValueError("Minutes cannot be negative")

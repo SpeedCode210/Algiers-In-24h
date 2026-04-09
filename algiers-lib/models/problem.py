@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-import csv
 from typing import Optional
-
-import pandas as pd
 
 from models.landmark import Day, Landmark, loadLandmarks, loadHotel
 from utils.distance import travel_time_minutes

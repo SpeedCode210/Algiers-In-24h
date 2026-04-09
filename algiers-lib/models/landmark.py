@@ -1,4 +1,3 @@
-import csv
 from dataclasses import dataclass, field
 from enum import IntEnum
 from typing import Optional
@@ -83,7 +82,7 @@ class Landmark:
     
 
 import pandas as pd
-from utils.time import timeInMinutes
+from utils.time import time_in_minutes
 
 
 def loadLandmarks(filepath: str = "../data/data.csv") -> list[Landmark]:
@@ -99,8 +98,8 @@ def loadLandmarks(filepath: str = "../data/data.csv") -> list[Landmark]:
         for _, row in group.iterrows():
             day = Day.from_string(row["day"])
             slot = TimeSlot(
-                open_time=timeInMinutes(row["open_time"]),
-                close_time=timeInMinutes(row["close_time"]),
+                open_time=time_in_minutes(row["open_time"]),
+                close_time=time_in_minutes(row["close_time"]),
             )
             slots.setdefault(day, []).append(slot)
 
