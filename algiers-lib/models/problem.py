@@ -46,7 +46,7 @@ class Problem:
         return Tour(problem=self)
     
     def random_tour(self) -> Tour:
-        """Generate valid random tour potentially used for intial solutions """
+        """Generate valid random tour potentially used for initial solutions """
 
         tour = self.create_empty_tour()
         candidates = self.feasible_candidates(tour)

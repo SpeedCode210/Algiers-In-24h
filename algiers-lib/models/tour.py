@@ -57,7 +57,7 @@ class Tour:
 
             if visit_start_time is None:
 
-                return SimulationResult(total_duration=float(current_time - self.problem.start_time),
+                return SimulationResult(total_duration=float(arrival_time - self.problem.start_time),
                                         is_valid=False,
                                         entries=entries) 
             
