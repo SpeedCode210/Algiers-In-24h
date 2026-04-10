@@ -4,6 +4,7 @@ from typing import Optional
 
 from models.landmark import Day, Landmark, loadLandmarks, loadHotel
 from utils.distance import travel_time_minutes
+from tour import Tour 
 
 class Problem:
 
