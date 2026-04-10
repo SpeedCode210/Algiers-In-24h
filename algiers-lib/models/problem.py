@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Optional , TYPE_CHECKING
+import random
 
 from models.landmark import Day, Landmark, loadLandmarks, loadHotel
 from utils.distance import travel_time_minutes
@@ -43,6 +44,20 @@ class Problem:
 
         from models.tour import Tour
         return Tour(problem=self)
+    
+    def random_tour(self) -> Tour:
+        """Generate valid random tour potentially used for intial solutions """
+
+        tour = self.create_empty_tour()
+        candidates = self.feasible_candidates(tour)
+        random.shuffle(candidates)
+        
+        for landmark in candidates:
+            tour.add_landmark(landmark)
+            if not tour.is_valid():
+                tour.remove_landmark(landmark)
+        
+        return tour
 
 
     def unvisited_landmarks(self, tour: Tour) -> list[Landmark]:
