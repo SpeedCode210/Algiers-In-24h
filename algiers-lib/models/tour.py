@@ -3,7 +3,7 @@ from dataclasses import dataclass , field
 from typing import Optional
 import math 
 
-from landmark import Landmark
+from models.landmark import Landmark
 from utils.time import time_in_string
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -36,10 +36,11 @@ class SimulationResult:
 
 class Tour:
 
-    def __init__(self, problem: "Problem" , visited_landmarks: Optional[list["Landmark"]] = None ) -> None:
+    def __init__(self, problem: Problem , visited_landmarks: Optional[list["Landmark"]] = None ) -> None:
 
         self.problem =  problem
         self.visited_landmarks = visited_landmarks if visited_landmarks is not None else []
+        self._cache: Optional[SimulationResult] = None #for caching the last simulation result
     
     def simulate(self) -> SimulationResult:
 
@@ -72,13 +73,25 @@ class Tour:
         total_duration = float(( current_time + return_travel_time ) - self.problem.start_time)
 
         if total_duration > self.problem.time_budget:
+
             return SimulationResult( total_duration=total_duration , is_valid=False , entries=entries ) 
         
         return SimulationResult(total_duration=total_duration , is_valid=True , entries=entries)
     
+    def simulation_cache(self) -> SimulationResult:
+
+        if self._cache is None:
+            self._cache = self.simulate()
+
+        return self._cache
+    
+    def _invalidate_cache(self) -> None: #After each mutation
+
+        self._cache = None
+
     def is_valid(self) -> bool:
 
-        return self.simulate().is_valid
+        return self.simulation_cache().is_valid
     
     def total_score(self) -> float:
 
@@ -88,16 +101,22 @@ class Tour:
 
         if landmark  in self.visited_landmarks:
             raise ValueError(f"{landmark.name} is already in the tour.")
+        
         if position is None:
             self.visited_landmarks.append(landmark)
+
         else:
             self.visited_landmarks.insert(position , landmark)
+
+        self._invalidate_cache()
 
     def remove_landmark(self , landmark: Landmark) -> None:
 
         if landmark not in self.visited_landmarks:
             raise ValueError(f"{landmark.name} does not exist in the tour.")
+        
         self.visited_landmarks.remove(landmark)
+        self._invalidate_cache()
 
     def swap_landmarks(self, lm1: Landmark , lm2: Landmark) -> None:
 
@@ -110,25 +129,32 @@ class Tour:
         i = self.visited_landmarks.index(lm1)
         j = self.visited_landmarks.index(lm2)
         self.visited_landmarks[i], self.visited_landmarks[j] = self.visited_landmarks[j], self.visited_landmarks[i]
+        self._invalidate_cache()
 
     def swap_by_index(self, i: int, j: int) -> None:
 
         if not (0 <= i < len(self.visited_landmarks)):
             raise IndexError(f"Indices {i} is out of range.")
+        
         if not (0 <= j < len(self.visited_landmarks)):
             raise IndexError(f"Indices {j} is out of range.")
+        
         self.visited_landmarks[i], self.visited_landmarks[j] = self.visited_landmarks[j], self.visited_landmarks[i]
+        self._invalidate_cache()
 
     def replace_landmark(self, old: Landmark , new: Landmark) -> None:
 
         if old not in self.visited_landmarks:
             raise ValueError(f"{old.name} does not exist in the tour.")
+        
         if new in self.visited_landmarks:
             raise ValueError(f"{new.name} is already in the tour.")
+        
         index = self.visited_landmarks.index(old)
         self.visited_landmarks[index] = new
+        self._invalidate_cache()
 
-    def copy(self) -> "Tour":
+    def copy(self) -> Tour:
 
         return Tour(self.problem, list(self.visited_landmarks))
     
@@ -142,7 +168,7 @@ class Tour:
     
     def __str__(self) -> str:
 
-        simulation = self.simulate()
+        simulation = self.simulation_cache()
         tour_details = [f"Start: Hotel {self.problem.hotel.name} at {time_in_string(self.problem.start_time)}"]
 
         for entry in simulation.entries:
