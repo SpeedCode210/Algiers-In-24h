@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional , TYPE_CHECKING
 
 from models.landmark import Day, Landmark, loadLandmarks, loadHotel
 from utils.distance import travel_time_minutes
-from tour import Tour 
+if TYPE_CHECKING:
+    from models.tour import Tour 
 
 class Problem:
 
@@ -40,6 +41,7 @@ class Problem:
 
     def create_empty_tour(self) -> Tour:
 
+        from models.tour import Tour
         return Tour(problem=self)
 
 

@@ -1,12 +1,17 @@
+from __future__ import annotations
 from dataclasses import dataclass , field 
 from typing import Optional
 import math 
 
 from landmark import Landmark
-from problem import Problem 
+from utils.time import time_in_string
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from models.problem import Problem
 
 @dataclass
 class ScheduleEntry: 
+
     landmark: Landmark
     arrival_time: float
     visit_start_time: int 
@@ -22,6 +27,7 @@ class ScheduleEntry:
 
 @dataclass
 class SimulationResult:
+
     total_duration: float
     is_valid: bool
     entries: list[ScheduleEntry] = field(default_factory=list)
@@ -29,12 +35,15 @@ class SimulationResult:
 
 
 class Tour:
+
     def __init__(self, problem: "Problem" , visited_landmarks: Optional[list["Landmark"]] = None ) -> None:
+
         self.problem =  problem
         self.visited_landmarks = visited_landmarks if visited_landmarks is not None else []
     
     def simulate(self) -> SimulationResult:
-        entries: list = []
+
+        entries: list[ScheduleEntry] = []
         current_position: Landmark = self.problem.hotel
         current_time: float = self.problem.start_time
 
@@ -67,8 +76,82 @@ class Tour:
         
         return SimulationResult(total_duration=total_duration , is_valid=True , entries=entries)
     
+    def is_valid(self) -> bool:
 
+        return self.simulate().is_valid
+    
+    def total_score(self) -> float:
+
+        return sum(lm.interest_score for lm in self.visited_landmarks)
+    
+    def add_landmark(self , landmark: Landmark, position: Optional[int] = None) -> None:
+
+        if landmark  in self.visited_landmarks:
+            raise ValueError(f"{landmark.name} is already in the tour.")
+        if position is None:
+            self.visited_landmarks.append(landmark)
+        else:
+            self.visited_landmarks.insert(position , landmark)
+
+    def remove_landmark(self , landmark: Landmark) -> None:
+
+        if landmark not in self.visited_landmarks:
+            raise ValueError(f"{landmark.name} does not exist in the tour.")
+        self.visited_landmarks.remove(landmark)
+
+    def swap_landmarks(self, lm1: Landmark , lm2: Landmark) -> None:
+
+        if lm1 not in self.visited_landmarks:
+            raise ValueError(f"{lm1.name} does not exist in the tour.")
         
+        if lm2 not in self.visited_landmarks:
+            raise ValueError(f"{lm2.name} does not exist in the tour.")
+        
+        i = self.visited_landmarks.index(lm1)
+        j = self.visited_landmarks.index(lm2)
+        self.visited_landmarks[i], self.visited_landmarks[j] = self.visited_landmarks[j], self.visited_landmarks[i]
+
+    def swap_by_index(self, i: int, j: int) -> None:
+
+        if not (0 <= i < len(self.visited_landmarks)):
+            raise IndexError(f"Indices {i} is out of range.")
+        if not (0 <= j < len(self.visited_landmarks)):
+            raise IndexError(f"Indices {j} is out of range.")
+        self.visited_landmarks[i], self.visited_landmarks[j] = self.visited_landmarks[j], self.visited_landmarks[i]
+
+    def replace_landmark(self, old: Landmark , new: Landmark) -> None:
+
+        if old not in self.visited_landmarks:
+            raise ValueError(f"{old.name} does not exist in the tour.")
+        if new in self.visited_landmarks:
+            raise ValueError(f"{new.name} is already in the tour.")
+        index = self.visited_landmarks.index(old)
+        self.visited_landmarks[index] = new
+
+    def copy(self) -> "Tour":
+
+        return Tour(self.problem, list(self.visited_landmarks))
+    
+    def __contains__(self, landmark: Landmark) -> bool:
+
+        return landmark in self.visited_landmarks
+    
+    def __len__(self) -> int:
+
+        return len(self.visited_landmarks)
+    
+    def __str__(self) -> str:
+
+        simulation = self.simulate()
+        tour_details = [f"Start: Hotel {self.problem.hotel.name} at {time_in_string(self.problem.start_time)}"]
+
+        for entry in simulation.entries:
+            wait_str = f" | wait: {time_in_string(round(entry.waiting_time))}" if entry.waiting_time > 0 else ""
+            tour_details.append(f" {entry.landmark.name} | arrival: {time_in_string(round(entry.arrival_time))}{wait_str} | start visit: {time_in_string(entry.visit_start_time)} | departure: {time_in_string(entry.departure_time)} ")
+
+        tour_details.append(f"end: Hotel {self.problem.hotel.name}")
+        tour_details.append(f"Valid: {simulation.is_valid} | Total duration: {simulation.total_duration:.1f} min | Score: {self.total_score()}")
+        return "\n".join(tour_details)
 
 
         
