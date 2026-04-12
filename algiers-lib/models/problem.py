@@ -1,9 +1,12 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional , TYPE_CHECKING
+import random
 
 from models.landmark import Day, Landmark, loadLandmarks, loadHotel
 from utils.distance import travel_time_minutes
+if TYPE_CHECKING:
+    from models.tour import Tour 
 
 class Problem:
 
@@ -39,7 +42,22 @@ class Problem:
 
     def create_empty_tour(self) -> Tour:
 
+        from models.tour import Tour
         return Tour(problem=self)
+    
+    def random_tour(self) -> Tour:
+        """Generate valid random tour potentially used for initial solutions """
+
+        tour = self.create_empty_tour()
+        candidates = self.feasible_candidates(tour)
+        random.shuffle(candidates)
+        
+        for landmark in candidates:
+            tour.add_landmark(landmark)
+            if not tour.is_valid():
+                tour.remove_landmark(landmark)
+        
+        return tour
 
 
     def unvisited_landmarks(self, tour: Tour) -> list[Landmark]:
