@@ -57,13 +57,16 @@ class Tour:
 
             if visit_start_time is None:
 
-                return SimulationResult(total_duration=float(arrival_time - self.problem.start_time),
-                                        is_valid=False,
-                                        entries=entries) 
+                return_travel = self.problem.travel_time(current_position, self.problem.hotel)
+                return SimulationResult(
+                    total_duration=float(arrival_time + return_travel - self.problem.start_time),
+                    is_valid=False,
+                    entries=entries
+                )
             
             entry = ScheduleEntry(landmark=landmark,
                                 arrival_time=float(arrival_time),
-                                visit_start_time=visit_start_time,)
+                                visit_start_time=visit_start_time)
             
             entries.append(entry)
             current_time = float(entry.departure_time)
