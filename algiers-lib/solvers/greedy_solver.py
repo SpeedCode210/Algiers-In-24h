@@ -10,9 +10,13 @@ class GreedySolver:
     def _priority(self, candidate: Landmark, curr: Landmark):
         travel= self.problem.travel_time(curr, candidate)
         if self.use_ratio:
-            return candidate.interest_score / travel
+            if travel > 0:
+                return candidate.interest_score / travel
+            #impossible case if the data is consistent
+            else:
+                return float('inf')
         
-        #maximize interest score, if equality minimize travel
+        #maximize interest score, if equality minimize travel time
         return (candidate.interest_score, -travel)
 
     def solve(self) -> Tour:
