@@ -1,10 +1,13 @@
-from models.landmark import Landmark
-from models.problem import Problem 
-from models.tour import Tour
 
-class GreedySolver:
+from models.landmark import Landmark
+from models.problem import Problem
+from models.tour import Tour
+from .solver import Solver
+
+
+class GreedySolver(Solver):
     def __init__(self, problem: Problem, use_ratio: bool = False) -> None:
-        self.problem = problem
+        super().__init__(problem)
         self.use_ratio = use_ratio
 
     def _priority(self, candidate: Landmark, curr: Landmark):
