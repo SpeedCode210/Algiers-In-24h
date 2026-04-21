@@ -76,7 +76,7 @@ class SimulatedAnnealingSolver(Solver):
             return 0.0 
         
         if self.acceptance_criterion == AcceptanceFunction.BOLTZMANN:
-            return min(1, pow(math.e, delta / temperature))
+            return min(1, math.exp(delta / temperature))
         elif self.acceptance_criterion == AcceptanceFunction.CAUCHY:
             return min(1, 1 / (1 + delta**2 / temperature))
         else:
