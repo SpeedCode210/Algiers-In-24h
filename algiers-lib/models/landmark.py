@@ -112,7 +112,7 @@ def loadLandmarks(filepath: str = "../data/data.csv") -> list[Landmark]:
             longitude=float(first["longitude"]),
             interest_score=float(first["interest_score"]),
             visit_duration=int(first["visit_duration_minutes"]),
-            schedule=WeeklySchedule(slots=slots),
+            schedule=WeeklySchedule(schedule=slots),
             category=str(first["category"]),
         )
         landmarks.append(landmark)
@@ -126,7 +126,7 @@ def loadHotel(hotel_path: str = "../data/hotel.csv") -> Landmark:
 
     full_day_slot = TimeSlot(open_time=0, close_time=1439)
     slots = {day: [full_day_slot] for day in Day}
-    schedule = WeeklySchedule(slots=slots)
+    schedule = WeeklySchedule(schedule=slots)
 
     return Landmark(
         id=str(row["id"]).strip(),
