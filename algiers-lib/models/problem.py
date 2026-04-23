@@ -9,8 +9,22 @@ if TYPE_CHECKING:
     from models.tour import Tour 
 
 class Problem:
+    """Represents the Orienteering Problem instance with landmarks, hotel, and constraints.
+
+    This class encapsulates the problem data including travel times, time budget, and tour day.
+    It provides methods to query feasible landmarks and create tours.
+    """
 
     def __init__(self, hotel: Landmark, landmarks: list[Landmark], time_budget: int, tour_day: Day, start_time: int = 540,) -> None:
+        """Initialize the Problem instance.
+
+        Args:
+            hotel (Landmark): The starting and ending point of tours.
+            landmarks (list[Landmark]): List of available landmarks to visit.
+            time_budget (int): Maximum allowed time for the tour in minutes.
+            tour_day (Day): The day of the week for the tour.
+            start_time (int): Start time in minutes from midnight. Defaults to 540 (9 AM).
+        """
 
         self.hotel: Landmark = hotel
         self.landmarks: list[Landmark] = landmarks
@@ -23,6 +37,7 @@ class Problem:
 
 
     def _precompute_travel_matrix(self) -> None:
+        """Precompute travel times between all pairs of locations for efficiency."""
 
         all_locations: list[Landmark] = [self.hotel] + self.landmarks
         for origin in all_locations:
@@ -34,6 +49,15 @@ class Problem:
 
 
     def travel_time(self, origin: Landmark, destination: Landmark) -> float:
+        """Get the precomputed travel time between two landmarks.
+
+        Args:
+            origin (Landmark): Starting landmark.
+            destination (Landmark): Destination landmark.
+
+        Returns:
+            float: Travel time in minutes.
+        """
 
         if origin.id == destination.id:
             return 0.0
@@ -41,6 +65,11 @@ class Problem:
     
 
     def create_empty_tour(self) -> Tour:
+        """Create an empty tour for this problem.
+
+        Returns:
+            Tour: A new empty Tour instance.
+        """
 
         from models.tour import Tour
         return Tour(problem=self)
