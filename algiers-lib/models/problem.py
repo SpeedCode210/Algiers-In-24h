@@ -90,12 +90,28 @@ class Problem:
 
 
     def unvisited_landmarks(self, tour: Tour) -> list[Landmark]:
+        """Get landmarks not yet visited in the given tour.
+
+        Args:
+            tour (Tour): The current tour.
+
+        Returns:
+            list[Landmark]: List of unvisited landmarks.
+        """
 
         visited_ids = {lm.id for lm in tour.visited_landmarks}
         return [lm for lm in self.landmarks if lm.id not in visited_ids]
     
     
     def feasible_candidates(self, tour: Tour) -> list[Landmark]:
+        """Get landmarks that are unvisited and open on the tour day.
+
+        Args:
+            tour (Tour): The current tour.
+
+        Returns:
+            list[Landmark]: List of feasible candidate landmarks.
+        """
 
         return [lm for lm in self.unvisited_landmarks(tour) if lm.schedule.is_open_on(self.tour_day)]
     
@@ -113,6 +129,18 @@ class Problem:
 
     @classmethod
     def LoadProblem(cls, landmarks_path: str, hotel_path: str, time_budget: int, tour_day: Day, start_time: int = 540,) -> "Problem":
+        """Load a Problem instance from CSV files.
+
+        Args:
+            landmarks_path (str): Path to the landmarks CSV file.
+            hotel_path (str): Path to the hotel CSV file.
+            time_budget (int): Time budget in minutes.
+            tour_day (Day): Day of the tour.
+            start_time (int): Start time in minutes. Defaults to 540.
+
+        Returns:
+            Problem: The loaded Problem instance.
+        """
 
         hotel = loadHotel(hotel_path)
         landmarks = loadLandmarks(landmarks_path)
