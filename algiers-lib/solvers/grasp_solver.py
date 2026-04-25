@@ -6,7 +6,7 @@ from typing import Optional
 from models.landmark import Landmark
 from models.problem import Problem
 from models.tour import Tour
-from solvers.solver import Solver
+from .solver import Solver
 
 
 class GraspSolver(Solver):
