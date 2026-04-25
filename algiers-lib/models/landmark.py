@@ -3,6 +3,8 @@ from enum import IntEnum
 from typing import Optional
 
 class Day(IntEnum):
+    """Enumeration for days of the week, starting from Sunday as 0."""
+
     SUNDAY = 0
     MONDAY = 1
     TUESDAY = 2
@@ -13,6 +15,17 @@ class Day(IntEnum):
 
     @classmethod
     def from_string(cls, day_str: str) -> "Day":
+        """Convert a string representation of a day to the Day enum.
+
+        Args:
+            day_str (str): The day name (case-insensitive).
+
+        Returns:
+            Day: The corresponding Day enum value.
+
+        Raises:
+            ValueError: If the day_str is not a valid day name.
+        """
         try:
             return cls[day_str.strip().upper()]
         except KeyError:
@@ -24,6 +37,12 @@ class Day(IntEnum):
 
 @dataclass(frozen=True)
 class TimeSlot:
+    """Represents a time slot with opening and closing times in minutes since midnight.
+
+    Attributes:
+        open_time (int): Opening time in minutes.
+        close_time (int): Closing time in minutes.
+    """
 
     open_time: int
     close_time: int
@@ -35,21 +54,61 @@ class TimeSlot:
                 f"close_time ({self.close_time}).")
 
     def contains(self, arrival: int, duration: int) -> bool:
+        """Check if a visit starting at arrival time with given duration fits within the slot.
+
+        Args:
+            arrival (int): Arrival time in minutes.
+            duration (int): Visit duration in minutes.
+
+        Returns:
+            bool: True if the visit fits, False otherwise.
+        """
         return self.open_time <= arrival and (arrival + duration) <= self.close_time
 
 
 @dataclass
 class WeeklySchedule:
+    """Represents the weekly schedule of time slots for each day.
+
+    Attributes:
+        schedule (dict[Day, list[TimeSlot]]): Mapping of days to lists of time slots.
+    """
 
     schedule: dict[Day, list[TimeSlot]] = field(default_factory=dict)
 
     def is_open_on(self, day: Day) -> bool:
+        """Check if the schedule has any slots on the given day.
+
+        Args:
+            day (Day): The day to check.
+
+        Returns:
+            bool: True if there are slots on that day.
+        """
         return bool(self.schedule.get(day))
 
     def get_slots(self, day: Day) -> list[TimeSlot]:
+        """Get the list of time slots for the given day.
+
+        Args:
+            day (Day): The day to get slots for.
+
+        Returns:
+            list[TimeSlot]: List of slots, empty if none.
+        """
         return self.schedule.get(day, [])
 
     def earliest_valid_start(self, day: Day, arrival: int, duration: int) -> Optional[int]:
+        """Find the earliest valid start time for a visit on the given day.
+
+        Args:
+            day (Day): The day of the visit.
+            arrival (int): Arrival time in minutes.
+            duration (int): Visit duration in minutes.
+
+        Returns:
+            Optional[int]: The start time if possible, None otherwise.
+        """
         for slot in self.get_slots(day):
             start = max(arrival, slot.open_time)
             if slot.contains(start, duration):
@@ -59,6 +118,19 @@ class WeeklySchedule:
 
 @dataclass(frozen=True)
 class Landmark:
+    """Represents a landmark with location, interest, and schedule information.
+
+    Attributes:
+        id (str): Unique identifier.
+        name (str): Name of the landmark.
+        latitude (float): Latitude coordinate.
+        longitude (float): Longitude coordinate.
+        interest_score (float): Interest score.
+        visit_duration (int): Estimated Visit duration in minutes.
+        schedule (WeeklySchedule): Weekly schedule.
+        category (str): Category of the landmark.
+    """
+
     id: str
     name: str
     latitude: float
@@ -70,9 +142,15 @@ class Landmark:
 
     @property
     def coordinates(self) -> tuple[float, float]:
+        """Get the coordinates as a tuple (latitude, longitude).
+
+        Returns:
+            tuple[float, float]: The coordinates.
+        """
         return (self.latitude, self.longitude)
     
     def __str__(self) -> str: #helps for printing
+        """Return a string representation of the landmark."""
         return (
             f"{self.name} "
             f"[{self.category}] "
@@ -86,6 +164,14 @@ from utils.time import time_in_minutes
 
 
 def loadLandmarks(filepath: str = "../data/data.csv") -> list[Landmark]:
+    """Load landmarks from a CSV file.
+
+    Args:
+        filepath (str): Path to the CSV file. Defaults to "../data/data.csv".
+
+    Returns:
+        list[Landmark]: List of loaded landmarks.
+    """
 
     df = pd.read_csv(filepath)
 
@@ -121,6 +207,14 @@ def loadLandmarks(filepath: str = "../data/data.csv") -> list[Landmark]:
 
 
 def loadHotel(hotel_path: str = "../data/hotel.csv") -> Landmark:
+    """Load the hotel landmark from a CSV file.
+
+    Args:
+        hotel_path (str): Path to the hotel CSV file. Defaults to "../data/hotel.csv".
+
+    Returns:
+        Landmark: The hotel landmark.
+    """
     df = pd.read_csv(hotel_path)
     row = df.iloc[0]
 
