@@ -53,8 +53,7 @@ class Tour:
             travel_time = self.problem.travel_time(current_position, landmark)
             arrival_time = current_time + travel_time
             visit_start_time = landmark.schedule.earliest_valid_start(
-                self.problem.tour_day, math.ceil(arrival_time) , landmark.visit_duration)
-
+                self.problem.tour_day, arrival_time , landmark.visit_duration)
             if visit_start_time is None:
 
                 return_travel = self.problem.travel_time(current_position, self.problem.hotel)

@@ -1,35 +1,35 @@
-id,name,latitude,longitude,interest_score,visit_duration_minutes,day,open_time,close_time,
 id,name,latitude,longitude,interest_score,visit_duration_minutes,day,open_time,close_time,category
-1,Jardin d'Essai du Hamma,36.7484,3.0758,10,120,1,540,1140,Park
-2,Great Mosque of Algiers,36.735,3.1402,10,60,1,0,1439,Religious
-3,Casbah of Algiers,36.7845,3.0589,10,120,1,0,1439,Historic
-4,Maqam Echahid,36.746,3.0695,9,60,1,0,1439,Landmark
-5,Notre Dame d'Afrique,36.801,3.0426,9,60,1,660,1050,Religious
-6,Palais des Rais,36.7885,3.0635,8,90,1,540,1020,Museum
-7,National Museum of Fine Arts,36.746,3.0722,8,120,1,600,1080,Museum
-8,Promenade des Sablettes,36.7495,3.0903,7,60,1,0,1439,Park
-9,Ketchaoua Mosque,36.7851,3.0607,8,45,1,0,1439,Religious
-10,La Grande Poste d'Alger,36.7731,3.0594,9,30,1,480,1080,Landmark
-11,Museum of Antiquities,36.7611,3.0475,7,90,1,540,1020,Museum
-12,Dar Mustapha Pacha,36.7856,3.0608,7,60,1,540,960,Historic
-13,Villa Abd-el-Latif,36.7448,3.0728,6,60,1,540,960,Historic
-14,Jamaa el-Kebir,36.7852,3.0641,8,45,1,210,1380,Religious
-15,Musée de l'Armée,36.7457,3.0693,7,90,1,600,1200,Museum
-16,Dar Aziza,36.785,3.0614,7,60,1,510,1020,Historic
-17,Bardo National Museum,36.7607,3.0471,8,90,1,540,1020,Museum
-18,Jamaa el-Jdid,36.7849,3.0632,7,30,1,0,1439,Religious
-19,Parc des Grands Vents,36.7516,2.9127,6,60,1,0,1439,Park
-20,Théâtre National Algérien,36.7812,3.0603,7,90,1,540,1200,Culture
-21,Port de Sidi Fredj,36.7649,2.848,7,60,1,0,1439,Leisure
-22,National Library,36.7483,3.0692,6,60,1,480,1200,Culture
-23,Marina Mall,36.7398,3.1406,7,120,1,540,1320,Shopping
-24,Martyrs' Square,36.7845,3.0624,6,30,1,0,1439,Square
-25,Audin Square,36.7701,3.0553,6,30,1,0,1439,Square
-26,Emir Abdelkader Square,36.7761,3.0581,6,30,1,0,1439,Square
-27,Garden City Mall,36.7505,2.9491,7,120,1,600,1439,Shopping
-28,Bab Ezzouar Mall,36.7119,3.1946,7,120,1,540,1380,Shopping
-29,Laser Strike,36.7527,2.9467,5,60,1,660,1320,Entertainment
-30,Prison Island Alger,36.7391,2.9149,6,90,1,780,1320,Entertainment
-31,Algiers Opera House,36.7369,2.8953,8,120,1,540,960,Culture
-32,Riyadh Al-Fath,36.7426,3.0648,7,90,1,540,960,Shopping
-33,Sacred Heart Cathedral,36.7643,3.0474,8,60,1,870,1050,Religious
+id,Jardin d'Essai du Hamma,36.7484,3.0758,10,120,MONDAY,09:00,19:00,Park
+1,Great Mosque of Algiers,36.735,3.1402,10,60,MONDAY,00:00,23:59,Religious
+2,Casbah of Algiers,36.7845,3.0589,10,120,MONDAY,00:00,23:59,Historic
+3,Maqam Echahid,36.746,3.0695,9,60,MONDAY,00:00,23:59,Landmark
+4,Notre Dame d'Afrique,36.801,3.0426,9,60,MONDAY,11:00,17:30,Religious
+5,Palais des Rais,36.7885,3.0635,8,90,MONDAY,09:00,17:00,Museum
+6,National Museum of Fine Arts,36.746,3.0722,8,120,MONDAY,10:00,18:00,Museum
+7,Promenade des Sablettes,36.7495,3.0903,7,60,MONDAY,00:00,23:59,Park
+8,Ketchaoua Mosque,36.7851,3.0607,8,45,MONDAY,00:00,23:59,Religious
+9,La Grande Poste d'Alger,36.7731,3.0594,9,30,MONDAY,08:00,18:00,Landmark
+10,Museum of Antiquities,36.7611,3.0475,7,90,MONDAY,09:00,17:00,Museum
+11,Dar Mustapha Pacha,36.7856,3.0608,7,60,MONDAY,09:00,16:00,Historic
+12,Villa Abd-el-Latif,36.7448,3.0728,6,60,MONDAY,09:00,16:00,Historic
+13,Jamaa el-Kebir,36.7852,3.0641,8,45,MONDAY,03:30,23:00,Religious
+14,Musée de l'Armée,36.7457,3.0693,7,90,MONDAY,10:00,20:00,Museum
+15,Dar Aziza,36.785,3.0614,7,60,MONDAY,08:30,17:00,Historic
+16,Bardo National Museum,36.7607,3.0471,8,90,MONDAY,09:00,17:00,Museum
+17,Jamaa el-Jdid,36.7849,3.0632,7,30,MONDAY,00:00,23:59,Religious
+18,Parc des Grands Vents,36.7516,2.9127,6,60,MONDAY,00:00,23:59,Park
+19,Théâtre National Algérien,36.7812,3.0603,7,90,MONDAY,09:00,20:00,Culture
+20,Port de Sidi Fredj,36.7649,2.848,7,60,MONDAY,00:00,23:59,Leisure
+21,National Library,36.7483,3.0692,6,60,MONDAY,08:00,20:00,Culture
+22,Marina Mall,36.7398,3.1406,7,120,MONDAY,09:00,22:00,Shopping
+23,Martyrs' Square,36.7845,3.0624,6,30,MONDAY,00:00,23:59,Square
+24,Audin Square,36.7701,3.0553,6,30,MONDAY,00:00,23:59,Square
+25,Emir Abdelkader Square,36.7761,3.0581,6,30,MONDAY,00:00,23:59,Square
+26,Garden City Mall,36.7505,2.9491,7,120,MONDAY,10:00,23:59,Shopping
+27,Bab Ezzouar Mall,36.7119,3.1946,7,120,MONDAY,09:00,23:00,Shopping
+28,Laser Strike,36.7527,2.9467,5,60,MONDAY,11:00,22:00,Entertainment
+29,Prison Island Alger,36.7391,2.9149,6,90,MONDAY,13:00,22:00,Entertainment
+30,Algiers Opera House,36.7369,2.8953,8,120,MONDAY,09:00,16:00,Culture
+31,Riyadh Al-Fath,36.7426,3.0648,7,90,MONDAY,09:00,16:00,Shopping
+32,Sacred Heart Cathedral,36.7643,3.0474,8,60,MONDAY,14:30,17:30,Religious
+,,,3.0474,8,60,MONDAY,12:30,18:30,Religious

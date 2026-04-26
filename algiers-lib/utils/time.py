@@ -10,6 +10,7 @@ def time_in_minutes(time_str: str) -> int:
 
 def time_in_string(minutes: int) -> str:
     try:
+        print(minutes)
         if minutes < 0:
             raise ValueError("Minutes cannot be negative")
         if minutes >= 24 * 60:

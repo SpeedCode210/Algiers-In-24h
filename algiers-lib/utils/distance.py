@@ -10,7 +10,6 @@ def distance(point1: Tuple[float, float], point2: Tuple[float, float]) -> float:
     dlon = lon2 - lon1
     a = math.sin(dlat/2)**2 + math.cos(lat1)*math.cos(lat2)*math.sin(dlon/2)**2
     return R * 2 * math.asin(math.sqrt(a))
-
 AVG_SPEED = 25.0 #approxmation
 
 def travel_time_minutes(point1: Tuple[float, float], point2: Tuple[float, float]) -> float:
