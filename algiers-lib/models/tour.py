@@ -65,6 +65,11 @@ class Tour:
         self.problem =  problem
         self.visited_landmarks = visited_landmarks if visited_landmarks is not None else []
         self._cache: Optional[SimulationResult] = None #for caching the last simulation result
+
+    @property
+    def slack(self) -> float:
+        simulation = self.simulation_cache()
+        return self.problem.time_budget - simulation.total_duration
     
     def simulate(self) -> SimulationResult:
         """Simulate the tour schedule, checking validity and computing timings.

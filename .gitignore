@@ -27,8 +27,9 @@ report/*.pdf
 
 # Local test artifacts and benchmark outputs (ignore user-created test scripts)
 # Ignore the ad-hoc Tabu benchmark script and any ad-hoc solver tests
-algiers-lib/solvers/test_tabuSolver.py
-algiers-lib/solvers/test_*.py
+algiers-lib/solvers/test_sa_vs_tabu.py
+algiers-lib/solvers/diagnose_*.py
+
 
 # Benchmark results / history produced by running the benchmark
 algiers-lib/solvers/benchmarks/
