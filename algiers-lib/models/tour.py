@@ -1,7 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass , field 
 from typing import Optional
-import math 
 
 from models.landmark import Landmark
 from utils.time import time_in_string
@@ -16,14 +15,14 @@ class ScheduleEntry:
     Attributes:
         landmark (Landmark): The landmark being visited.
         arrival_time (float): The time of arrival at the landmark.
-        visit_start_time (int): The time when the visit starts.
-        departure_time (int): The time when the visit ends (computed).
+        visit_start_time (float): The time when the visit starts.
+        departure_time (float): The time when the visit ends (computed).
     """
 
     landmark: Landmark
     arrival_time: float
-    visit_start_time: int 
-    departure_time: int = field(init = False)
+    visit_start_time: float 
+    departure_time: float = field(init = False)
 
     def __post_init__(self) -> None:
         self.departure_time = self.visit_start_time + self.landmark.visit_duration
