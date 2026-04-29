@@ -75,44 +75,31 @@ class GraspSolver(Solver):
     # Phase 1 — Randomized greedy construction
     # ------------------------------------------------------------------
 
-    def _construction_phase(self) -> Tour:
-        """Builds a feasible tour using randomized greedy insertion.
+def _construction_phase(self) -> Tour:
+    tour = self.problem.create_empty_tour()
+    permanently_rejected: set[str] = set()
 
-        At each step, scores all feasible unvisited landmarks using the
-        interest-score-to-time-cost ratio, builds a Restricted Candidate
-        List (RCL) from the top-scoring ones, and picks randomly from it.
-        This produces a different route on each call, giving GRASP its
-        diversity across iterations.
+    while True:
+        candidates = [
+            lm for lm in self.problem.feasible_candidates(tour)
+            if lm.id not in permanently_rejected
+        ]
+        if not candidates:
+            break
 
-        Returns:
-            A feasible Tour (may be empty if no landmark fits at all).
-        """
-        tour = self.problem.create_empty_tour()
+        scored = self._score_candidates(candidates, tour)
+        if not scored:
+            break
 
-        while True:
-            candidates = self.problem.feasible_candidates(tour)
-            if not candidates:
-                break
+        rcl = self._build_rcl(scored)
+        chosen = random.choice(rcl)
 
-            # Score every candidate by value-per-minute-cost
-            scored = self._score_candidates(candidates, tour)
-            if not scored:
-                break
+        tour.add_landmark(chosen)
+        if not tour.is_valid():
+            tour.remove_landmark(chosen)
+            permanently_rejected.add(chosen.id)
 
-            # Build the RCL and pick one randomly
-            rcl = self._build_rcl(scored)
-            chosen = random.choice(rcl)
-
-            # Add and immediately verify — undo if it breaks the tour
-            tour.add_landmark(chosen)
-            if not tour.is_valid():
-                tour.remove_landmark(chosen)
-                # Remove from future consideration this iteration
-                candidates = [c for c in candidates if c.id != chosen.id]
-                if not candidates:
-                    break
-
-        return tour
+    return tour
 
     def _score_candidates(
         self,
@@ -229,46 +216,46 @@ class GraspSolver(Solver):
 
         return tour
 
-    def _try_swap(self, tour: Tour) -> bool:
-        """Tries all pairwise swaps and applies the best improving one.
+def _try_swap(self, tour: Tour) -> bool:
+    """Tries all pairwise swaps to improve time-window alignment.
 
-        A swap changes the visiting order of two landmarks already in
-        the tour. It cannot change which landmarks are visited — only
-        the sequence.
+    A swap doesn't change the score directly but can reorder the route
+    to better satisfy time windows, potentially enabling subsequent
+    insertions. Accepts any swap that keeps the tour valid and maximises
+    remaining time budget (enabling future inserts).
 
-        Args:
-            tour: The tour to improve in-place.
+    Args:
+        tour: The tour to improve in-place.
 
-        Returns:
-            True if an improving swap was found and applied.
-        """
-        n = len(tour)
-        if n < 2:
-            return False
-
-        best_gain = 0.0
-        best_i: Optional[int] = None
-        best_j: Optional[int] = None
-
-        for i in range(n):
-            for j in range(i + 1, n):
-                candidate = tour.copy()
-                candidate.swap_by_index(i, j)
-
-                if not candidate.is_valid():
-                    continue
-
-                gain = candidate.total_score() - tour.total_score()
-                if gain > best_gain:
-                    best_gain = gain
-                    best_i = i
-                    best_j = j
-
-        if best_i is not None:
-            tour.swap_by_index(best_i, best_j)  # type: ignore[arg-type]
-            return True
-
+    Returns:
+        True if a beneficial swap was found and applied.
+    """
+    n = len(tour)
+    if n < 2:
         return False
+
+    best_remaining = tour.simulation_cache().total_duration
+    best_i: Optional[int] = None
+    best_j: Optional[int] = None
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            candidate = tour.copy()
+            candidate.swap_by_index(i, j)
+            if not candidate.is_valid():
+                continue
+            # Prefer the ordering that leaves the most time budget free
+            remaining = candidate.simulation_cache().total_duration
+            if remaining < best_remaining:
+                best_remaining = remaining
+                best_i = i
+                best_j = j
+
+    if best_i is not None:
+        tour.swap_by_index(best_i, best_j)  # type: ignore[arg-type]
+        return True
+
+    return False
 
     def _try_replace(self, tour: Tour) -> bool:
         """Tries replacing each visited landmark with each unvisited one.
