@@ -75,31 +75,31 @@ class GraspSolver(Solver):
     # Phase 1 — Randomized greedy construction
     # ------------------------------------------------------------------
 
-def _construction_phase(self) -> Tour:
-    tour = self.problem.create_empty_tour()
-    permanently_rejected: set[str] = set()
+    def _construction_phase(self) -> Tour:
+        tour = self.problem.create_empty_tour()
+        permanently_rejected: set[str] = set()
 
-    while True:
-        candidates = [
-            lm for lm in self.problem.feasible_candidates(tour)
-            if lm.id not in permanently_rejected
-        ]
-        if not candidates:
-            break
+        while True:
+            candidates = [
+                lm for lm in self.problem.feasible_candidates(tour)
+                if lm.id not in permanently_rejected
+            ]
+            if not candidates:
+                break
 
-        scored = self._score_candidates(candidates, tour)
-        if not scored:
-            break
+            scored = self._score_candidates(candidates, tour)
+            if not scored:
+                break
 
-        rcl = self._build_rcl(scored)
-        chosen = random.choice(rcl)
+            rcl = self._build_rcl(scored)
+            chosen = random.choice(rcl)
 
-        tour.add_landmark(chosen)
-        if not tour.is_valid():
-            tour.remove_landmark(chosen)
-            permanently_rejected.add(chosen.id)
+            tour.add_landmark(chosen)
+            if not tour.is_valid():
+                tour.remove_landmark(chosen)
+                permanently_rejected.add(chosen.id)
 
-    return tour
+        return tour
 
     def _score_candidates(
         self,
@@ -216,46 +216,46 @@ def _construction_phase(self) -> Tour:
 
         return tour
 
-def _try_swap(self, tour: Tour) -> bool:
-    """Tries all pairwise swaps to improve time-window alignment.
+    def _try_swap(self, tour: Tour) -> bool:
+        """Tries all pairwise swaps to improve time-window alignment.
 
-    A swap doesn't change the score directly but can reorder the route
-    to better satisfy time windows, potentially enabling subsequent
-    insertions. Accepts any swap that keeps the tour valid and maximises
-    remaining time budget (enabling future inserts).
+        A swap doesn't change the score directly but can reorder the route
+        to better satisfy time windows, potentially enabling subsequent
+        insertions. Accepts any swap that keeps the tour valid and maximises
+        remaining time budget (enabling future inserts).
 
-    Args:
-        tour: The tour to improve in-place.
+        Args:
+            tour: The tour to improve in-place.
 
-    Returns:
-        True if a beneficial swap was found and applied.
-    """
-    n = len(tour)
-    if n < 2:
+        Returns:
+            True if a beneficial swap was found and applied.
+        """
+        n = len(tour)
+        if n < 2:
+            return False
+
+        best_remaining = tour.simulation_cache().total_duration
+        best_i: Optional[int] = None
+        best_j: Optional[int] = None
+
+        for i in range(n):
+            for j in range(i + 1, n):
+                candidate = tour.copy()
+                candidate.swap_by_index(i, j)
+                if not candidate.is_valid():
+                    continue
+                # Prefer the ordering that leaves the most time budget free
+                remaining = candidate.simulation_cache().total_duration
+                if remaining < best_remaining:
+                    best_remaining = remaining
+                    best_i = i
+                    best_j = j
+
+        if best_i is not None:
+            tour.swap_by_index(best_i, best_j)  # type: ignore[arg-type]
+            return True
+
         return False
-
-    best_remaining = tour.simulation_cache().total_duration
-    best_i: Optional[int] = None
-    best_j: Optional[int] = None
-
-    for i in range(n):
-        for j in range(i + 1, n):
-            candidate = tour.copy()
-            candidate.swap_by_index(i, j)
-            if not candidate.is_valid():
-                continue
-            # Prefer the ordering that leaves the most time budget free
-            remaining = candidate.simulation_cache().total_duration
-            if remaining < best_remaining:
-                best_remaining = remaining
-                best_i = i
-                best_j = j
-
-    if best_i is not None:
-        tour.swap_by_index(best_i, best_j)  # type: ignore[arg-type]
-        return True
-
-    return False
 
     def _try_replace(self, tour: Tour) -> bool:
         """Tries replacing each visited landmark with each unvisited one.
