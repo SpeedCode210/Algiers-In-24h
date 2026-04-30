@@ -94,7 +94,6 @@ class CPLEXSolver(Solver):
 
         nodes: list[Landmark] = [self.problem.hotel] + candidates  # index 0 = hotel
         N = len(nodes)
-        n = N - 1  # number of candidate landmarks
 
         # Pre-fetch slots for each landmark node (index 1..N-1)
         day_slots: dict[int, list] = {
