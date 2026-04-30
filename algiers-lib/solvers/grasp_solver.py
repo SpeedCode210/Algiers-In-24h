@@ -372,6 +372,7 @@ class GraspSolver(Solver):
                     best_position = position
 
         if best_landmark is not None:
+            assert best_position is not None
             tour.add_landmark(best_landmark, best_position)
             return True
 
