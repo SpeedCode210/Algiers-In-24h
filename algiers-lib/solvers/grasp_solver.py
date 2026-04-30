@@ -201,17 +201,13 @@ class GraspSolver(Solver):
 
         while improved:
             improved = False
-
-            # Try each operator in sequence; restart the loop if any improves
-            if self._try_swap(tour):
-                improved = True
-                continue
-
             if self._try_replace(tour):
                 improved = True
                 continue
-
             if self._try_insert(tour):
+                improved = True
+                continue
+            if self._try_swap(tour):  
                 improved = True
 
         return tour
@@ -234,7 +230,7 @@ class GraspSolver(Solver):
         if n < 2:
             return False
 
-        best_remaining = tour.simulation_cache().total_duration
+        best_remaining = float('inf')
         best_i: Optional[int] = None
         best_j: Optional[int] = None
 
