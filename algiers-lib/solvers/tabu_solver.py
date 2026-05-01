@@ -27,6 +27,44 @@ class OscillationPhase(Enum):
  
 
 class TabuSolver(Solver):
+    """
+    Strategy Overview:
+    ------------------
+    The solver employs a 'Strategic Oscillation' strategy combined with memory-based
+    neighborhood search to escape local optima and navigate complex temporal constraints.
+
+    Key Mechanisms:
+    1. Neighborhood Search (Intensification):
+       Explores local changes through four move types: SWAP, INSERT, REMOVE, and REPLACE.
+       To maintain efficiency, it uses 'Successive Filtering'—ranking landmarks by 
+       'weakness' (induced travel cost vs. interest score) and 'fitness' to prune 
+       the search space to only the most promising candidates.
+
+    2. Tabu Memory & Aspiration:
+       Prevents cycling by tracking recent moves in a 'Tabu List' for a duration 
+       defined by `tabu_tenure`. It includes an 'Aspiration Criterion' that allows 
+       a Tabu move if it results in a new global best score.
+
+    3. Strategic Oscillation (Diversification):
+       The solver oscillates between three distinct phases based on search progress:
+       - INTENSIFICATION: Standard search within strict time budget constraints.
+       - EXPANSION: Triggered by plateaus. The time budget is relaxed by `oscillation_slack`,
+         allowing the search to pass through infeasible regions to reach distant 
+         optimal clusters.
+       - RECOVERY: A cleaning phase that aggressively removes the weakest landmarks
+         to bring an expanded tour back into feasibility under the hard budget.
+
+    4. Adaptive Plateau Management:
+       Monitors `iterations_since_improvement`. If the search flatlines beyond 
+       `plateau_threshold`, it forces a shift from exploitation to exploration.
+
+    Attributes:
+        problem (Problem): The orienteering problem instance to solve.
+        max_iterations (int): Maximum search depth.
+        tabu_tenure (int): The number of iterations a move remains forbidden.
+        n_remove/insert_candidates (int): Beam-search width for candidate filtering.
+        oscillation_slack (float): The temporal 'buffer' allowed during Expansion.
+    """
 
     def __init__(self,
                   problem: Problem, 
