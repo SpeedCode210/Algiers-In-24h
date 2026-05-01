@@ -81,7 +81,7 @@ Same applies to `services/__init__.py` and `schemas/__init__.py` — all three a
 2. Passes to `solver_service.run_all_solvers()`
 3. Returns the ranked comparison of every algorithm
 
-**What it does NOT do:** No algorithm logic. No OSRM calls. No score calculations. It purely handles HTTP — reading the request and writing the response. All real work happens in `services/`.
+**What it does NOT do:** No algorithm logic. No map calls. No score calculations. It purely handles HTTP — reading the request and writing the response. All real work happens in `services/`.
 
 **Why keep routes dumb?** Because if you put logic in routes, when you need to change how algorithms run, you have to hunt through HTTP-handling code to find it. Keeping routes as thin wrappers makes the codebase navigable.
 
@@ -123,25 +123,20 @@ The solver then runs on this modified problem. Because the solver maximizes tota
 
 ## `services/routing_service.py`
 
-**What it is:** The file that talks to OSRM to get real road routes and distances.
+**What it is:** The file that talks to map to get real road routes and distances.
 
 **What it does:** Two things.
 
 **Function 1 — `get_route_geometry()`:**
-After the solver produces a tour, this function takes the ordered list of stops, sends them to the OSRM public API, and gets back the full road geometry — hundreds of GPS coordinates that trace the exact path along real streets in Algiers. This is what the frontend draws on the map. Not straight lines — actual roads.
+After the solver produces a tour, this function takes the ordered list of stops, sends them to the map public API, and gets back the full road geometry — hundreds of GPS coordinates that trace the exact path along real streets in Algiers. This is what the frontend draws on the map. Not straight lines — actual roads.
 
-The OSRM call looks like:
-```
-GET router.project-osrm.org/route/v1/driving/3.056,36.769;3.059,36.787;3.041,36.753;3.056,36.769
-    ?overview=full&geometries=geojson
-```
 
-OSRM returns a GeoJSON LineString — a list of coordinate pairs. Your backend puts this directly into the API response. The frontend passes it directly to Leaflet. Done.
+map returns a GeoJSON LineString — a list of coordinate pairs. Your backend puts this directly into the API response. The frontend passes it directly to Leaflet. Done.
 
 **Function 2 — `get_leg_distances()`:**
-Calls OSRM again (or reuses the same call with a small modification) to get the real road distance for each individual leg — hotel to stop 1, stop 1 to stop 2, etc. These are in kilometers and go into the itinerary panel shown to the user. These are real road distances, not the Haversine approximation used internally by the algorithms.
+Calls map again (or reuses the same call with a small modification) to get the real road distance for each individual leg — hotel to stop 1, stop 1 to stop 2, etc. These are in kilometers and go into the itinerary panel shown to the user. These are real road distances, not the Haversine approximation used internally by the algorithms.
 
-**What happens if OSRM is unreachable?** Both functions have a `try/except` block. If the OSRM server doesn't respond within 8 seconds (timeout), the functions return a straight-line fallback. The algorithm still ran correctly — you just lose the pretty road-following visualization and get straight lines instead. The demo doesn't crash.
+**What happens if map is unreachable?** Both functions have a `try/except` block. If the map server doesn't respond within 8 seconds (timeout), the functions return a straight-line fallback. The algorithm still ran correctly — you just lose the pretty road-following visualization and get straight lines instead. The demo doesn't crash.
 
 **Why is this in services and not in routes?** Because both `/api/solve` and `/api/solve/all` need road geometry. If it were in the route file, you'd duplicate the code. Putting it in a service means both routes call the same function.
 
@@ -174,7 +169,7 @@ Calls `run_solver()` for every algorithm in the registry in a loop. Collects all
 This is the most detailed function. It takes a Tour and converts it into everything the frontend needs:
 - Each stop with its arrival time, visit start, departure time, waiting time
 - Travel time and distance from the previous stop
-- The road geometry from OSRM
+- The road geometry from map
 - Total score, total duration, total distance
 - Execution time in milliseconds
 
@@ -220,8 +215,8 @@ To make everything concrete, here is what happens when a user clicks "Run GRASP"
 
 5. _format_result() inside solver_service.py:
    - Reads tour.simulation_cache() for schedule details
-   - Calls services/routing_service.get_route_geometry() → calls OSRM
-   - Calls services/routing_service.get_leg_distances() → calls OSRM
+   - Calls services/routing_service.get_route_geometry() → calls map
+   - Calls services/routing_service.get_leg_distances() → calls map
    - Builds the complete result dictionary
 
 6. routes/solve.py:
