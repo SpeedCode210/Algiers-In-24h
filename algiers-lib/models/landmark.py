@@ -57,8 +57,8 @@ class TimeSlot:
         """Check if a visit starting at arrival time with given duration fits within the slot.
 
         Args:
-            arrival (int): Arrival time in minutes.
-            duration (int): Visit duration in minutes.
+            arrival (float): Arrival time in minutes.
+            duration (float): Visit duration in minutes.
 
         Returns:
             bool: True if the visit fits, False otherwise.
