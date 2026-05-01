@@ -59,8 +59,6 @@ class GreedySolver(Solver):
             else:
                 cur = self.problem.hotel
             candidates = self.problem.feasible_candidates(tour)
-
-            invalid: set[str] = set()
             
             added = False
             while candidates:
@@ -70,8 +68,7 @@ class GreedySolver(Solver):
                     added = True
                     break
                 tour.remove_landmark(best)
-                invalid.add(best.id)
-                candidates = [c for c in candidates if c.id not in invalid]
+                candidates.remove(best)
                 
             if not added:
                 break
