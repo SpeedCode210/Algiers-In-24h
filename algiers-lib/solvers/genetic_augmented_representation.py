@@ -10,9 +10,22 @@ from models.tour import Tour
 
 class AugmentedRepresentation:
     """Augmented representation for genetic algorithm optimization of tour routes.
-
-    This class extends tour representations with timeline information that includes
-    flexibility calculations for genetic crossover operations.
+ 
+    Extends a tour representation with a timeline that includes flexibility
+    (max_shift) values for each landmark visit. These values are used by the
+    tailored crossover and mutation operators to determine valid cut points and
+    insertion positions without re-simulating the full tour.
+ 
+    Attributes:
+        landmarks: Ordered list of landmarks in the tour.
+        problem: The optimization problem instance.
+        timeline: List of tuples, one per landmark, each containing:
+            - arrival_time (float): Time the tourist arrives at the landmark.
+            - wait (float): Idle time before the visit window opens.
+            - start_time (float): Actual visit start time.
+            - departure_time (float): Time the tourist leaves the landmark.
+            - max_shift (float): Maximum delay that can be applied to start_time
+              while still respecting all downstream time windows and the budget.
     """
 
     def __init__(
@@ -21,10 +34,11 @@ class AugmentedRepresentation:
         problem: Optional[Problem] = None,
     ) -> None:
         """Initialize an augmented representation.
-
+ 
         Args:
-            landmarks: List of landmarks in the tour route.
-            problem: The optimization problem instance. Optional for basic operations.
+            landmarks: Ordered list of landmarks in the tour route.
+            problem: The optimization problem instance. Optional for basic
+                operations that do not require problem context.
         """
         self.landmarks = landmarks
         self.problem = problem
@@ -32,16 +46,20 @@ class AugmentedRepresentation:
 
     @classmethod
     def from_tour(cls, tour: Tour) -> "AugmentedRepresentation":
-        """Create an augmented representation from a tour with timeline calculations.
-
-        Computes the timeline with flexibility information for each landmark visit,
-        including maximum allowable shifts for genetic crossover operations.
-
+        """Create an augmented representation from a valid tour.
+ 
+        Runs the tour simulation to obtain the scheduled timeline, then performs
+        a backward pass to compute the max_shift for each landmark. The max_shift
+        at position i represents how much the visit start at i can be delayed
+        while guaranteeing that all subsequent visits and the return to the hotel
+        still fit within their time windows and the overall time budget.
+ 
         Args:
-            tour: The tour to convert to augmented representation.
-
+            tour: A valid tour to convert. Must have a non-empty simulation result.
+ 
         Returns:
-            Augmented representation with computed timeline.
+            AugmentedRepresentation with a fully computed timeline. If the tour
+            has no visited landmarks, the timeline will be empty.
         """
         simulation = tour.simulation_cache()
         landmarks = [entry.landmark for entry in simulation.entries]
@@ -92,19 +110,24 @@ class AugmentedRepresentation:
         visit_duration: float,
         next_limit: float,
     ) -> float:
-        """Compute the maximum allowable shift for a landmark visit.
-
-        Calculates how much a visit can be delayed while still respecting
-        time windows and subsequent constraints.
-
+        """Compute the maximum allowable shift for a single landmark visit.
+ 
+        Finds the tightest constraint between the landmark's own closing time
+        and the downstream propagated limit. The result is the largest delay
+        that can be applied to start_time without violating the slot's closing
+        time, capped by the downstream constraint next_limit.
+ 
         Args:
             day_slots: Available time slots for the landmark on the tour day.
-            start_time: Current planned start time of the visit.
-            visit_duration: Duration of the landmark visit.
-            next_limit: Maximum allowable delay from subsequent constraints.
-
+            start_time: Currently scheduled visit start time.
+            visit_duration: Duration of the landmark visit in minutes.
+            next_limit: Maximum allowable delay propagated from downstream
+                constraints (subsequent landmarks and time budget).
+ 
         Returns:
-            Maximum time shift allowed for this visit.
+            Maximum time shift in minutes that can be applied to start_time.
+            Returns next_limit if the closing slack of every valid slot exceeds
+            next_limit, meaning the downstream constraint is the binding one.
         """
         candidates = [
             float(slot.close_time - start_time - visit_duration)
