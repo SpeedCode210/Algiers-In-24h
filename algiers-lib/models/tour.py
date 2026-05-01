@@ -148,7 +148,8 @@ class Tour:
             float: The sum of interest scores of all visited landmarks.
         """
 
-        return sum(lm.interest_score for lm in self.visited_landmarks)
+        simulation = self.simulation_cache()
+        return sum(entry.landmark.interest_score for entry in simulation.entries)
     
     def add_landmark(self , landmark: Landmark, position: Optional[int] = None) -> None:
         """Add a landmark to the tour at the specified position.
