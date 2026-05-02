@@ -1,1 +1,21 @@
 id,name,latitude,longitude,interest_score,visit_duration_minutes,day,open_time,close_time,category
+1,Casbah of Algiers,36.7878,3.0600,95,90,Monday,08:00,18:00,Historical
+2,Notre-Dame d Afrique,36.8050,3.0412,88,45,Monday,09:00,17:00,Religious
+3,Martyrs Memorial,36.7539,3.0441,92,30,Monday,08:00,20:00,Monument
+4,Ketchaoua Mosque,36.7858,3.0590,85,40,Monday,09:00,17:00,Religious
+5,Great Mosque of Algiers,36.7797,3.0598,90,50,Monday,08:00,19:00,Religious
+6,Bardo National Museum,36.7603,3.0458,82,90,Monday,09:00,17:00,Museum
+7,National Museum of Fine Arts,36.7610,3.0541,78,75,Monday,10:00,17:00,Museum
+8,Riadh El Feth Complex,36.7538,3.0438,75,60,Monday,09:00,22:00,Cultural
+9,Palais des Rais,36.7838,3.0558,79,50,Monday,09:00,17:00,Historical
+10,Place des Martyrs,36.7846,3.0590,77,30,Monday,00:00,23:59,Landmark
+11,Algiers Waterfront,36.7756,3.0606,85,60,Monday,00:00,23:59,Nature
+12,Jardin d Essai du Hamma,36.7505,3.0695,80,60,Monday,08:00,18:00,Nature
+13,Sidi Abderrahmane Shrine,36.7862,3.0572,80,35,Monday,08:00,18:00,Religious
+14,Ahmed Zabana Museum,36.7614,3.0537,76,70,Monday,09:00,17:00,Museum
+15,African Union Monument,36.7535,3.0432,68,20,Monday,00:00,23:59,Monument
+16,Algiers Zoo,36.7500,3.0690,62,90,Monday,09:00,17:00,Nature
+17,Sacre Coeur Basilica,36.7600,3.0420,70,40,Monday,08:00,18:00,Historical
+18,Algiers Port Harbor,36.7790,3.0640,72,30,Monday,00:00,23:59,Landmark
+19,El Kettar Gardens,36.7720,3.0580,60,30,Monday,08:00,17:00,Historical
+20,Makam El Chahid,36.7536,3.0440,74,25,Monday,07:00,22:00,Monument
