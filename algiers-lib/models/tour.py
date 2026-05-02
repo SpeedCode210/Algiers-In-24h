@@ -282,7 +282,7 @@ class Tour:
 
         for entry in simulation.entries:
             wait_str = f" | wait: {time_in_string(round(entry.waiting_time))}" if entry.waiting_time > 0 else ""
-            tour_details.append(f" {entry.landmark.name} | arrival: {time_in_string(round(entry.arrival_time))}{wait_str} | start visit: {time_in_string(entry.visit_start_time)} | departure: {time_in_string(entry.departure_time)} ")
+            tour_details.append(f" {entry.landmark.name} | arrival: {time_in_string(round(entry.arrival_time))}{wait_str} | start visit: {time_in_string(round(entry.visit_start_time))} | departure: {time_in_string(round(entry.departure_time))} ") #we are rounding evrything
 
         tour_details.append(f"end: Hotel {self.problem.hotel.name}")
         tour_details.append(f"Valid: {simulation.is_valid} | Total duration: {simulation.total_duration:.1f} min | Score: {self.total_score()}")

@@ -11,6 +11,27 @@ from .genetic_fitness import FitnessFunction
 from .genetic_selection import Selection
 
 class GeneticSolver(Solver):  
+    """Standard genetic algorithm solver for the Orienteering Problem with Time Windows.
+ 
+    Uses order-based crossover on raw Tour objects and supports optional elitism
+    and culling strategies. The population is initialized with random tours and
+    evolved over a fixed number of generations, with early stopping when fitness
+    has not improved for 100 consecutive generations.
+ 
+    Attributes:
+        fitness_function: Fitness function used to evaluate and rank tours.
+        regenerations: Maximum number of generations to run.
+        population_size: Number of tours in the population at each generation.
+        mutation_rate: Probability of applying mutation to each child.
+        selection: Selection operator used to pick parents.
+        crossover: Crossover operator used to produce children.
+        mutation: Mutation operator applied to children.
+        elitism: Whether to carry the top-performing tours into the next generation.
+        culling: Whether to replace the lowest-performing tours with random ones
+            each generation.
+        elite_proportion: Fraction of the population preserved via elitism.
+        culling_proportion: Fraction of the population replaced via culling.
+    """
     def __init__(
         self,
         problem: Problem,
@@ -25,6 +46,31 @@ class GeneticSolver(Solver):
         elite_proportion: float = 0.1,
         culling_proportion: float = 0.1,
     ) -> None:
+        """Initialize the genetic solver.
+ 
+        Args:
+            problem: The OPTW problem instance to solve.
+            fitness_function: Fitness function for evaluating tours.
+            regenerations: Maximum number of generations. Defaults to 100.
+            population_size: Number of individuals per generation. Defaults to 20.
+            mutation_rate: Probability in [0, 1] of mutating each child.
+                Defaults to 0.1.
+            insertion_probability: Probability of insertion vs deletion in the
+                mutation operator. Defaults to 0.5.
+            crossover_method: Crossover strategy to pass to the Crossover operator.
+                Defaults to ``"order"``.
+            elitism: If True, the top ``elite_proportion`` of the population is
+                carried unchanged into the next generation. Defaults to False.
+            culling: If True, the bottom ``culling_proportion`` of the next
+                generation is replaced with fresh random tours. Defaults to False.
+            elite_proportion: Fraction of population size to preserve as elites.
+                Defaults to 0.1.
+            culling_proportion: Fraction of population size to cull each generation.
+                Defaults to 0.1.
+ 
+        Raises:
+            ValueError: If any parameter is outside its valid range.
+        """
         super().__init__(problem)
         if regenerations < 1:
             raise ValueError("Regenerations must be at least 1.")
@@ -50,6 +96,16 @@ class GeneticSolver(Solver):
         self.culling_proportion = culling_proportion
 
     def solve(self) -> Tour:
+        """Run the genetic algorithm and return the best tour found.
+ 
+        Initializes the population with random tours, then evolves it for up
+        to ``regenerations`` generations using tournament selection, crossover,
+        and mutation. Terminates early if fitness does not improve for 100
+        consecutive generations.
+ 
+        Returns:
+            The best Tour found across all generations.
+        """
         population = [self.problem.random_tour() for _ in range(self.population_size)]
 
         best = max(population, key=self.fitness_function.fitness)
@@ -113,6 +169,28 @@ class GeneticSolver(Solver):
 
 
 class TailoredGeneticSolver(Solver):
+    """Time-window-aware genetic algorithm solver for the OPTW.
+ 
+    Uses the tailored crossover operator, which exploits the augmented
+    representation's max_shift values to find valid splice points between
+    parent tours. This guarantees that children produced by crossover always
+    respect the time windows of their inherited landmarks, provided the parents
+    are valid.
+ 
+    Attributes:
+        fitness_function: Fitness function used to evaluate and rank tours.
+        regenerations: Maximum number of generations to run.
+        population_size: Number of tours in the population at each generation.
+        mutation_rate: Probability of applying mutation to each child.
+        selection: Selection operator used to pick parents.
+        crossover: Crossover operator configured for the tailored method.
+        mutation: Mutation operator applied to children.
+        elitism: Whether to carry the top-performing tours into the next generation.
+        culling: Whether to replace the lowest-performing tours with random ones.
+        elite_proportion: Fraction of the population preserved via elitism.
+        culling_proportion: Fraction of the population replaced via culling.
+        patience: Number of generations without improvement before early stopping.
+    """
     def __init__(
         self,
         problem: Problem,
@@ -128,6 +206,34 @@ class TailoredGeneticSolver(Solver):
         culling_proportion: float = 0.1,
         patience : int =100,
     ) -> None:
+        """Initialize the tailored genetic solver.
+ 
+        Args:
+            problem: The OPTW problem instance to solve.
+            fitness_function: Fitness function for evaluating tours.
+            regenerations: Maximum number of generations. Defaults to 100.
+            population_size: Number of individuals per generation. Defaults to 20.
+            mutation_rate: Probability in [0, 1] of mutating each child.
+                Defaults to 0.1.
+            insertion_probability: Probability of insertion vs deletion in the
+                mutation operator. Defaults to 0.5.
+            crossover_method: Must be ``"tailored"`` or
+                ``"tailored_mutation_motivated"``. Defaults to ``"tailored"``.
+            elitism: If True, the top ``elite_proportion`` of the population is
+                carried unchanged into the next generation. Defaults to False.
+            culling: If True, the bottom ``culling_proportion`` of the next
+                generation is replaced with fresh random tours. Defaults to False.
+            elite_proportion: Fraction of population size to preserve as elites.
+                Defaults to 0.1.
+            culling_proportion: Fraction of population size to cull each generation.
+                Defaults to 0.1.
+            patience: Number of consecutive generations without improvement before
+                the algorithm terminates early. Defaults to 100.
+ 
+        Raises:
+            ValueError: If any parameter is outside its valid range, or if
+                crossover_method is not a supported tailored variant.
+        """
         super().__init__(problem)
         if regenerations < 1:
             raise ValueError("Regenerations must be at least 1.")
@@ -158,6 +264,16 @@ class TailoredGeneticSolver(Solver):
         self.patience = patience
 
     def solve(self) -> Tour:
+        """Run the tailored genetic algorithm and return the best tour found.
+ 
+        Initializes the population with random tours, then evolves it using
+        tailored crossover and mutation. Children produced by crossover are
+        normalized to plain Tour objects before mutation is applied. Terminates
+        early if fitness does not improve for ``patience`` consecutive generations.
+ 
+        Returns:
+            The best Tour found across all generations.
+        """
         population = [self._generate_valid_route() for _ in range(self.population_size)]#this works fine 
         best = max(population, key=self.fitness_function.fitness)
         best_fitness = self.fitness_function.fitness(best)
@@ -225,15 +341,40 @@ class TailoredGeneticSolver(Solver):
         return best
 
     def augmented_representation(self, tour: Tour) -> AugmentedRepresentation:
+        """Convert a tour to its augmented representation.
+ 
+        Args:
+            tour: A valid tour to convert.
+ 
+        Returns:
+            AugmentedRepresentation with a fully computed timeline.
+        """
         return AugmentedRepresentation.from_tour(tour)
 
     def _generate_valid_route(self) -> Tour:
+        """Generate a random tour for population initialization.
+ 
+        Returns:
+            A randomly generated Tour from the problem instance.
+        """
         random_tour = self.problem.random_tour()
         return random_tour
 
     def _normalize_child(
         self, individual: Tour | AugmentedRepresentation
     ) -> Tour:
+        """Convert a child individual to a plain Tour if needed.
+ 
+        The tailored crossover returns AugmentedRepresentation objects.
+        This method unwraps them so that the rest of the solve loop always
+        works with Tour instances.
+ 
+        Args:
+            individual: A Tour or AugmentedRepresentation produced by crossover.
+ 
+        Returns:
+            A Tour built from the individual's landmark list.
+        """
         if isinstance(individual, AugmentedRepresentation):
             return Tour(self.problem, list(individual.landmarks))
         return individual

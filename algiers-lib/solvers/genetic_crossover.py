@@ -5,8 +5,25 @@ from models.tour import Tour
 from .genetic_augmented_representation import AugmentedRepresentation
 
 class Crossover:
+    """Crossover operator for the genetic algorithm.
+ 
+    Supports multiple crossover strategies for combining two parent tours into
+    two child tours. The strategy is selected at construction time and applied
+    uniformly through the ``crossover`` dispatch method.
+ 
+    Attributes:
+        method: Name of the crossover strategy in use. Supported values are
+            ``"order"`` and ``"tailored"``.
+    """
 
     def __init__(self, method: str = "order") -> None:
+        """Initialize the crossover operator.
+ 
+        Args:
+            method: Crossover strategy to use. ``"order"`` applies order-based
+                crossover on raw Tour objects. ``"tailored"`` applies the
+                time-window-aware crossover using AugmentedRepresentation.
+        """
         self.method = method
 
     def crossover(
@@ -14,6 +31,21 @@ class Crossover:
         parent1: Tour | AugmentedRepresentation,
         parent2: Tour | AugmentedRepresentation,
     ) -> tuple[Tour | AugmentedRepresentation, Tour | AugmentedRepresentation]:
+        """Dispatch crossover to the configured strategy.
+ 
+        Converts parents to AugmentedRepresentation automatically when the
+        tailored method is selected and raw Tours are provided.
+ 
+        Args:
+            parent1: First parent tour or augmented representation.
+            parent2: Second parent tour or augmented representation.
+ 
+        Returns:
+            A tuple of two child individuals produced by the crossover.
+ 
+        Raises:
+            NotImplementedError: If the configured method is not supported.
+        """
         if self.method == "order":
             return self.order_crossover(parent1, parent2)
         if self.method == "tailored":
@@ -33,6 +65,22 @@ class Crossover:
         )
 
     def order_crossover(self, parent1: Tour, parent2: Tour) -> tuple[Tour, Tour]:
+        """Perform order-based crossover (OX) on two parent tours.
+ 
+        Selects a random segment from the shorter parent and fills the remaining
+        positions with landmarks from the longer parent in their original order,
+        skipping duplicates. Two children are produced symmetrically.
+ 
+        Args:
+            parent1: First parent tour.
+            parent2: Second parent tour.
+ 
+        Returns:
+            A tuple of two child Tours.
+ 
+        Raises:
+            ValueError: If the parents belong to different problem instances.
+        """
         if parent1.problem is not parent2.problem:
             raise ValueError("Both parents must belong to the same problem instance.")
 
@@ -40,9 +88,7 @@ class Crossover:
             return Tour(parent1.problem, []), Tour(parent1.problem, [])
 
         if len(parent1.visited_landmarks) == 0 or len(parent2.visited_landmarks) == 0:
-            raise ValueError(
-                "Order crossover requires both parents to contain at least one landmark."
-            )
+            return parent1 , parent2
 
         source_parent, donor_parent = (
             (parent1, parent2)
@@ -80,6 +126,29 @@ class Crossover:
         parent1: AugmentedRepresentation,
         parent2: AugmentedRepresentation,
     ) -> tuple[AugmentedRepresentation, AugmentedRepresentation]:
+        """Perform time-window-aware crossover using augmented representations.
+ 
+        Searches for valid cut points between the two parents by checking whether
+        the departure time at position i in one parent allows the tourist to reach
+        position j in the other parent within its allowable start window
+        (start_time + max_shift). Two cuts are selected at random from all valid
+        candidates and used to splice the parents into two children.
+ 
+        If no valid cut points are found, two random tours are returned as
+        fallback children. If only one valid cut is found, the second child is
+        a random tour.
+ 
+        Args:
+            parent1: First parent as an augmented representation.
+            parent2: Second parent as an augmented representation.
+ 
+        Returns:
+            A tuple of two child AugmentedRepresentations (or Tours as fallback).
+ 
+        Raises:
+            ValueError: If either parent lacks a problem instance, or if they
+                belong to different problem instances.
+        """
         if parent1.problem is None or parent2.problem is None:
             raise ValueError(
                 "Augmented representations must include problem context for tailored crossover."
@@ -155,6 +224,21 @@ class Crossover:
         source_index: int,
         donor_index: int,
     ) -> AugmentedRepresentation:
+        """Build a child by splicing a source prefix with a donor tail.
+ 
+        Takes landmarks 0 through source_index (inclusive) from the source, then
+        appends landmarks from donor_index onward from the donor, excluding any
+        landmark already present in the source prefix to avoid duplicates.
+ 
+        Args:
+            source: The parent providing the prefix.
+            donor: The parent providing the tail.
+            source_index: Last index (inclusive) of the source prefix.
+            donor_index: First index (inclusive) of the donor tail.
+ 
+        Returns:
+            AugmentedRepresentation of the child tour built from the splice.
+        """
         source_prefix = source.landmarks[: source_index + 1]
         donor_tail = [
             landmark
@@ -178,6 +262,26 @@ class Crossover:
         start: int,
         end: int,
     ) -> Tour:
+        """Build a single order-crossover child.
+ 
+        Copies the segment [start, end] from segment_parent into the child genome,
+        then fills remaining positions in wrap-around order using landmarks from
+        fill_parent, skipping any landmark already in the segment.
+ 
+        Args:
+            segment_parent: Parent whose segment is copied into the child.
+            fill_parent: Parent whose landmarks fill the remaining positions.
+            child_length: Total number of landmarks in the child genome.
+            start: Start index of the copied segment (inclusive).
+            end: End index of the copied segment (inclusive).
+ 
+        Returns:
+            A new Tour built from the assembled child genome.
+ 
+        Raises:
+            ValueError: If the child genome cannot be fully filled because
+                fill_parent does not have enough unique landmarks.
+        """
         segment = segment_parent.visited_landmarks[start : end + 1]
         child_genome: list[Optional[Tour]] = [None] * child_length
         child_genome[start : end + 1] = segment
