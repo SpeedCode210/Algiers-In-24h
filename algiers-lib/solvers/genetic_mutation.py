@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-import math
 import random
-from typing import Optional
-from models.landmark import Landmark
 from models.tour import Tour
 from .genetic_augmented_representation import AugmentedRepresentation
 
