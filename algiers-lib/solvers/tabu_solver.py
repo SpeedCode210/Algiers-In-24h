@@ -1,10 +1,10 @@
 from __future__ import annotations
  
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 from models.landmark import Landmark
 from models.tour import Tour
 from models.problem import Problem
-from dataclasses import dataclass , field 
+from dataclasses import dataclass
 import random
 from .solver import Solver
 from enum import Enum
