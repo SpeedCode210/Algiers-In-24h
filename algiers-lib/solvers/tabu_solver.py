@@ -307,7 +307,14 @@ class TabuSolver(Solver):
                 break
 
             current_tour = best_neighbor
-            self.tabu_end[best_neighbor_move] = iteration + self.tabu_tenure
+            if best_neighbor_move.move_type == MoveType.REMOVE:
+                reverse_move = TabuMove(MoveType.INSERT, best_neighbor_move.landmark_ids)
+            elif best_neighbor_move.move_type == MoveType.INSERT:
+                reverse_move = TabuMove(MoveType.REMOVE, best_neighbor_move.landmark_ids)
+            else:
+                reverse_move = best_neighbor_move
+
+            self.tabu_end[reverse_move] = iteration + self.tabu_tenure
 
             if (self._is_feasible_under(current_tour, hard_budget)
                 and current_tour.total_score() > self.best_score):
