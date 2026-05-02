@@ -117,7 +117,7 @@ class PenaltyFitnessFunction(FitnessFunction):
             - self.invalid_penalty * invalid_count
             - self.overtime_penalty * max(total_duration - tour.problem.time_budget, 0)
         )
-        return int(round(raw_score))
+        return raw_score
 
 
 class InfeasibilityFitnessFunction(PenaltyFitnessFunction):
