@@ -3,7 +3,6 @@ from __future__ import annotations
 import random
 from models.problem import Problem
 from models.tour import Tour
-from models.landmark import Landmark
 from .solver import Solver
 from .genetic_augmented_representation import AugmentedRepresentation
 from .genetic_crossover import Crossover

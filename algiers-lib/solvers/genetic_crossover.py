@@ -1,9 +1,6 @@
 from __future__ import annotations
-from utils.time import time_in_string
-import math
 import random
 from typing import Optional
-from models.landmark import Day, Landmark
 from models.tour import Tour
 from .genetic_augmented_representation import AugmentedRepresentation
 
