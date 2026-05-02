@@ -324,72 +324,96 @@ def plot_solver_distributions(
     fig, axes = plt.subplots(2, 2, figsize=figsize)
     fig.suptitle('Solver Distribution and Cost/Time Analysis', fontsize=16, fontweight='bold')
 
-    # Execution time histogram / bar chart
+    # Execution time chart: use histogram only if there are multiple raw samples per solver,
+    # otherwise plot clear bars for each solver.
     ax_time = axes[0, 0]
     execution_values = [m.execution_time for m in metrics_list]
     time_scale_ms = max(execution_values) < 1.0
     if time_scale_ms:
-        samples_sets = [[t * 1000 for t in [m.execution_time for m in metrics_list if m.solver_name == name]] for name in solver_names]
         xlabel = 'Execution Time (milliseconds)'
-        value_formatter = lambda v: f'{v:.1f} ms'
+        conversion = 1000.0
+        value_label = lambda v: f'{v:.1f} ms'
     else:
-        samples_sets = [[m.execution_time for m in metrics_list if m.solver_name == name] for name in solver_names]
         xlabel = 'Execution Time (seconds)'
-        value_formatter = lambda v: f'{v:.3f} s'
+        conversion = 1.0
+        value_label = lambda v: f'{v:.3f} s'
 
-    for name, samples in zip(solver_names, samples_sets):
-        if len(samples) > 1:
-            ax_time.hist(samples, alpha=0.5, bins=8, label=name)
-        elif samples:
-            ax_time.bar(name, samples[0], alpha=0.8)
-    ax_time.set_title('Execution Time Distribution')
-    ax_time.set_ylabel('Number of runs')
+    all_samples = [
+        [m.execution_time * conversion for m in metrics_list if m.solver_name == name]
+        for name in solver_names
+    ]
+
+    if any(len(samples) > 1 for samples in all_samples):
+        for name, samples in zip(solver_names, all_samples):
+            if samples:
+                ax_time.hist(samples, bins=8, alpha=0.5, label=name)
+        ax_time.set_ylabel('Runs')
+    else:
+        bars = ax_time.bar(solver_names, [samples[0] if samples else 0 for samples in all_samples], color=plt.cm.Set2(np.linspace(0, 1, len(solver_names))))
+        for bar, samples in zip(bars, all_samples):
+            if samples:
+                ax_time.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), value_label(bar.get_height()),
+                             ha='center', va='bottom', fontsize=9)
+        ax_time.set_ylabel('Time')
+
+    ax_time.set_title('Solver Execution Time')
     ax_time.set_xlabel(xlabel)
     ax_time.grid(True, alpha=0.3)
     ax_time.legend(fontsize=8)
 
-    # Tour quality histogram
+    # Tour quality chart
     ax_quality = axes[0, 1]
-    for name in solver_names:
-        qualities = [m.tour_quality for m in metrics_list if m.solver_name == name]
-        if len(qualities) > 1:
-            ax_quality.hist(qualities, alpha=0.5, bins=8, label=name)
-        else:
-            ax_quality.bar(name, qualities[0], alpha=0.8)
-    ax_quality.set_title('Tour Quality Distribution')
-    ax_quality.set_ylabel('Number of runs')
-    ax_quality.set_xlabel('Tour Quality (interest score)')
+    quality_samples = [
+        [m.tour_quality for m in metrics_list if m.solver_name == name]
+        for name in solver_names
+    ]
+    if any(len(samples) > 1 for samples in quality_samples):
+        for name, samples in zip(solver_names, quality_samples):
+            ax_quality.hist(samples, bins=8, alpha=0.5, label=name)
+        ax_quality.set_ylabel('Runs')
+    else:
+        bars = ax_quality.bar(solver_names, [samples[0] if samples else 0 for samples in quality_samples], color=plt.cm.Set2(np.linspace(0, 1, len(solver_names))))
+        for bar in bars:
+            ax_quality.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f'{bar.get_height():.1f}',
+                             ha='center', va='bottom', fontsize=9)
+        ax_quality.set_ylabel('Score')
+
+    ax_quality.set_title('Tour Quality')
+    ax_quality.set_xlabel('Interest Score')
     ax_quality.grid(True, alpha=0.3)
     ax_quality.legend(fontsize=8)
 
-    # Total duration box plot
-    ax_duration = axes[1, 0]
-    durations = [
-        [m.tour.simulate().total_duration for m in metrics_list if m.solver_name == name]
+    # Efficiency bar chart (quality per second)
+    ax_efficiency = axes[1, 0]
+    efficiencies = [
+        np.mean([m.quality_per_second for m in metrics_list if m.solver_name == name])
         for name in solver_names
     ]
-    ax_duration.boxplot(durations, labels=solver_names, patch_artist=True,
-                        boxprops=dict(facecolor='lightblue', edgecolor='navy'))
-    ax_duration.set_title('Total Duration Distribution')
-    ax_duration.set_ylabel('Duration (minutes)')
-    ax_duration.grid(True, alpha=0.3)
+    bars_eff = ax_efficiency.bar(solver_names, efficiencies, color=plt.cm.Set2(np.linspace(0, 1, len(solver_names))))
+    ax_efficiency.set_title('Solver Efficiency')
+    ax_efficiency.set_ylabel('Quality points / sec')
+    ax_efficiency.tick_params(axis='x', rotation=45)
+    ax_efficiency.grid(axis='y', alpha=0.3)
+    for bar in bars_eff:
+        height = bar.get_height()
+        ax_efficiency.text(bar.get_x() + bar.get_width()/2., height,
+                f'{height:.2f}', ha='center', va='bottom', fontsize=9)
 
     # Quality vs execution time scatter plot
     ax_scatter = axes[1, 1]
     for name in solver_names:
         solver_samples = [m for m in metrics_list if m.solver_name == name]
-        times = [m.execution_time for m in solver_samples]
-        if time_scale_ms:
-            times = [t * 1000 for t in times]
+        times = [m.execution_time * conversion for m in solver_samples]
         ax_scatter.scatter(
             times,
             [m.tour_quality for m in solver_samples],
-            s=80,
-            alpha=0.7,
-            label=name
+            s=120,
+            alpha=0.8,
+            label=name,
+            edgecolors='k'
         )
     ax_scatter.set_title('Quality vs Execution Time')
-    ax_scatter.set_xlabel('Execution Time' + (' (milliseconds)' if time_scale_ms else ' (seconds)'))
+    ax_scatter.set_xlabel(xlabel)
     ax_scatter.set_ylabel('Tour Quality')
     ax_scatter.grid(True, alpha=0.3)
     ax_scatter.legend(fontsize=8)
