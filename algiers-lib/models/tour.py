@@ -1,7 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass , field 
 from typing import Optional
-import math 
 
 from models.landmark import Landmark
 from utils.time import time_in_string
@@ -16,14 +15,14 @@ class ScheduleEntry:
     Attributes:
         landmark (Landmark): The landmark being visited.
         arrival_time (float): The time of arrival at the landmark.
-        visit_start_time (int): The time when the visit starts.
-        departure_time (int): The time when the visit ends (computed).
+        visit_start_time (float): The time when the visit starts.
+        departure_time (float): The time when the visit ends (computed).
     """
 
     landmark: Landmark
     arrival_time: float
-    visit_start_time: int 
-    departure_time: int = field(init = False)
+    visit_start_time: float 
+    departure_time: float = field(init = False)
 
     def __post_init__(self) -> None:
         self.departure_time = self.visit_start_time + self.landmark.visit_duration
@@ -82,8 +81,7 @@ class Tour:
             travel_time = self.problem.travel_time(current_position, landmark)
             arrival_time = current_time + travel_time
             visit_start_time = landmark.schedule.earliest_valid_start(
-                self.problem.tour_day, math.ceil(arrival_time) , landmark.visit_duration)
-
+                self.problem.tour_day, arrival_time , landmark.visit_duration)
             if visit_start_time is None:
 
                 return_travel = self.problem.travel_time(current_position, self.problem.hotel)
@@ -284,7 +282,7 @@ class Tour:
 
         for entry in simulation.entries:
             wait_str = f" | wait: {time_in_string(round(entry.waiting_time))}" if entry.waiting_time > 0 else ""
-            tour_details.append(f" {entry.landmark.name} | arrival: {time_in_string(round(entry.arrival_time))}{wait_str} | start visit: {time_in_string(entry.visit_start_time)} | departure: {time_in_string(entry.departure_time)} ")
+            tour_details.append(f" {entry.landmark.name} | arrival: {time_in_string(round(entry.arrival_time))}{wait_str} | start visit: {time_in_string(round(entry.visit_start_time))} | departure: {time_in_string(round(entry.departure_time))} ") #we are rounding evrything
 
         tour_details.append(f"end: Hotel {self.problem.hotel.name}")
         tour_details.append(f"Valid: {simulation.is_valid} | Total duration: {simulation.total_duration:.1f} min | Score: {self.total_score()}")
