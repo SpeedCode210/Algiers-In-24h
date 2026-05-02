@@ -208,7 +208,11 @@ class TabuSolver(Solver):
     
     def _is_feasible_under(self, tour: Tour, budget: float) -> bool:
         """Check if the tour is valid under a given budget"""
-        return tour.simulation_cache().total_duration <= budget
+        sim = tour.simulation_cache()
+        return (
+            sim.total_duration <= budget
+            and len(sim.entries) == len(tour.visited_landmarks)
+        )
     
     def _recover_tour(self, tour:Tour, iteration:int) -> Tour:
         """remove the weakest landmarks one by one
