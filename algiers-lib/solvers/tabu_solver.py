@@ -176,7 +176,7 @@ class TabuSolver(Solver):
 
             neighbor = tour.copy()
             neighbor.remove_landmark(lm)
-            move = TabuMove(MoveType.INSERT, (lm.id,))
+            move = TabuMove(MoveType.REMOVE, (lm.id,))
             neighbors.append((neighbor, move))
 
         for i in range(len(visited)): #swap
@@ -201,7 +201,7 @@ class TabuSolver(Solver):
                 for position in range(len(visited) + 1):
                     neighbor = tour.copy()
                     neighbor.add_landmark(strong, position)
-                    move = TabuMove(MoveType.REMOVE, (strong.id,))
+                    move = TabuMove(MoveType.INSERT, (strong.id,))
                     neighbors.append((neighbor, move))
 
         return neighbors
@@ -227,7 +227,7 @@ class TabuSolver(Solver):
             weakest = max(recovered.visited_landmarks,
                            key=lambda lm:self._weakness_score(lm,recovered))
             recovered.remove_landmark(weakest)
-            move = TabuMove(MoveType.INSERT, (weakest.id,))
+            move = TabuMove(MoveType.REMOVE, (weakest.id,))
             self.tabu_end[move] = iteration + self.tabu_tenure
 
         return recovered

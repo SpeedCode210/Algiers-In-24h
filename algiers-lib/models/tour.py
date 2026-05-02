@@ -68,6 +68,11 @@ class Tour:
 
     @property
     def slack(self) -> float:
+        """
+        Remaining time budget after the current tour completes and returns to hotel.
+        Positive means the tour fits within the budget with time to spare.
+        Negative means the tour exceeds the budget (invalid).
+        """
         simulation = self.simulation_cache()
         return self.problem.time_budget - simulation.total_duration
     
