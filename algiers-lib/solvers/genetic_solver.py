@@ -45,6 +45,7 @@ class GeneticSolver(Solver):
         culling: bool = False,
         elite_proportion: float = 0.1,
         culling_proportion: float = 0.1,
+        patience : int =100,
     ) -> None:
         """Initialize the genetic solver.
  
@@ -82,7 +83,8 @@ class GeneticSolver(Solver):
             raise ValueError("Elite proportion must be between 0 and 1.")
         if not 0.0 <= culling_proportion <= 1.0:
             raise ValueError("Culling proportion must be between 0 and 1.")
-
+        if patience < 1:
+            raise ValueError("Patience must be at least 1.")
         self.fitness_function = fitness_function
         self.regenerations = regenerations
         self.population_size = population_size
@@ -94,6 +96,7 @@ class GeneticSolver(Solver):
         self.culling = culling
         self.elite_proportion = elite_proportion
         self.culling_proportion = culling_proportion
+        self.patience = patience
 
     def solve(self) -> Tour:
         """Run the genetic algorithm and return the best tour found.
@@ -162,7 +165,7 @@ class GeneticSolver(Solver):
             else:
                 unchanged_generations += 1
 
-            if unchanged_generations >= 100:
+            if unchanged_generations >= self.patience:
                 break
 
         return best
