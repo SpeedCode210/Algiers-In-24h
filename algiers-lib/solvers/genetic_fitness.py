@@ -101,7 +101,7 @@ class PenaltyFitnessFunction(FitnessFunction):
         self.invalid_penalty = invalid_penalty
         self.overtime_penalty = overtime_penalty
 
-    def fitness(self, tour: Tour) -> int:
+    def fitness(self, tour: Tour) -> float:
         """Compute fitness with penalties for violations and overtime.
  
         Args:

@@ -114,6 +114,10 @@ class Crossover:
             start=start,
             end=end,
         )
+        if source_length < 2:
+            start = end = 0
+        else:
+            start, end = sorted(random.sample(range(source_length), 2))
         child2 = self._build_order_child(
             segment_parent=donor_parent,
             fill_parent=source_parent,
