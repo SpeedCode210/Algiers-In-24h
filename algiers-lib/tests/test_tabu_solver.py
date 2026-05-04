@@ -7,7 +7,7 @@ import pytest
 from models.landmark import Day, Landmark, TimeSlot, WeeklySchedule
 from models.problem import Problem
 from models.tour import Tour
-from solvers.tabu_solver import MoveType, TabuMove, TabuSolver
+from solvers.tabu_solver import MoveType, OscillationPhase, TabuMove, TabuSolver
 
 
 def _make_slot(open_time: int = 480, close_time: int = 1080) -> TimeSlot:
@@ -193,7 +193,7 @@ class TestMoveSemantics:
         tour.add_landmark(landmarks[1])
 
         solver = TabuSolver(problem, max_iterations=1, tabu_tenure=5)
-        neighbors = solver._get_neighbors(tour, effective_budget=float(problem.time_budget))
+        neighbors = solver._get_neighbors(tour, effective_budget=float(problem.time_budget), phase=OscillationPhase.INTENSIFICATION)
 
         removed_moves = [
             move for neighbor, move in neighbors
@@ -214,7 +214,7 @@ class TestMoveSemantics:
         tour.add_landmark(landmarks[1])
 
         solver = TabuSolver(problem, max_iterations=1, tabu_tenure=5)
-        neighbors = solver._get_neighbors(tour, effective_budget=float(problem.time_budget))
+        neighbors = solver._get_neighbors(tour, effective_budget=float(problem.time_budget), phase=OscillationPhase.EXPANSION)
 
         inserted_moves = [
             move for neighbor, move in neighbors
@@ -222,6 +222,41 @@ class TestMoveSemantics:
         ]
         assert inserted_moves, "Expected at least one insertion neighbor"
         assert all(move.move_type == MoveType.INSERT for move in inserted_moves)
+
+    def test_recover_adds_insert_not_remove_to_tabu(
+        self, small_problem: Problem
+    ) -> None:
+        """_recover_tour must tabu INSERT (not REMOVE) for removed landmarks.
+
+        This is the critical regression test for the bug where REMOVE was
+        incorrectly added instead of INSERT, allowing immediate re-insertion
+        of just-removed landmarks.
+        """
+        solver = TabuSolver(small_problem, tabu_tenure=10)
+
+        # Force an infeasible tour by appending all landmarks directly
+        infeasible = small_problem.create_empty_tour()
+        for lm in small_problem.landmarks:
+            infeasible.visited_landmarks.append(lm)
+            infeasible._invalidate_cache()
+
+        original_ids = {lm.id for lm in infeasible.visited_landmarks}
+        recovered = solver._recover_tour(infeasible, iteration=5)
+        recovered_ids = {lm.id for lm in recovered.visited_landmarks}
+        removed_ids = original_ids - recovered_ids
+
+        for removed_id in removed_ids:
+            insert_move = TabuMove(MoveType.INSERT, (removed_id,))
+            remove_move = TabuMove(MoveType.REMOVE, (removed_id,))
+
+            assert insert_move in solver.tabu_end, (
+                f"INSERT({removed_id}) not in tabu after recovery — "
+                f"re-insertion not prevented."
+            )
+            assert remove_move not in solver.tabu_end, (
+                f"REMOVE({removed_id}) incorrectly in tabu — "
+                f"landmark is no longer in the tour, this entry is useless."
+            )
 
 
 # ---------------------------------------------------------------------------

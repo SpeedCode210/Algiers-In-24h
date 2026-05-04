@@ -104,7 +104,8 @@ class TabuSolver(Solver):
 
         induced_cost = (self.problem.travel_time(prev, landmark) 
             + self.problem.travel_time(landmark, nxt)
-            - self.problem.travel_time(prev, nxt))
+            - self.problem.travel_time(prev, nxt)
+            + landmark.visit_duration)
         
         if landmark.interest_score == 0:
             return float('inf')
@@ -152,7 +153,13 @@ class TabuSolver(Solver):
         nxt = self.problem.hotel if idx == len(visited) - 1 else visited[idx + 1]
 
         simulation = tour.simulation_cache()
-        slack = effective_budget - simulation.total_duration
+        weak_cost = (
+            self.problem.travel_time(prev, removed)
+            + self.problem.travel_time(removed, nxt)
+            - self.problem.travel_time(prev, nxt)
+            + removed.visit_duration
+        )
+        slack = (effective_budget - simulation.total_duration) + weak_cost
 
         feasible: list[Landmark] = []
         for lm in unvisited:
@@ -160,6 +167,7 @@ class TabuSolver(Solver):
                 self.problem.travel_time(prev, lm)
                 + self.problem.travel_time(lm, nxt)
                 - self.problem.travel_time(prev, nxt)
+                + lm.visit_duration
             )
             if induced_cost <= slack:
                 feasible.append(lm)
@@ -167,7 +175,13 @@ class TabuSolver(Solver):
         ranked = sorted(feasible, key=lambda lm: self._fitness_score(lm, removed, tour), reverse=True)
         return ranked[:self.n_insert_candidates]
         
-    def _get_neighbors(self, tour: Tour, effective_budget: float, ) -> list[tuple[Tour, TabuMove]]:
+    def _get_neighbors(
+        self,
+        tour: Tour,
+        effective_budget: float,
+        phase: OscillationPhase,
+    ) -> list[tuple[Tour, TabuMove]]:
+        
         neighbors = []
         visited = tour.visited_landmarks
         remove_candidates = self._removal_candidates(tour)
@@ -195,14 +209,15 @@ class TabuSolver(Solver):
                 move = TabuMove(MoveType.REPLACE, tuple(sorted([weak.id, strong.id])))
                 neighbors.append((neighbor, move))
             
-            for strong in insertion_candidates:
-                if strong in tour:
-                    continue
-                for position in range(len(visited) + 1):
-                    neighbor = tour.copy()
-                    neighbor.add_landmark(strong, position)
-                    move = TabuMove(MoveType.INSERT, (strong.id,))
-                    neighbors.append((neighbor, move))
+            if phase == OscillationPhase.EXPANSION:
+                for strong in insertion_candidates:
+                    if strong in tour:
+                        continue
+                    for position in range(len(visited) + 1):
+                        neighbor = tour.copy()
+                        neighbor.add_landmark(strong, position)
+                        move = TabuMove(MoveType.INSERT, (strong.id,))
+                        neighbors.append((neighbor, move))
 
         return neighbors
     
@@ -227,7 +242,7 @@ class TabuSolver(Solver):
             weakest = max(recovered.visited_landmarks,
                            key=lambda lm:self._weakness_score(lm,recovered))
             recovered.remove_landmark(weakest)
-            move = TabuMove(MoveType.REMOVE, (weakest.id,))
+            move = TabuMove(MoveType.INSERT, (weakest.id,))
             self.tabu_end[move] = iteration + self.tabu_tenure
 
         return recovered
@@ -276,7 +291,7 @@ class TabuSolver(Solver):
                     # fully recovered
                     phase = OscillationPhase.INTENSIFICATION
             
-            neighbors = self._get_neighbors(current_tour, effective_budget)
+            neighbors = self._get_neighbors(current_tour, effective_budget, phase)
 
             best_neighbor: Optional[Tour] = None
             best_neighbor_score:float = -1.0
