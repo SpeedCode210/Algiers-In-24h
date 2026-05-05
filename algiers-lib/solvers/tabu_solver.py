@@ -127,6 +127,7 @@ class TabuSolver(Solver):
             self.problem.travel_time(prev, candidate)
             + self.problem.travel_time(candidate, nxt)
             - self.problem.travel_time(prev, nxt)
+            + candidate.visit_duration
         )
  
         return candidate.interest_score / (induced_cost + 1e-9)
@@ -208,16 +209,42 @@ class TabuSolver(Solver):
                 neighbor.replace_landmark(old=weak,new=strong)
                 move = TabuMove(MoveType.REPLACE, tuple(sorted([weak.id, strong.id])))
                 neighbors.append((neighbor, move))
-            
-            if phase == OscillationPhase.EXPANSION:
-                for strong in insertion_candidates:
-                    if strong in tour:
-                        continue
-                    for position in range(len(visited) + 1):
-                        neighbor = tour.copy()
-                        neighbor.add_landmark(strong, position)
-                        move = TabuMove(MoveType.INSERT, (strong.id,))
-                        neighbors.append((neighbor, move))
+
+        if phase == OscillationPhase.EXPANSION:
+            simulation = tour.simulation_cache()
+            slack = effective_budget - simulation.total_duration
+            unvisited = self.problem.feasible_candidates(tour)
+
+            ranked_insert: list[tuple[Landmark, float, int]] = []
+            for candidate in unvisited:
+                best_cost = float("inf")
+                best_position = 0
+                for position in range(len(visited) + 1):
+                    prev = self.problem.hotel if position == 0 else visited[position - 1]
+                    nxt = self.problem.hotel if position == len(visited) else visited[position]
+                    induced_cost = (
+                        self.problem.travel_time(prev, candidate)
+                        + self.problem.travel_time(candidate, nxt)
+                        - self.problem.travel_time(prev, nxt)
+                        + candidate.visit_duration
+                    )
+                    if induced_cost < best_cost:
+                        best_cost = induced_cost
+                        best_position = position
+
+                if best_cost <= slack:
+                    ranked_insert.append((candidate, best_cost, best_position))
+
+            ranked_insert.sort(
+                key=lambda item: item[0].interest_score / (item[1] + 1e-9),
+                reverse=True,
+            )
+
+            for candidate, _, position in ranked_insert[:self.n_insert_candidates]:
+                neighbor = tour.copy()
+                neighbor.add_landmark(candidate, position)
+                move = TabuMove(MoveType.INSERT, (candidate.id,))
+                neighbors.append((neighbor, move))
 
         return neighbors
     
@@ -323,13 +350,12 @@ class TabuSolver(Solver):
 
             current_tour = best_neighbor
             if best_neighbor_move.move_type == MoveType.REMOVE:
-                reverse_move = TabuMove(MoveType.INSERT, best_neighbor_move.landmark_ids)
+                self.tabu_end[TabuMove(MoveType.INSERT, best_neighbor_move.landmark_ids)] = iteration + self.tabu_tenure
             elif best_neighbor_move.move_type == MoveType.INSERT:
-                reverse_move = TabuMove(MoveType.REMOVE, best_neighbor_move.landmark_ids)
+                self.tabu_end[TabuMove(MoveType.REMOVE, best_neighbor_move.landmark_ids)] = iteration + self.tabu_tenure
             else:
-                reverse_move = best_neighbor_move
+                self.tabu_end[best_neighbor_move] = iteration + self.tabu_tenure
 
-            self.tabu_end[reverse_move] = iteration + self.tabu_tenure
 
             if (self._is_feasible_under(current_tour, hard_budget)
                 and current_tour.total_score() > self.best_score):
