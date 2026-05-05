@@ -170,7 +170,7 @@ class TabuSolver(Solver):
                 - self.problem.travel_time(prev, nxt)
                 + lm.visit_duration
             )
-            if induced_cost <= slack:
+            if induced_cost <=  slack:
                 feasible.append(lm)
 
         ranked = sorted(feasible, key=lambda lm: self._fitness_score(lm, removed, tour), reverse=True)
