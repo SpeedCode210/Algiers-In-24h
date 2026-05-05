@@ -64,6 +64,16 @@ class Tour:
         self.problem =  problem
         self.visited_landmarks = visited_landmarks if visited_landmarks is not None else []
         self._cache: Optional[SimulationResult] = None #for caching the last simulation result
+
+    @property
+    def slack(self) -> float:
+        """
+        Remaining time budget after the current tour completes and returns to hotel.
+        Positive means the tour fits within the budget with time to spare.
+        Negative means the tour exceeds the budget (invalid).
+        """
+        simulation = self.simulation_cache()
+        return self.problem.time_budget - simulation.total_duration
     
     def simulate(self) -> SimulationResult:
         """Simulate the tour schedule, checking validity and computing timings.
@@ -141,7 +151,7 @@ class Tour:
             float: The sum of interest scores of all visited landmarks.
         """
 
-        return sum(lm.interest_score for lm in self.visited_landmarks)
+        return sum(landmark.interest_score for landmark in self.visited_landmarks)
     
     def add_landmark(self , landmark: Landmark, position: Optional[int] = None) -> None:
         """Add a landmark to the tour at the specified position.
