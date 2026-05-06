@@ -34,4 +34,5 @@ algiers-lib/solvers/diagnose_*.py
 # Benchmark results / history produced by running the benchmark
 algiers-lib/solvers/benchmarks/
 algiers-lib/solvers/benchmarks/*
+algiers-lib/results/
 
