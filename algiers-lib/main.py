@@ -6,6 +6,7 @@ import time
 from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
+from config import solver_configs
 
 # Add project root to path
 project_root = Path(__file__).parent
@@ -160,21 +161,7 @@ class ExperimentsRunner:
         print("Comparing solver performance, then generating easy-to-read output and reports.\n")
         
         results = []
-        
-        solver_configs = [
-            (GreedySolver, {'use_ratio': False}, 'Greedy (Score Priority)', f'{experiment_name}_greedy_score'),
-            (GreedySolver, {'use_ratio': True}, 'Greedy (Ratio Priority)', f'{experiment_name}_greedy_ratio'),
-            (
-                SimulatedAnnealingSolver,
-                {
-                    'initial_temperature': 50,
-                    'cooling_rate': 0.95,
-                    'max_iterations': 1000
-                },
-                'Simulated Annealing',
-                f'{experiment_name}_sa'
-            )
-        ]
+    
 
         metrics_list = []
         for solver_class, kwargs, solver_name, tour_key in solver_configs:
@@ -187,7 +174,7 @@ class ExperimentsRunner:
             )
             results.append(result)
             metrics_list.append(metrics)
-            self.tours[tour_key] = result['Tour']
+            self.tours[experiment_name + tour_key] = result['Tour']
 
         # Create DataFrame
         df = pd.DataFrame(results)
