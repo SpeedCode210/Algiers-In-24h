@@ -2,7 +2,7 @@ from solvers.greedy_solver import GreedySolver
 from solvers.grasp_solver import GraspSolver
 from solvers.tabu_solver import TabuSolver
 from solvers.genetic_solver import GeneticSolver
-from solvers.genetic_fitness import PenaltyFitnessFunction
+from solvers.genetic_fitness import PenaltyFitnessFunction, FeasibilityFitnessFunction
 from solvers.simulated_annealing_solver import SimulatedAnnealingSolver, AcceptanceFunction
 
 try:
@@ -35,6 +35,14 @@ solver_configs = [
         },
         'Genetic',
         '_genetic'
+    ),
+    (
+        GeneticSolver,
+        {
+            'fitness_function': FeasibilityFitnessFunction(),
+        },
+        'Tailored Genetic',
+        '_tailored_genetic'
     ),
 ]
 
