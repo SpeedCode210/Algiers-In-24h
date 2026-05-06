@@ -1,6 +1,2 @@
 id,name,latitude,longitude
-1,Hotel El Djazair,36.7563,3.0508
-2,Sofitel Algiers,36.7510,3.0693
-3,Hotel Mercure Alger,36.6940,3.2150
-4,Hotel Aurassi,36.7538,3.0441
-5,Sheraton Club des Pins,36.6860,2.9140
+hotel_aurassi,Hotel El-Aurassi,36.77658596259107,3.0514184804441955

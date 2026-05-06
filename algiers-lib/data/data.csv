@@ -1,21 +1,385 @@
 id,name,latitude,longitude,interest_score,visit_duration_minutes,day,open_time,close_time,category
-1,Casbah of Algiers,36.7878,3.0600,95,90,Monday,08:00,18:00,Historical
-2,Notre-Dame d Afrique,36.8050,3.0412,88,45,Monday,09:00,17:00,Religious
-3,Martyrs Memorial,36.7539,3.0441,92,30,Monday,08:00,20:00,Monument
-4,Ketchaoua Mosque,36.7858,3.0590,85,40,Monday,09:00,17:00,Religious
-5,Great Mosque of Algiers,36.7797,3.0598,90,50,Monday,08:00,19:00,Religious
-6,Bardo National Museum,36.7603,3.0458,82,90,Monday,09:00,17:00,Museum
-7,National Museum of Fine Arts,36.7610,3.0541,78,75,Monday,10:00,17:00,Museum
-8,Riadh El Feth Complex,36.7538,3.0438,75,60,Monday,09:00,22:00,Cultural
-9,Palais des Rais,36.7838,3.0558,79,50,Monday,09:00,17:00,Historical
-10,Place des Martyrs,36.7846,3.0590,77,30,Monday,00:00,23:59,Landmark
-11,Algiers Waterfront,36.7756,3.0606,85,60,Monday,00:00,23:59,Nature
-12,Jardin d Essai du Hamma,36.7505,3.0695,80,60,Monday,08:00,18:00,Nature
-13,Sidi Abderrahmane Shrine,36.7862,3.0572,80,35,Monday,08:00,18:00,Religious
-14,Ahmed Zabana Museum,36.7614,3.0537,76,70,Monday,09:00,17:00,Museum
-15,African Union Monument,36.7535,3.0432,68,20,Monday,00:00,23:59,Monument
-16,Algiers Zoo,36.7500,3.0690,62,90,Monday,09:00,17:00,Nature
-17,Sacre Coeur Basilica,36.7600,3.0420,70,40,Monday,08:00,18:00,Historical
-18,Algiers Port Harbor,36.7790,3.0640,72,30,Monday,00:00,23:59,Landmark
-19,El Kettar Gardens,36.7720,3.0580,60,30,Monday,08:00,17:00,Historical
-20,Makam El Chahid,36.7536,3.0440,74,25,Monday,07:00,22:00,Monument
+jardin_essai,Jardin d'Essai du Hamma,36.7484,3.0758,8.9,120,sunday,09:00,19:00,attraction
+jardin_essai,Jardin d'Essai du Hamma,36.7484,3.0758,8.9,120,monday,09:00,19:00,attraction
+jardin_essai,Jardin d'Essai du Hamma,36.7484,3.0758,8.9,120,tuesday,09:00,19:00,attraction
+jardin_essai,Jardin d'Essai du Hamma,36.7484,3.0758,8.9,120,wednesday,09:00,19:00,attraction
+jardin_essai,Jardin d'Essai du Hamma,36.7484,3.0758,8.9,120,thursday,09:00,19:00,attraction
+jardin_essai,Jardin d'Essai du Hamma,36.7484,3.0758,8.9,120,friday,09:00,19:00,attraction
+jardin_essai,Jardin d'Essai du Hamma,36.7484,3.0758,8.9,120,saturday,09:00,19:00,attraction
+great_mosque_algiers,Great Mosque of Algiers (Djamaa el Djazair),36.735,3.1402,9.3,60,sunday,00:00,23:59,religious
+great_mosque_algiers,Great Mosque of Algiers (Djamaa el Djazair),36.735,3.1402,9.3,60,monday,00:00,23:59,religious
+great_mosque_algiers,Great Mosque of Algiers (Djamaa el Djazair),36.735,3.1402,9.3,60,tuesday,00:00,23:59,religious
+great_mosque_algiers,Great Mosque of Algiers (Djamaa el Djazair),36.735,3.1402,9.3,60,wednesday,00:00,23:59,religious
+great_mosque_algiers,Great Mosque of Algiers (Djamaa el Djazair),36.735,3.1402,9.3,60,thursday,00:00,23:59,religious
+great_mosque_algiers,Great Mosque of Algiers (Djamaa el Djazair),36.735,3.1402,9.3,60,friday,00:00,23:59,religious
+great_mosque_algiers,Great Mosque of Algiers (Djamaa el Djazair),36.735,3.1402,9.3,60,saturday,00:00,23:59,religious
+casbah,Casbah of Algiers (Old City),36.7845,3.0589,8.9,120,sunday,00:00,23:59,historical
+casbah,Casbah of Algiers (Old City),36.7845,3.0589,8.9,120,monday,00:00,23:59,historical
+casbah,Casbah of Algiers (Old City),36.7845,3.0589,8.9,120,tuesday,00:00,23:59,historical
+casbah,Casbah of Algiers (Old City),36.7845,3.0589,8.9,120,wednesday,00:00,23:59,historical
+casbah,Casbah of Algiers (Old City),36.7845,3.0589,8.9,120,thursday,00:00,23:59,historical
+casbah,Casbah of Algiers (Old City),36.7845,3.0589,8.9,120,friday,00:00,23:59,historical
+casbah,Casbah of Algiers (Old City),36.7845,3.0589,8.9,120,saturday,00:00,23:59,historical
+maqam_echahid,Maqam Echahid (Martyrs' Memorial),36.74601,3.069576,8.5,60,sunday,00:00,23:59,historical
+maqam_echahid,Maqam Echahid (Martyrs' Memorial),36.74601,3.069576,8.5,60,monday,00:00,23:59,historical
+maqam_echahid,Maqam Echahid (Martyrs' Memorial),36.74601,3.069576,8.5,60,tuesday,00:00,23:59,historical
+maqam_echahid,Maqam Echahid (Martyrs' Memorial),36.74601,3.069576,8.5,60,wednesday,00:00,23:59,historical
+maqam_echahid,Maqam Echahid (Martyrs' Memorial),36.74601,3.069576,8.5,60,thursday,00:00,23:59,historical
+maqam_echahid,Maqam Echahid (Martyrs' Memorial),36.74601,3.069576,8.5,60,friday,00:00,23:59,historical
+maqam_echahid,Maqam Echahid (Martyrs' Memorial),36.74601,3.069576,8.5,60,saturday,00:00,23:59,historical
+notre_dame_afrique,Notre Dame d'Afrique,36.801,3.0426,9.0,60,sunday,11:00,12:30,historical
+notre_dame_afrique,Notre Dame d'Afrique,36.801,3.0426,9.0,60,sunday,15:00,17:30,historical
+notre_dame_afrique,Notre Dame d'Afrique,36.801,3.0426,9.0,60,monday,11:00,12:30,historical
+notre_dame_afrique,Notre Dame d'Afrique,36.801,3.0426,9.0,60,monday,15:00,17:30,historical
+notre_dame_afrique,Notre Dame d'Afrique,36.801,3.0426,9.0,60,tuesday,11:00,12:30,historical
+notre_dame_afrique,Notre Dame d'Afrique,36.801,3.0426,9.0,60,tuesday,15:00,17:30,historical
+notre_dame_afrique,Notre Dame d'Afrique,36.801,3.0426,9.0,60,wednesday,11:00,12:30,historical
+notre_dame_afrique,Notre Dame d'Afrique,36.801,3.0426,9.0,60,wednesday,15:00,17:30,historical
+notre_dame_afrique,Notre Dame d'Afrique,36.801,3.0426,9.0,60,thursday,11:00,12:30,historical
+notre_dame_afrique,Notre Dame d'Afrique,36.801,3.0426,9.0,60,thursday,15:00,17:30,historical
+notre_dame_afrique,Notre Dame d'Afrique,36.801,3.0426,9.0,60,friday,10:30,12:30,historical
+notre_dame_afrique,Notre Dame d'Afrique,36.801,3.0426,9.0,60,friday,15:00,18:00,historical
+notre_dame_afrique,Notre Dame d'Afrique,36.801,3.0426,9.0,60,saturday,11:00,12:30,historical
+notre_dame_afrique,Notre Dame d'Afrique,36.801,3.0426,9.0,60,saturday,15:00,17:30,historical
+palais_des_rais,Palais des Rais (Bastion 23),36.78856,3.063578,9.3,90,monday,09:00,17:00,historical
+palais_des_rais,Palais des Rais (Bastion 23),36.78856,3.063578,9.3,90,tuesday,09:00,17:00,historical
+palais_des_rais,Palais des Rais (Bastion 23),36.78856,3.063578,9.3,90,wednesday,09:00,17:00,historical
+palais_des_rais,Palais des Rais (Bastion 23),36.78856,3.063578,9.3,90,thursday,09:00,17:00,historical
+palais_des_rais,Palais des Rais (Bastion 23),36.78856,3.063578,9.3,90,friday,09:00,17:00,historical
+palais_des_rais,Palais des Rais (Bastion 23),36.78856,3.063578,9.3,90,saturday,09:00,17:00,historical
+museum_fine_arts,National Museum of Fine Arts,36.746087,3.072272,8.9,120,monday,10:00,18:00,tradition_art
+museum_fine_arts,National Museum of Fine Arts,36.746087,3.072272,8.9,120,tuesday,10:00,18:00,tradition_art
+museum_fine_arts,National Museum of Fine Arts,36.746087,3.072272,8.9,120,wednesday,10:00,18:00,tradition_art
+museum_fine_arts,National Museum of Fine Arts,36.746087,3.072272,8.9,120,thursday,10:00,18:00,tradition_art
+museum_fine_arts,National Museum of Fine Arts,36.746087,3.072272,8.9,120,friday,10:00,18:00,tradition_art
+museum_fine_arts,National Museum of Fine Arts,36.746087,3.072272,8.9,120,saturday,10:00,18:00,tradition_art
+promenade_sablettes,Promenade des Sablettes,36.7495,3.0903,8.0,60,sunday,00:00,23:59,attraction
+promenade_sablettes,Promenade des Sablettes,36.7495,3.0903,8.0,60,monday,00:00,23:59,attraction
+promenade_sablettes,Promenade des Sablettes,36.7495,3.0903,8.0,60,tuesday,00:00,23:59,attraction
+promenade_sablettes,Promenade des Sablettes,36.7495,3.0903,8.0,60,wednesday,00:00,23:59,attraction
+promenade_sablettes,Promenade des Sablettes,36.7495,3.0903,8.0,60,thursday,00:00,23:59,attraction
+promenade_sablettes,Promenade des Sablettes,36.7495,3.0903,8.0,60,friday,00:00,23:59,attraction
+promenade_sablettes,Promenade des Sablettes,36.7495,3.0903,8.0,60,saturday,00:00,23:59,attraction
+ketchaoua_mosque,Ketchaoua Mosque,36.7851,3.0607,9.0,60,sunday,00:00,23:59,historical
+ketchaoua_mosque,Ketchaoua Mosque,36.7851,3.0607,9.0,60,monday,00:00,23:59,historical
+ketchaoua_mosque,Ketchaoua Mosque,36.7851,3.0607,9.0,60,tuesday,00:00,23:59,historical
+ketchaoua_mosque,Ketchaoua Mosque,36.7851,3.0607,9.0,60,wednesday,00:00,23:59,historical
+ketchaoua_mosque,Ketchaoua Mosque,36.7851,3.0607,9.0,60,thursday,00:00,23:59,historical
+ketchaoua_mosque,Ketchaoua Mosque,36.7851,3.0607,9.0,60,friday,00:00,23:59,historical
+ketchaoua_mosque,Ketchaoua Mosque,36.7851,3.0607,9.0,60,saturday,00:00,23:59,historical
+grande_poste,La Grande Poste d'Alger,36.7731,3.0594,8.7,30,sunday,08:00,18:00,historical
+grande_poste,La Grande Poste d'Alger,36.7731,3.0594,8.7,30,monday,08:00,18:00,historical
+grande_poste,La Grande Poste d'Alger,36.7731,3.0594,8.7,30,tuesday,08:00,18:00,historical
+grande_poste,La Grande Poste d'Alger,36.7731,3.0594,8.7,30,wednesday,08:00,18:00,historical
+grande_poste,La Grande Poste d'Alger,36.7731,3.0594,8.7,30,thursday,08:00,18:00,historical
+grande_poste,La Grande Poste d'Alger,36.7731,3.0594,8.7,30,saturday,08:00,18:00,historical
+museum_antiquities,Museum of Antiquities and Islamic Art,36.761111,3.0475,8.8,90,monday,09:00,17:00,tradition_art
+museum_antiquities,Museum of Antiquities and Islamic Art,36.761111,3.0475,8.8,90,tuesday,09:00,17:00,tradition_art
+museum_antiquities,Museum of Antiquities and Islamic Art,36.761111,3.0475,8.8,90,wednesday,09:00,17:00,tradition_art
+museum_antiquities,Museum of Antiquities and Islamic Art,36.761111,3.0475,8.8,90,thursday,09:00,17:00,tradition_art
+museum_antiquities,Museum of Antiquities and Islamic Art,36.761111,3.0475,8.8,90,saturday,10:00,17:00,tradition_art
+dar_mustapha_pacha,Dar Mustapha Pacha (Casbah),36.785613,3.060884,9.2,60,monday,09:00,16:00,historical
+dar_mustapha_pacha,Dar Mustapha Pacha (Casbah),36.785613,3.060884,9.2,60,tuesday,09:00,16:00,historical
+dar_mustapha_pacha,Dar Mustapha Pacha (Casbah),36.785613,3.060884,9.2,60,wednesday,09:00,16:00,historical
+dar_mustapha_pacha,Dar Mustapha Pacha (Casbah),36.785613,3.060884,9.2,60,thursday,09:00,16:00,historical
+dar_mustapha_pacha,Dar Mustapha Pacha (Casbah),36.785613,3.060884,9.2,60,saturday,09:00,16:00,historical
+villa_abd_el_latif,Villa Abd-el-Latif,36.744866,3.072827,8.7,60,monday,09:00,16:00,historical
+villa_abd_el_latif,Villa Abd-el-Latif,36.744866,3.072827,8.7,60,tuesday,09:00,16:00,historical
+villa_abd_el_latif,Villa Abd-el-Latif,36.744866,3.072827,8.7,60,wednesday,09:00,16:00,historical
+villa_abd_el_latif,Villa Abd-el-Latif,36.744866,3.072827,8.7,60,thursday,09:00,16:00,historical
+villa_abd_el_latif,Villa Abd-el-Latif,36.744866,3.072827,8.7,60,saturday,09:00,16:00,historical
+jamaa_el_kebir,Jamaa el-Kebir (Great Mosque of 1097),36.785278,3.064167,8.8,30,sunday,03:30,23:00,historical
+jamaa_el_kebir,Jamaa el-Kebir (Great Mosque of 1097),36.785278,3.064167,8.8,30,monday,03:30,23:00,historical
+jamaa_el_kebir,Jamaa el-Kebir (Great Mosque of 1097),36.785278,3.064167,8.8,30,tuesday,03:30,23:00,historical
+jamaa_el_kebir,Jamaa el-Kebir (Great Mosque of 1097),36.785278,3.064167,8.8,30,wednesday,03:30,23:00,historical
+jamaa_el_kebir,Jamaa el-Kebir (Great Mosque of 1097),36.785278,3.064167,8.8,30,thursday,03:30,23:00,historical
+jamaa_el_kebir,Jamaa el-Kebir (Great Mosque of 1097),36.785278,3.064167,8.8,30,friday,03:30,23:00,historical
+jamaa_el_kebir,Jamaa el-Kebir (Great Mosque of 1097),36.785278,3.064167,8.8,30,saturday,03:30,23:00,historical
+musee_armee,Musée de l'Armée Nationale Populaire,36.745773,3.069364,8.9,90,monday,10:00,20:00,historical
+musee_armee,Musée de l'Armée Nationale Populaire,36.745773,3.069364,8.9,90,tuesday,09:00,18:00,historical
+musee_armee,Musée de l'Armée Nationale Populaire,36.745773,3.069364,8.9,90,wednesday,09:00,18:00,historical
+musee_armee,Musée de l'Armée Nationale Populaire,36.745773,3.069364,8.9,90,thursday,09:00,18:00,historical
+musee_armee,Musée de l'Armée Nationale Populaire,36.745773,3.069364,8.9,90,friday,09:00,18:00,historical
+musee_armee,Musée de l'Armée Nationale Populaire,36.745773,3.069364,8.9,90,saturday,09:00,18:00,historical
+musee_armee,Musée de l'Armée Nationale Populaire,36.745773,3.069364,8.9,90,sunday,09:00,18:00,historical
+palais_hassan_bacha,Palais Hassan Bacha,36.78525,3.06086,9.0,60,monday,09:30,17:30,historical
+palais_hassan_bacha,Palais Hassan Bacha,36.78525,3.06086,9.0,60,tuesday,09:30,17:30,historical
+palais_hassan_bacha,Palais Hassan Bacha,36.78525,3.06086,9.0,60,wednesday,09:30,17:30,historical
+palais_hassan_bacha,Palais Hassan Bacha,36.78525,3.06086,9.0,60,thursday,09:30,17:30,historical
+ali_bitchin_mosque,Ali Bitchin Mosque,36.786944,3.061944,9.2,30,sunday,09:00,17:00,historical
+ali_bitchin_mosque,Ali Bitchin Mosque,36.786944,3.061944,9.2,30,monday,09:00,17:00,historical
+ali_bitchin_mosque,Ali Bitchin Mosque,36.786944,3.061944,9.2,30,tuesday,09:00,17:00,historical
+ali_bitchin_mosque,Ali Bitchin Mosque,36.786944,3.061944,9.2,30,wednesday,09:00,17:00,historical
+ali_bitchin_mosque,Ali Bitchin Mosque,36.786944,3.061944,9.2,30,thursday,09:00,17:00,historical
+ali_bitchin_mosque,Ali Bitchin Mosque,36.786944,3.061944,9.2,30,friday,09:00,17:00,historical
+ali_bitchin_mosque,Ali Bitchin Mosque,36.786944,3.061944,9.2,30,saturday,09:00,17:00,historical
+dar_aziza,Dar Aziza,36.785002,3.061469,8.0,60,sunday,08:30,17:00,historical
+dar_aziza,Dar Aziza,36.785002,3.061469,8.0,60,monday,08:30,17:00,historical
+dar_aziza,Dar Aziza,36.785002,3.061469,8.0,60,tuesday,08:30,17:00,historical
+dar_aziza,Dar Aziza,36.785002,3.061469,8.0,60,wednesday,08:30,17:00,historical
+dar_aziza,Dar Aziza,36.785002,3.061469,8.0,60,thursday,08:30,17:00,historical
+dar_aziza,Dar Aziza,36.785002,3.061469,8.0,60,friday,08:30,17:00,historical
+dar_aziza,Dar Aziza,36.785002,3.061469,8.0,60,saturday,08:30,17:00,historical
+bardo_museum,Bardo National Museum (Prehistory & Ethnography),36.760728,3.04719,8.9,90,monday,09:00,17:00,historical
+bardo_museum,Bardo National Museum (Prehistory & Ethnography),36.760728,3.04719,8.9,90,tuesday,09:00,17:00,historical
+bardo_museum,Bardo National Museum (Prehistory & Ethnography),36.760728,3.04719,8.9,90,wednesday,09:00,17:00,historical
+bardo_museum,Bardo National Museum (Prehistory & Ethnography),36.760728,3.04719,8.9,90,thursday,09:00,17:00,historical
+bardo_museum,Bardo National Museum (Prehistory & Ethnography),36.760728,3.04719,8.9,90,friday,14:00,17:00,historical
+bardo_museum,Bardo National Museum (Prehistory & Ethnography),36.760728,3.04719,8.9,90,saturday,10:00,17:00,historical
+jamaa_el_jdid,Jamaa el-Jdid,36.784967,3.063219,9.0,30,sunday,00:00,23:59,religious
+jamaa_el_jdid,Jamaa el-Jdid,36.784967,3.063219,9.0,30,monday,00:00,23:59,religious
+jamaa_el_jdid,Jamaa el-Jdid,36.784967,3.063219,9.0,30,tuesday,00:00,23:59,religious
+jamaa_el_jdid,Jamaa el-Jdid,36.784967,3.063219,9.0,30,wednesday,00:00,23:59,religious
+jamaa_el_jdid,Jamaa el-Jdid,36.784967,3.063219,9.0,30,thursday,00:00,23:59,religious
+jamaa_el_jdid,Jamaa el-Jdid,36.784967,3.063219,9.0,30,friday,00:00,23:59,religious
+jamaa_el_jdid,Jamaa el-Jdid,36.784967,3.063219,9.0,30,saturday,00:00,23:59,religious
+ben_aknoun_zoo,Ben Aknoun Park & Zoo,36.751078,3.005708,5.6,120,sunday,10:00,19:00,attraction
+ben_aknoun_zoo,Ben Aknoun Park & Zoo,36.751078,3.005708,5.6,120,monday,10:00,19:00,attraction
+ben_aknoun_zoo,Ben Aknoun Park & Zoo,36.751078,3.005708,5.6,120,tuesday,10:00,19:00,attraction
+ben_aknoun_zoo,Ben Aknoun Park & Zoo,36.751078,3.005708,5.6,120,wednesday,10:00,19:00,attraction
+ben_aknoun_zoo,Ben Aknoun Park & Zoo,36.751078,3.005708,5.6,120,thursday,10:00,19:00,attraction
+ben_aknoun_zoo,Ben Aknoun Park & Zoo,36.751078,3.005708,5.6,120,friday,10:00,20:00,attraction
+ben_aknoun_zoo,Ben Aknoun Park & Zoo,36.751078,3.005708,5.6,120,saturday,10:00,20:00,attraction
+parc_grands_vents,Parc des Grands Vents,36.748712,2.977472,6.6,60,sunday,09:00,18:00,attraction
+parc_grands_vents,Parc des Grands Vents,36.748712,2.977472,6.6,60,monday,09:00,18:00,attraction
+parc_grands_vents,Parc des Grands Vents,36.748712,2.977472,6.6,60,tuesday,09:00,18:00,attraction
+parc_grands_vents,Parc des Grands Vents,36.748712,2.977472,6.6,60,wednesday,09:00,18:00,attraction
+parc_grands_vents,Parc des Grands Vents,36.748712,2.977472,6.6,60,thursday,09:00,18:00,attraction
+parc_grands_vents,Parc des Grands Vents,36.748712,2.977472,6.6,60,friday,09:00,18:00,attraction
+parc_grands_vents,Parc des Grands Vents,36.748712,2.977472,6.6,60,saturday,09:00,18:00,attraction
+theatre_national,Théâtre National Algérien,36.781231,3.060366,8.5,90,sunday,09:00,21:00,tradition_art
+theatre_national,Théâtre National Algérien,36.781231,3.060366,8.5,90,monday,09:00,21:00,tradition_art
+theatre_national,Théâtre National Algérien,36.781231,3.060366,8.5,90,tuesday,09:00,21:00,tradition_art
+theatre_national,Théâtre National Algérien,36.781231,3.060366,8.5,90,wednesday,09:00,21:00,tradition_art
+theatre_national,Théâtre National Algérien,36.781231,3.060366,8.5,90,thursday,09:00,21:00,tradition_art
+theatre_national,Théâtre National Algérien,36.781231,3.060366,8.5,90,friday,09:00,21:00,tradition_art
+theatre_national,Théâtre National Algérien,36.781231,3.060366,8.5,90,saturday,09:00,21:00,tradition_art
+port_sidi_fredj,Port de Sidi Fredj,36.764962,2.848049,8.0,30,sunday,00:00,23:59,attraction
+port_sidi_fredj,Port de Sidi Fredj,36.764962,2.848049,8.0,30,monday,00:00,23:59,attraction
+port_sidi_fredj,Port de Sidi Fredj,36.764962,2.848049,8.0,30,tuesday,00:00,23:59,attraction
+port_sidi_fredj,Port de Sidi Fredj,36.764962,2.848049,8.0,30,wednesday,00:00,23:59,attraction
+port_sidi_fredj,Port de Sidi Fredj,36.764962,2.848049,8.0,30,thursday,00:00,23:59,attraction
+port_sidi_fredj,Port de Sidi Fredj,36.764962,2.848049,8.0,30,friday,00:00,23:59,attraction
+port_sidi_fredj,Port de Sidi Fredj,36.764962,2.848049,8.0,30,saturday,00:00,23:59,attraction
+museum_popular_arts,National Museum of Arts and Popular Traditions,36.78675,3.06101,8.5,60,saturday,08:30,12:00,tradition_art
+museum_popular_arts,National Museum of Arts and Popular Traditions,36.78675,3.06101,8.5,60,saturday,13:00,16:30,tradition_art
+museum_popular_arts,National Museum of Arts and Popular Traditions,36.78675,3.06101,8.5,60,sunday,08:30,12:00,tradition_art
+museum_popular_arts,National Museum of Arts and Popular Traditions,36.78675,3.06101,8.5,60,sunday,13:00,16:30,tradition_art
+museum_popular_arts,National Museum of Arts and Popular Traditions,36.78675,3.06101,8.5,60,monday,08:30,12:00,tradition_art
+museum_popular_arts,National Museum of Arts and Popular Traditions,36.78675,3.06101,8.5,60,monday,13:00,16:30,tradition_art
+museum_popular_arts,National Museum of Arts and Popular Traditions,36.78675,3.06101,8.5,60,tuesday,08:30,12:00,tradition_art
+museum_popular_arts,National Museum of Arts and Popular Traditions,36.78675,3.06101,8.5,60,tuesday,13:00,16:30,tradition_art
+museum_popular_arts,National Museum of Arts and Popular Traditions,36.78675,3.06101,8.5,60,wednesday,08:30,12:00,tradition_art
+museum_popular_arts,National Museum of Arts and Popular Traditions,36.78675,3.06101,8.5,60,wednesday,13:00,16:30,tradition_art
+museum_popular_arts,National Museum of Arts and Popular Traditions,36.78675,3.06101,8.5,60,thursday,08:30,12:00,tradition_art
+museum_popular_arts,National Museum of Arts and Popular Traditions,36.78675,3.06101,8.5,60,thursday,13:00,16:30,tradition_art
+hala_gallery,Hala Art Gallery,36.75357,3.041295,9.6,60,saturday,11:00,20:00,tradition_art
+hala_gallery,Hala Art Gallery,36.75357,3.041295,9.6,60,sunday,11:00,20:00,tradition_art
+hala_gallery,Hala Art Gallery,36.75357,3.041295,9.6,60,monday,11:00,20:00,tradition_art
+hala_gallery,Hala Art Gallery,36.75357,3.041295,9.6,60,tuesday,11:00,20:00,tradition_art
+hala_gallery,Hala Art Gallery,36.75357,3.041295,9.6,60,wednesday,11:00,20:00,tradition_art
+hala_gallery,Hala Art Gallery,36.75357,3.041295,9.6,60,thursday,11:00,20:00,tradition_art
+hala_gallery,Hala Art Gallery,36.75357,3.041295,9.6,60,friday,16:00,20:00,tradition_art
+seen_gallery,Seen Art Gallery,36.760581,2.982519,8.7,60,monday,13:30,17:00,tradition_art
+seen_gallery,Seen Art Gallery,36.760581,2.982519,8.7,60,tuesday,13:30,17:00,tradition_art
+seen_gallery,Seen Art Gallery,36.760581,2.982519,8.7,60,wednesday,13:30,17:00,tradition_art
+seen_gallery,Seen Art Gallery,36.760581,2.982519,8.7,60,thursday,13:30,17:00,tradition_art
+seen_gallery,Seen Art Gallery,36.760581,2.982519,8.7,60,saturday,13:30,17:00,tradition_art
+national_library,National Library of Algeria,36.748446,3.071647,8.0,60,saturday,08:00,20:00,tradition_art
+national_library,National Library of Algeria,36.748446,3.071647,8.0,60,sunday,08:00,20:00,tradition_art
+national_library,National Library of Algeria,36.748446,3.071647,8.0,60,monday,08:00,20:00,tradition_art
+national_library,National Library of Algeria,36.748446,3.071647,8.0,60,tuesday,08:00,20:00,tradition_art
+national_library,National Library of Algeria,36.748446,3.071647,8.0,60,wednesday,08:00,20:00,tradition_art
+national_library,National Library of Algeria,36.748446,3.071647,8.0,60,thursday,08:00,20:00,tradition_art
+national_library,National Library of Algeria,36.748446,3.071647,8.0,60,friday,09:00,20:00,tradition_art
+marina_mall,Marina Mall,36.739906,3.143271,8.0,120,saturday,09:00,22:00,shopping
+marina_mall,Marina Mall,36.739906,3.143271,8.0,120,sunday,09:00,22:00,shopping
+marina_mall,Marina Mall,36.739906,3.143271,8.0,120,monday,09:00,22:00,shopping
+marina_mall,Marina Mall,36.739906,3.143271,8.0,120,tuesday,09:00,22:00,shopping
+marina_mall,Marina Mall,36.739906,3.143271,8.0,120,wednesday,09:00,22:00,shopping
+marina_mall,Marina Mall,36.739906,3.143271,8.0,120,thursday,09:00,22:00,shopping
+marina_mall,Marina Mall,36.739906,3.143271,8.0,120,friday,09:00,12:00,shopping
+marina_mall,Marina Mall,36.739906,3.143271,8.0,120,friday,14:30,23:00,shopping
+kettani_square,Kettani Square,36.788696,3.062485,8.2,30,sunday,00:00,23:59,attraction
+kettani_square,Kettani Square,36.788696,3.062485,8.2,30,monday,00:00,23:59,attraction
+kettani_square,Kettani Square,36.788696,3.062485,8.2,30,tuesday,00:00,23:59,attraction
+kettani_square,Kettani Square,36.788696,3.062485,8.2,30,wednesday,00:00,23:59,attraction
+kettani_square,Kettani Square,36.788696,3.062485,8.2,30,thursday,00:00,23:59,attraction
+kettani_square,Kettani Square,36.788696,3.062485,8.2,30,friday,00:00,23:59,attraction
+kettani_square,Kettani Square,36.788696,3.062485,8.2,30,saturday,00:00,23:59,attraction
+martyrs_square,Martyrs' Square,36.784592,3.062442,8.4,30,sunday,00:00,23:59,attraction
+martyrs_square,Martyrs' Square,36.784592,3.062442,8.4,30,monday,00:00,23:59,attraction
+martyrs_square,Martyrs' Square,36.784592,3.062442,8.4,30,tuesday,00:00,23:59,attraction
+martyrs_square,Martyrs' Square,36.784592,3.062442,8.4,30,wednesday,00:00,23:59,attraction
+martyrs_square,Martyrs' Square,36.784592,3.062442,8.4,30,thursday,00:00,23:59,attraction
+martyrs_square,Martyrs' Square,36.784592,3.062442,8.4,30,friday,00:00,23:59,attraction
+martyrs_square,Martyrs' Square,36.784592,3.062442,8.4,30,saturday,00:00,23:59,attraction
+audin_square,Audin Square,36.77012,3.055376,8.8,30,sunday,00:00,23:59,attraction
+audin_square,Audin Square,36.77012,3.055376,8.8,30,monday,00:00,23:59,attraction
+audin_square,Audin Square,36.77012,3.055376,8.8,30,tuesday,00:00,23:59,attraction
+audin_square,Audin Square,36.77012,3.055376,8.8,30,wednesday,00:00,23:59,attraction
+audin_square,Audin Square,36.77012,3.055376,8.8,30,thursday,00:00,23:59,attraction
+audin_square,Audin Square,36.77012,3.055376,8.8,30,friday,00:00,23:59,attraction
+audin_square,Audin Square,36.77012,3.055376,8.8,30,saturday,00:00,23:59,attraction
+emir_abdelkader_square,Emir Abdelkader Square,36.776196,3.058162,9.0,30,sunday,00:00,23:59,attraction
+emir_abdelkader_square,Emir Abdelkader Square,36.776196,3.058162,9.0,30,monday,00:00,23:59,attraction
+emir_abdelkader_square,Emir Abdelkader Square,36.776196,3.058162,9.0,30,tuesday,00:00,23:59,attraction
+emir_abdelkader_square,Emir Abdelkader Square,36.776196,3.058162,9.0,30,wednesday,00:00,23:59,attraction
+emir_abdelkader_square,Emir Abdelkader Square,36.776196,3.058162,9.0,30,thursday,00:00,23:59,attraction
+emir_abdelkader_square,Emir Abdelkader Square,36.776196,3.058162,9.0,30,friday,00:00,23:59,attraction
+emir_abdelkader_square,Emir Abdelkader Square,36.776196,3.058162,9.0,30,saturday,00:00,23:59,attraction
+terrasse_bouneta,Terrasse Bouneta,36.775316,3.06165,8.2,60,sunday,00:00,23:59,attraction
+terrasse_bouneta,Terrasse Bouneta,36.775316,3.06165,8.2,60,monday,00:00,23:59,attraction
+terrasse_bouneta,Terrasse Bouneta,36.775316,3.06165,8.2,60,tuesday,00:00,23:59,attraction
+terrasse_bouneta,Terrasse Bouneta,36.775316,3.06165,8.2,60,wednesday,00:00,23:59,attraction
+terrasse_bouneta,Terrasse Bouneta,36.775316,3.06165,8.2,60,thursday,00:00,23:59,attraction
+terrasse_bouneta,Terrasse Bouneta,36.775316,3.06165,8.2,60,friday,00:00,23:59,attraction
+terrasse_bouneta,Terrasse Bouneta,36.775316,3.06165,8.2,60,saturday,00:00,23:59,attraction
+kiffan_club,Kiffan Club,36.758543,3.217974,6.9,120,sunday,10:00,18:00,attraction
+kiffan_club,Kiffan Club,36.758543,3.217974,6.9,120,monday,10:00,18:00,attraction
+kiffan_club,Kiffan Club,36.758543,3.217974,6.9,120,tuesday,10:00,18:00,attraction
+kiffan_club,Kiffan Club,36.758543,3.217974,6.9,120,wednesday,10:00,18:00,attraction
+kiffan_club,Kiffan Club,36.758543,3.217974,6.9,120,thursday,10:00,18:00,attraction
+kiffan_club,Kiffan Club,36.758543,3.217974,6.9,120,friday,10:00,18:00,attraction
+kiffan_club,Kiffan Club,36.758543,3.217974,6.9,120,saturday,10:00,18:00,attraction
+parc_sidi_abdellah,Parc d'Attraction Sidi Abdellah,36.692138,2.875651,6.6,180,saturday,10:00,22:00,attraction
+parc_sidi_abdellah,Parc d'Attraction Sidi Abdellah,36.692138,2.875651,6.6,180,sunday,10:00,22:00,attraction
+parc_sidi_abdellah,Parc d'Attraction Sidi Abdellah,36.692138,2.875651,6.6,180,monday,10:00,22:00,attraction
+parc_sidi_abdellah,Parc d'Attraction Sidi Abdellah,36.692138,2.875651,6.6,180,tuesday,10:00,22:00,attraction
+parc_sidi_abdellah,Parc d'Attraction Sidi Abdellah,36.692138,2.875651,6.6,180,wednesday,10:00,22:00,attraction
+parc_sidi_abdellah,Parc d'Attraction Sidi Abdellah,36.692138,2.875651,6.6,180,thursday,10:00,22:00,attraction
+parc_sidi_abdellah,Parc d'Attraction Sidi Abdellah,36.692138,2.875651,6.6,180,friday,10:00,12:00,attraction
+parc_sidi_abdellah,Parc d'Attraction Sidi Abdellah,36.692138,2.875651,6.6,180,friday,13:00,22:00,attraction
+teri_park,Teri Park,36.760829,2.9257,8.7,180,sunday,14:00,23:00,attraction
+teri_park,Teri Park,36.760829,2.9257,8.7,180,monday,14:00,23:00,attraction
+teri_park,Teri Park,36.760829,2.9257,8.7,180,tuesday,14:00,23:00,attraction
+teri_park,Teri Park,36.760829,2.9257,8.7,180,wednesday,14:00,23:00,attraction
+teri_park,Teri Park,36.760829,2.9257,8.7,180,thursday,14:00,23:00,attraction
+teri_park,Teri Park,36.760829,2.9257,8.7,180,friday,12:00,23:59,attraction
+teri_park,Teri Park,36.760829,2.9257,8.7,180,saturday,12:00,23:59,attraction
+garden_city_mall,Garden City Mall,36.750562,2.951788,8.4,120,sunday,10:00,23:59,shopping
+garden_city_mall,Garden City Mall,36.750562,2.951788,8.4,120,monday,10:00,23:59,shopping
+garden_city_mall,Garden City Mall,36.750562,2.951788,8.4,120,tuesday,10:00,23:59,shopping
+garden_city_mall,Garden City Mall,36.750562,2.951788,8.4,120,wednesday,10:00,23:59,shopping
+garden_city_mall,Garden City Mall,36.750562,2.951788,8.4,120,thursday,10:00,23:59,shopping
+garden_city_mall,Garden City Mall,36.750562,2.951788,8.4,120,friday,10:00,23:59,shopping
+garden_city_mall,Garden City Mall,36.750562,2.951788,8.4,120,saturday,10:00,23:59,shopping
+bab_ezzouar_mall,Bab Ezzouar Mall,36.711933,3.197303,7.7,120,sunday,09:00,23:00,shopping
+bab_ezzouar_mall,Bab Ezzouar Mall,36.711933,3.197303,7.7,120,monday,09:00,23:00,shopping
+bab_ezzouar_mall,Bab Ezzouar Mall,36.711933,3.197303,7.7,120,tuesday,09:00,23:00,shopping
+bab_ezzouar_mall,Bab Ezzouar Mall,36.711933,3.197303,7.7,120,wednesday,09:00,23:00,shopping
+bab_ezzouar_mall,Bab Ezzouar Mall,36.711933,3.197303,7.7,120,thursday,09:00,23:00,shopping
+bab_ezzouar_mall,Bab Ezzouar Mall,36.711933,3.197303,7.7,120,friday,09:00,23:59,shopping
+bab_ezzouar_mall,Bab Ezzouar Mall,36.711933,3.197303,7.7,120,saturday,09:00,23:59,shopping
+el_qods_mall,El Qods Shopping Mall,36.75907,2.963731,6.0,90,saturday,07:00,19:00,shopping
+el_qods_mall,El Qods Shopping Mall,36.75907,2.963731,6.0,90,sunday,07:00,19:00,shopping
+el_qods_mall,El Qods Shopping Mall,36.75907,2.963731,6.0,90,monday,07:00,19:00,shopping
+el_qods_mall,El Qods Shopping Mall,36.75907,2.963731,6.0,90,tuesday,07:00,19:00,shopping
+el_qods_mall,El Qods Shopping Mall,36.75907,2.963731,6.0,90,wednesday,07:00,19:00,shopping
+el_qods_mall,El Qods Shopping Mall,36.75907,2.963731,6.0,90,thursday,07:00,19:00,shopping
+karting_evasion,Karting Evasion,36.757903,3.218624,8.0,60,sunday,10:00,20:00,attraction
+karting_evasion,Karting Evasion,36.757903,3.218624,8.0,60,monday,10:00,20:00,attraction
+karting_evasion,Karting Evasion,36.757903,3.218624,8.0,60,tuesday,10:00,20:00,attraction
+karting_evasion,Karting Evasion,36.757903,3.218624,8.0,60,wednesday,10:00,20:00,attraction
+karting_evasion,Karting Evasion,36.757903,3.218624,8.0,60,thursday,10:00,20:00,attraction
+karting_evasion,Karting Evasion,36.757903,3.218624,8.0,60,friday,10:00,20:00,attraction
+karting_evasion,Karting Evasion,36.757903,3.218624,8.0,60,saturday,10:00,20:00,attraction
+laser_strike,Laser Strike,36.752711,2.946835,8.8,90,saturday,11:00,22:00,attraction
+laser_strike,Laser Strike,36.752711,2.946835,8.8,90,sunday,11:00,22:00,attraction
+laser_strike,Laser Strike,36.752711,2.946835,8.8,90,monday,11:00,22:00,attraction
+laser_strike,Laser Strike,36.752711,2.946835,8.8,90,tuesday,11:00,22:00,attraction
+laser_strike,Laser Strike,36.752711,2.946835,8.8,90,wednesday,11:00,22:00,attraction
+laser_strike,Laser Strike,36.752711,2.946835,8.8,90,thursday,11:00,22:00,attraction
+laser_strike,Laser Strike,36.752711,2.946835,8.8,90,friday,15:00,22:00,attraction
+teri_jump,Teri Jump,36.73013,2.926114,7.8,180,monday,14:00,21:00,attraction
+teri_jump,Teri Jump,36.73013,2.926114,7.8,180,tuesday,14:00,21:00,attraction
+teri_jump,Teri Jump,36.73013,2.926114,7.8,180,wednesday,14:00,21:00,attraction
+teri_jump,Teri Jump,36.73013,2.926114,7.8,180,thursday,14:00,21:00,attraction
+teri_jump,Teri Jump,36.73013,2.926114,7.8,180,saturday,14:00,21:00,attraction
+teri_jump,Teri Jump,36.73013,2.926114,7.8,180,friday,14:30,22:00,attraction
+dream_park,Dream Park,36.735824,3.160353,7.4,180,sunday,10:00,22:00,attraction
+dream_park,Dream Park,36.735824,3.160353,7.4,180,monday,10:00,22:00,attraction
+dream_park,Dream Park,36.735824,3.160353,7.4,180,tuesday,10:00,22:00,attraction
+dream_park,Dream Park,36.735824,3.160353,7.4,180,wednesday,10:00,22:00,attraction
+dream_park,Dream Park,36.735824,3.160353,7.4,180,thursday,10:00,22:00,attraction
+dream_park,Dream Park,36.735824,3.160353,7.4,180,friday,10:00,22:00,attraction
+dream_park,Dream Park,36.735824,3.160353,7.4,180,saturday,10:00,22:00,attraction
+thechillspot,The Chill Spot,36.717165,3.041313,9.6,120,sunday,11:00,20:00,attraction
+thechillspot,The Chill Spot,36.717165,3.041313,9.6,120,monday,11:00,20:00,attraction
+thechillspot,The Chill Spot,36.717165,3.041313,9.6,120,tuesday,11:00,20:00,attraction
+thechillspot,The Chill Spot,36.717165,3.041313,9.6,120,wednesday,11:00,20:00,attraction
+thechillspot,The Chill Spot,36.717165,3.041313,9.6,120,thursday,11:00,20:00,attraction
+thechillspot,The Chill Spot,36.717165,3.041313,9.6,120,friday,11:00,20:00,attraction
+thechillspot,The Chill Spot,36.717165,3.041313,9.6,120,saturday,11:00,20:00,attraction
+sports_complex_ghermoul,Sports Complex Ahmed Ghermoul,36.757157,3.054429,8.0,180,tuesday,10:00,18:00,attraction
+sports_complex_ghermoul,Sports Complex Ahmed Ghermoul,36.757157,3.054429,8.0,180,wednesday,10:00,18:00,attraction
+sports_complex_ghermoul,Sports Complex Ahmed Ghermoul,36.757157,3.054429,8.0,180,thursday,10:00,18:00,attraction
+sports_complex_ghermoul,Sports Complex Ahmed Ghermoul,36.757157,3.054429,8.0,180,friday,10:00,18:00,attraction
+sports_complex_ghermoul,Sports Complex Ahmed Ghermoul,36.757157,3.054429,8.0,180,saturday,10:00,18:00,attraction
+escape_rooms,Escape Rooms - Break the Code,36.713222,2.996883,10.0,180,saturday,13:00,23:00,attraction
+escape_rooms,Escape Rooms - Break the Code,36.713222,2.996883,10.0,180,sunday,13:00,23:00,attraction
+escape_rooms,Escape Rooms - Break the Code,36.713222,2.996883,10.0,180,monday,13:00,23:00,attraction
+escape_rooms,Escape Rooms - Break the Code,36.713222,2.996883,10.0,180,tuesday,13:00,23:00,attraction
+escape_rooms,Escape Rooms - Break the Code,36.713222,2.996883,10.0,180,wednesday,13:00,23:00,attraction
+escape_rooms,Escape Rooms - Break the Code,36.713222,2.996883,10.0,180,thursday,13:00,23:00,attraction
+prison_island,Prison Island Alger,36.73918,2.914987,8.6,120,sunday,13:00,22:00,attraction
+prison_island,Prison Island Alger,36.73918,2.914987,8.6,120,monday,13:00,22:00,attraction
+prison_island,Prison Island Alger,36.73918,2.914987,8.6,120,tuesday,13:00,22:00,attraction
+prison_island,Prison Island Alger,36.73918,2.914987,8.6,120,wednesday,13:00,22:00,attraction
+prison_island,Prison Island Alger,36.73918,2.914987,8.6,120,thursday,13:00,22:00,attraction
+prison_island,Prison Island Alger,36.73918,2.914987,8.6,120,friday,15:00,23:59,attraction
+prison_island,Prison Island Alger,36.73918,2.914987,8.6,120,saturday,10:00,22:00,attraction
+algerian_cinema,Algerian Cinema,36.766976,3.052959,7.6,180,sunday,18:00,23:59,attraction
+algerian_cinema,Algerian Cinema,36.766976,3.052959,7.6,180,monday,18:00,23:59,attraction
+algerian_cinema,Algerian Cinema,36.766976,3.052959,7.6,180,tuesday,18:00,23:59,attraction
+algerian_cinema,Algerian Cinema,36.766976,3.052959,7.6,180,wednesday,18:00,23:59,attraction
+algerian_cinema,Algerian Cinema,36.766976,3.052959,7.6,180,thursday,18:00,23:59,attraction
+algerian_cinema,Algerian Cinema,36.766976,3.052959,7.6,180,friday,18:00,23:59,attraction
+algerian_cinema,Algerian Cinema,36.766976,3.052959,7.6,180,saturday,18:00,23:59,attraction
+cinema_el_sahel,Cinéma El Sahel,36.768058,2.960017,7.4,180,sunday,18:00,23:59,attraction
+cinema_el_sahel,Cinéma El Sahel,36.768058,2.960017,7.4,180,monday,18:00,23:59,attraction
+cinema_el_sahel,Cinéma El Sahel,36.768058,2.960017,7.4,180,tuesday,18:00,23:59,attraction
+cinema_el_sahel,Cinéma El Sahel,36.768058,2.960017,7.4,180,wednesday,18:00,23:59,attraction
+cinema_el_sahel,Cinéma El Sahel,36.768058,2.960017,7.4,180,thursday,18:00,23:59,attraction
+cinema_el_sahel,Cinéma El Sahel,36.768058,2.960017,7.4,180,friday,18:00,23:59,attraction
+cinema_el_sahel,Cinéma El Sahel,36.768058,2.960017,7.4,180,saturday,18:00,23:59,attraction
+algiers_opera,Algiers Opera House,36.73693,2.930392,9.0,120,sunday,09:00,16:00,tradition_art
+algiers_opera,Algiers Opera House,36.73693,2.930392,9.0,120,monday,09:00,16:00,tradition_art
+algiers_opera,Algiers Opera House,36.73693,2.930392,9.0,120,tuesday,09:00,16:00,tradition_art
+algiers_opera,Algiers Opera House,36.73693,2.930392,9.0,120,wednesday,09:00,16:00,tradition_art
+algiers_opera,Algiers Opera House,36.73693,2.930392,9.0,120,thursday,09:00,16:00,tradition_art
+cosmos_theater,Cosmos Movie Theater,36.7432,3.070179,7.7,180,sunday,18:00,23:59,attraction
+cosmos_theater,Cosmos Movie Theater,36.7432,3.070179,7.7,180,monday,18:00,23:59,attraction
+cosmos_theater,Cosmos Movie Theater,36.7432,3.070179,7.7,180,tuesday,18:00,23:59,attraction
+cosmos_theater,Cosmos Movie Theater,36.7432,3.070179,7.7,180,wednesday,18:00,23:59,attraction
+cosmos_theater,Cosmos Movie Theater,36.7432,3.070179,7.7,180,thursday,18:00,23:59,attraction
+cosmos_theater,Cosmos Movie Theater,36.7432,3.070179,7.7,180,friday,18:00,23:59,attraction
+cosmos_theater,Cosmos Movie Theater,36.7432,3.070179,7.7,180,saturday,18:00,23:59,attraction
+riyadh_al_fath,Riyadh Al-Fath,36.743308,3.070326,7.8,120,saturday,09:00,16:00,shopping
+riyadh_al_fath,Riyadh Al-Fath,36.743308,3.070326,7.8,120,sunday,09:00,16:00,shopping
+riyadh_al_fath,Riyadh Al-Fath,36.743308,3.070326,7.8,120,monday,09:00,16:00,shopping
+riyadh_al_fath,Riyadh Al-Fath,36.743308,3.070326,7.8,120,tuesday,09:00,16:00,shopping
+riyadh_al_fath,Riyadh Al-Fath,36.743308,3.070326,7.8,120,wednesday,09:00,16:00,shopping
+riyadh_al_fath,Riyadh Al-Fath,36.743308,3.070326,7.8,120,thursday,09:00,16:00,shopping
+palace_of_dey,Palace of the Dey,36.784398,3.054964,8.8,180,saturday,08:30,16:00,historical
+palace_of_dey,Palace of the Dey,36.784398,3.054964,8.8,180,sunday,08:30,16:00,historical
+palace_of_dey,Palace of the Dey,36.784398,3.054964,8.8,180,monday,08:30,16:00,historical
+palace_of_dey,Palace of the Dey,36.784398,3.054964,8.8,180,tuesday,08:30,16:00,historical
+palace_of_dey,Palace of the Dey,36.784398,3.054964,8.8,180,wednesday,08:30,16:00,historical
+palace_of_dey,Palace of the Dey,36.784398,3.054964,8.8,180,thursday,08:30,16:00,historical
+palace_of_dey,Palace of the Dey,36.784398,3.054964,8.8,180,friday,08:30,12:00,historical
+palace_of_dey,Palace of the Dey,36.784398,3.054964,8.8,180,friday,14:30,16:00,historical
+poudrier_citadelle,Poudrière de la Citadelle d'Alger,36.784004,3.055244,9.0,60,saturday,08:30,16:00,historical
+poudrier_citadelle,Poudrière de la Citadelle d'Alger,36.784004,3.055244,9.0,60,sunday,08:30,16:00,historical
+poudrier_citadelle,Poudrière de la Citadelle d'Alger,36.784004,3.055244,9.0,60,monday,08:30,16:00,historical
+poudrier_citadelle,Poudrière de la Citadelle d'Alger,36.784004,3.055244,9.0,60,tuesday,08:30,16:00,historical
+poudrier_citadelle,Poudrière de la Citadelle d'Alger,36.784004,3.055244,9.0,60,wednesday,08:30,16:00,historical
+poudrier_citadelle,Poudrière de la Citadelle d'Alger,36.784004,3.055244,9.0,60,thursday,08:30,16:00,historical
+poudrier_citadelle,Poudrière de la Citadelle d'Alger,36.784004,3.055244,9.0,60,friday,08:30,12:00,historical
+poudrier_citadelle,Poudrière de la Citadelle d'Alger,36.784004,3.055244,9.0,60,friday,14:30,16:00,historical
+sacred_heart_cathedral,Sacred Heart Cathedral,36.764321,3.047456,7.9,60,tuesday,14:30,17:30,religious
+sacred_heart_cathedral,Sacred Heart Cathedral,36.764321,3.047456,7.9,60,wednesday,14:30,17:30,religious
+sacred_heart_cathedral,Sacred Heart Cathedral,36.764321,3.047456,7.9,60,thursday,14:30,17:30,religious
+sacred_heart_cathedral,Sacred Heart Cathedral,36.764321,3.047456,7.9,60,friday,10:30,12:30,religious
+sacred_heart_cathedral,Sacred Heart Cathedral,36.764321,3.047456,7.9,60,saturday,10:30,12:00,religious
+sacred_heart_cathedral,Sacred Heart Cathedral,36.764321,3.047456,7.9,60,saturday,14:30,17:30,religious
