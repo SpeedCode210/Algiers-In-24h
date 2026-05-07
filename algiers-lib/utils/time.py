@@ -38,6 +38,7 @@ def time_in_string(minutes: int) -> str:
         ValueError: If minutes is negative or exceeds 1439.
     """
     try:
+        print(minutes)
         if minutes < 0:
             raise ValueError("Minutes cannot be negative")
         if minutes >= 24 * 60:

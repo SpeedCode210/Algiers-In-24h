@@ -53,12 +53,12 @@ class TimeSlot:
                 f"open_time ({self.open_time}) must be strictly less than "
                 f"close_time ({self.close_time}).")
 
-    def contains(self, arrival: int, duration: int) -> bool:
+    def contains(self, arrival: float, duration: float) -> bool:
         """Check if a visit starting at arrival time with given duration fits within the slot.
 
         Args:
-            arrival (int): Arrival time in minutes.
-            duration (int): Visit duration in minutes.
+            arrival (float): Arrival time in minutes.
+            duration (float): Visit duration in minutes.
 
         Returns:
             bool: True if the visit fits, False otherwise.
@@ -98,17 +98,7 @@ class WeeklySchedule:
         """
         return self.schedule.get(day, [])
 
-    def earliest_valid_start(self, day: Day, arrival: int, duration: int) -> Optional[int]:
-        """Find the earliest valid start time for a visit on the given day.
-
-        Args:
-            day (Day): The day of the visit.
-            arrival (int): Arrival time in minutes.
-            duration (int): Visit duration in minutes.
-
-        Returns:
-            Optional[int]: The start time if possible, None otherwise.
-        """
+    def earliest_valid_start(self, day: Day, arrival: float, duration: float) -> Optional[float]:# this has been changed
         for slot in self.get_slots(day):
             start = max(arrival, slot.open_time)
             if slot.contains(start, duration):
