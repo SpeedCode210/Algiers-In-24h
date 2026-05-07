@@ -205,6 +205,45 @@ def loadLandmarks(filepath: str = "../data/data.csv") -> list[Landmark]:
 
     return landmarks
 
+def loadAllHotels(hotel_path: str = "../data/hotel.csv") -> list[Landmark]:
+    """Loads all hotels from a CSV file.
+
+    Each hotel gets a 24/7 open schedule, zero interest score, and
+    zero visit duration — matching the format used throughout the codebase.
+    This function does NOT replace loadHotel() which remains unchanged.
+
+    Args:
+        hotel_path: Path to the hotel CSV file.
+
+    Returns:
+        List of Landmark instances, one per hotel row.
+
+    Raises:
+        FileNotFoundError: If the file does not exist.
+        ValueError: If required columns are missing.
+    """
+    df = pd.read_csv(hotel_path)
+    required = {"id", "name", "latitude", "longitude"}
+    missing  = required - set(df.columns)
+    if missing:
+        raise ValueError(f"hotel.csv is missing columns: {missing}")
+
+    full_slot     = TimeSlot(open_time=0, close_time=1439)
+    full_schedule = WeeklySchedule(schedule={day: [full_slot] for day in Day})
+
+    hotels = []
+    for _, row in df.iterrows():
+        hotels.append(Landmark(
+            id             = str(row["id"]).strip(),
+            name           = str(row["name"]).strip(),
+            latitude       = float(row["latitude"]),
+            longitude      = float(row["longitude"]),
+            interest_score = 0.0,
+            visit_duration = 0,
+            schedule       = full_schedule,
+            category       = "hotel",
+        ))
+    return hotels
 
 def loadHotel(hotel_path: str = "../data/hotel.csv") -> Landmark:
     """Load the hotel landmark from a CSV file.
