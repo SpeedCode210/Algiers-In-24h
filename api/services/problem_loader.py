@@ -6,7 +6,7 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../algiers-lib"))
 
-from models.landmark import Day
+from models.landmark import Day, Landmark, loadAllHotels, loadLandmarks
 from models.problem import Problem
 
 _BASE_DIR       = os.path.dirname(os.path.abspath(__file__))
@@ -14,27 +14,12 @@ _LANDMARKS_PATH = os.path.join(_BASE_DIR, "../../algiers-lib/data/data.csv")
 _HOTEL_PATH     = os.path.join(_BASE_DIR, "../../algiers-lib/data/hotel.csv")
 
 
-_BASE_PROBLEM: Problem | None = None
-
-
-def get_base_problem() -> Problem:
-    """
-    Load and cache the base Problem instance from CSV files.
-    Expensive on first call (reads CSVs + builds travel matrix).
-    Subsequent calls return the cached instance instantly.
-    """
-    global _BASE_PROBLEM
-    if _BASE_PROBLEM is None:
-        _BASE_PROBLEM = Problem.LoadProblem(
-            landmarks_path=_LANDMARKS_PATH,
-            hotel_path=_HOTEL_PATH,
-            time_budget=480,
-            tour_day=Day.MONDAY,
-        )
-    return _BASE_PROBLEM
+_landmarks_cache: list[Landmark] | None     = None
+_hotels_index:    dict[str, Landmark] | None = None
 
 
 def build_problem(
+    hotel_id: str,
     time_budget: int,
     tour_day: str,
     start_time: int = 540,
@@ -44,14 +29,21 @@ def build_problem(
     Creates a new Problem instance with the user's specific parameters
     without reloading or recomputing the travel matrix from scratch.
     """
-    base = get_base_problem()
-    day  = Day.from_string(tour_day)
+    landmarks = get_all_landmarks()
+    hotels    = get_hotel()
+ 
+    if hotel_id not in hotels:
+        available = sorted(hotels.keys())
+        raise KeyError(
+            f"Hotel '{hotel_id}' not found. "
+            f"Available IDs: {available}"
+        )
 
     return Problem(
-        hotel=base.hotel,
-        landmarks=base.landmarks,
+        hotel=hotel_id,
+        landmarks=landmarks,
         time_budget=time_budget,
-        tour_day=day,
+        tour_day=Day.from_string(tour_day),
         start_time=start_time,
     )
 
@@ -61,7 +53,14 @@ def get_all_landmarks() -> list:
     Return all landmarks from the base problem.
     Used by the landmarks route to populate the map on page load.
     """
-    return get_base_problem().landmarks
+    global _landmarks_cache
+    if _landmarks_cache is None:
+        if not os.path.exists(_LANDMARKS_PATH):
+            raise FileNotFoundError(
+                f"data.csv not found at: {_LANDMARKS_PATH}"
+            )
+        _landmarks_cache = loadLandmarks(_LANDMARKS_PATH)
+    return _landmarks_cache
 
 
 def get_hotel():
@@ -69,13 +68,12 @@ def get_hotel():
     Return the hotel landmark.
     Used by the landmarks route as the map starting point.
     """
-    return get_base_problem().hotel
-
-
-def get_all_categories() -> list[str]:
-    """
-    Return a sorted list of unique landmark categories.
-    Used by the landmarks route to build the category filter panel.
-    """
-    landmarks = get_all_landmarks()
-    return sorted({lm.category for lm in landmarks})
+    global _hotels_index
+    if _hotels_index is None:
+        if not os.path.exists(_HOTEL_PATH):
+            raise FileNotFoundError(
+                f"hotel.csv not found at: {_HOTEL_PATH}"
+            )
+        all_hotels     = loadAllHotels(_HOTEL_PATH)
+        _hotels_index  = {h.id: h for h in all_hotels}
+    return _hotels_index
