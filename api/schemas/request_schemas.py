@@ -22,7 +22,7 @@ ALGORITHM_LABELS: dict[str, str] = {
     "tabu":                "Tabu Search",
     # Genetic Algorithm variants (one per fitness function)
     "ga":          "Genetic Algorithm",
-    "ga_tailored":    "Genetic Algorithm (Infeasibility Fitness)",
+    "ga_tailored":    "Tailored Genetic Algorithm",
     # Exact solver
     "cplex":               "CPLEX (Exact)",
 }
