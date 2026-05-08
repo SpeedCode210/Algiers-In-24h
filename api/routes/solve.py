@@ -1,10 +1,10 @@
 from __future__ import annotations
-
+ 
 import time
 from typing import Any
-
+ 
 from flask import Blueprint, jsonify, request
-
+ 
 from schemas.request_schemas import (
     ALGORITHM_LABELS,
     COMPARISON_ALGORITHMS,
@@ -14,99 +14,101 @@ from schemas.request_schemas import (
 )
 from services.problem_loader import build_problem
 from utils.time import time_in_string
-
-#  Optional service imports with graceful fallback 
+ 
+# Service imports with graceful fallback
 try:
     from services.solver_service import run_solver
     _SOLVER_OK = True
 except ImportError:
     _SOLVER_OK = False
-
+ 
 try:
     from services.scoring_service import apply_category_weights
     _SCORING_OK = True
 except ImportError:
     _SCORING_OK = False
-
+ 
 try:
-    from services.routing_service import get_route_geometry, get_leg_distances
+    from services.routing_service import get_leg_distances, get_route_geometry
     _ROUTING_OK = True
 except ImportError:
     _ROUTING_OK = False
-
+ 
 solve_bp = Blueprint("solve", __name__)
-
-
+ 
+ 
 # Private helpers
-
-def _error(message: str, code: int = 400):
-    """Builds a JSON error response.
-
+ 
+def _err(message: str, code: int = 400):
+    """Returns a JSON error response tuple.
+ 
     Args:
-        message: Human-readable error message.
+        message: Human-readable error description.
         code: HTTP status code.
-
+ 
     Returns:
-        Flask response tuple.
+        Flask (Response, int) tuple.
     """
     return jsonify({"error": message}), code
-
-
-def _straight_line_geometry(ordered_stops, hotel) -> dict:
-    """Builds a straight-line GeoJSON fallback when OSRM is unavailable.
-
+ 
+ 
+def _straight_line_fallback(ordered_stops, hotel) -> dict:
+    """Builds a straight-line GeoJSON when OSRM is unavailable.
+ 
     Args:
         ordered_stops: Landmarks in visit order.
-        hotel: The hotel landmark (start and end point).
-
+        hotel: Start/end hotel Landmark.
+ 
     Returns:
         GeoJSON LineString dict.
     """
-    all_points = [hotel] + list(ordered_stops) + [hotel]
-    return {
-        "type": "LineString",
-        "coordinates": [[lm.longitude, lm.latitude] for lm in all_points],
-    }
-
-
-def _get_road_data(tour, problem) -> tuple[dict, list[float]]:
-    """Fetches road geometry and distances, falling back to straight lines.
-
+    coords = (
+        [[hotel.longitude, hotel.latitude]]
+        + [[lm.longitude, lm.latitude] for lm in ordered_stops]
+        + [[hotel.longitude, hotel.latitude]]
+    )
+    return {"type": "LineString", "coordinates": coords}
+ 
+ 
+def _fetch_road_data(tour, problem) -> tuple[dict, list[float]]:
+    """Fetches road geometry and leg distances, with straight-line fallback.
+ 
     Args:
-        tour: The solved Tour instance.
-        problem: The Problem instance used during solving.
-
+        tour: Solved Tour instance.
+        problem: Problem instance used during solving.
+ 
     Returns:
-        Tuple of (GeoJSON geometry dict, list of distances in km per leg).
+        (GeoJSON geometry dict, list of km distances per leg).
     """
     sim     = tour.simulation_cache()
     ordered = [entry.landmark for entry in sim.entries]
-
+ 
     if _ROUTING_OK and ordered:
         try:
-            geometry      = get_route_geometry(ordered, problem.hotel)
-            leg_distances = get_leg_distances(ordered, problem.hotel)
-            return geometry, leg_distances
+            return (
+                get_route_geometry(ordered, problem.hotel),
+                get_leg_distances(ordered, problem.hotel),
+            )
         except Exception:
-            pass  # fall through to straight-line fallback
-
-    return _straight_line_geometry(ordered, problem.hotel), [0.0] * len(ordered)
-
-
+            pass  # fall through to straight-line
+ 
+    return _straight_line_fallback(ordered, problem.hotel), [0.0] * len(ordered)
+ 
+ 
 def _format_stops(sim_entries, problem, leg_distances: list[float]) -> list[dict]:
-    """Converts simulation entries into JSON stop dicts.
-
+    """Converts simulation schedule entries into JSON stop dicts.
+ 
     Args:
-        sim_entries: ScheduleEntry list from tour.simulation_cache().
-        problem: The Problem instance (for start_time).
+        sim_entries: List of ScheduleEntry from tour.simulation_cache().
+        problem: The Problem instance (for start_time reference).
         leg_distances: Real road distances per leg in km.
-
+ 
     Returns:
-        Ordered list of stop dicts.
+        Ordered list of stop dicts for the itinerary panel.
     """
     stops = []
     for i, entry in enumerate(sim_entries):
-        prev_departure = (
+        prev_dep = (
             float(problem.start_time) if i == 0
             else float(sim_entries[i - 1].departure_time)
         )
@@ -123,28 +125,34 @@ def _format_stops(sim_entries, problem, leg_distances: list[float]) -> list[dict
             "visit_start_time":         time_in_string(entry.visit_start_time),
             "departure_time":           time_in_string(entry.departure_time),
             "waiting_minutes":          round(entry.waiting_time),
-            "travel_from_prev_minutes": round(entry.arrival_time - prev_departure),
-            "distance_from_prev_km":    leg_distances[i] if i < len(leg_distances) else 0.0,
+            "travel_from_prev_minutes": round(entry.arrival_time - prev_dep),
+            "distance_from_prev_km":    (
+                leg_distances[i] if i < len(leg_distances) else 0.0
+            ),
         })
     return stops
-
-
-def _build_result(algorithm: str, tour, problem, elapsed_ms: int) -> dict:
-    """Assembles the full JSON result for one solver run.
-
+ 
+ 
+def _build_result(
+    algorithm: str,
+    tour,
+    problem,
+    elapsed_ms: int,
+) -> dict:
+    """Assembles the complete JSON result for one solver run.
+ 
     Args:
-        algorithm: Algorithm ID (e.g. "grasp").
-        tour: The solved Tour instance.
-        problem: The Problem instance.
-        elapsed_ms: Solver wall time in milliseconds.
-
+        algorithm: Algorithm ID string (e.g. "grasp").
+        tour: Solved Tour instance.
+        problem: Problem instance used during solving.
+        elapsed_ms: Solver wall-clock time in milliseconds.
+ 
     Returns:
-        Fully formatted result dict ready for jsonify.
+        Fully formatted result dict ready to jsonify.
     """
     sim                     = tour.simulation_cache()
-    geometry, leg_distances = _get_road_data(tour, problem)
-    stops                   = _format_stops(sim.entries, problem, leg_distances)
-
+    geometry, leg_distances = _fetch_road_data(tour, problem)
+ 
     return {
         "algorithm":              algorithm,
         "algorithm_label":        ALGORITHM_LABELS.get(algorithm, algorithm),
@@ -154,54 +162,52 @@ def _build_result(algorithm: str, tour, problem, elapsed_ms: int) -> dict:
         "num_landmarks":          len(tour),
         "is_valid":               sim.is_valid,
         "execution_time_ms":      elapsed_ms,
-        "stops":                  stops,
-        "road_geometry":          geometry,
         "hotel": {
             "id":        problem.hotel.id,
             "name":      problem.hotel.name,
             "latitude":  problem.hotel.latitude,
             "longitude": problem.hotel.longitude,
         },
+        "stops":        _format_stops(sim.entries, problem, leg_distances),
+        "road_geometry": geometry,
     }
-
-
+ 
+ 
 # POST /api/solve
-
+ 
 @solve_bp.route("/solve", methods=["POST"])
 def solve():
-    """Runs one algorithm and returns the full optimised tour.
-
+    """Runs one algorithm and returns the optimised tour.
+ 
     Request body (JSON):
-        algorithm        (str, required) — algorithm ID, e.g. "grasp"
-        hotel_id         (str, required) — e.g. "hotel_aurassi"
-        time_budget      (int, required) — minutes, 60-1440
-        tour_day         (str, required) — e.g. "saturday"
-        start_time       (str, optional) — "HH:MM", default "09:00"
-        category_weights (obj, optional) — {"historical": 1.5, ...}
-        algorithm_params (obj, optional) — {"iterations": 50, ...}
-
-    Response (200):
-        Full tour result with stops, road geometry, scores, timing.
-
-    Response (400): Validation error with field name.
-    Response (404): hotel_id not found.
-    Response (503): Solver service not yet implemented.
-    Response (500): Unexpected server error.
+        algorithm        str  required   e.g. "grasp"
+        hotel_id         str  required   e.g. "hotel_aurassi"
+        time_budget      int  required   minutes, 60–1440
+        tour_day         str  required   e.g. "saturday"
+        start_time       str  optional   "HH:MM", default "09:00"
+        category_weights obj  optional   {"historical": 1.5, ...}
+        algorithm_params obj  optional   {"iterations": 50, ...}
+ 
+    Responses:
+        200  Full tour result (stops, road_geometry, scores, timing).
+        400  { "error": str, "field": str }   validation failure.
+        404  { "error": str }                 hotel_id not found.
+        503  { "error": str }                 service not yet implemented.
+        500  { "error": str }                 unexpected server error.
     """
     if not _SOLVER_OK:
-        return _error(
-            "Solver service not available — "
-            "implement services/solver_service.py first.", 503
+        return _err(
+            "Solver service unavailable — "
+            "implement services/solver_service.py.", 503
         )
-
-    # Validate
+ 
+    # 1. Validate
     try:
         params = validate_solve_request(request.get_json(silent=True) or {})
     except ValidationError as exc:
         return jsonify({"error": exc.message, "field": exc.field}), 400
-
-    # Build problem
-    try:
+ 
+    # 2. Build Problem
         problem = build_problem(
             hotel_id    = params["hotel_id"],
             time_budget = params["time_budget"],
@@ -211,45 +217,55 @@ def solve():
     except KeyError as exc:
         return jsonify({"error": str(exc)}), 404
     except Exception as exc:
-        return _error(f"Failed to build problem: {exc}", 500)
-
-    # Apply category weights
+        return _err(f"Problem construction failed: {exc}", 500)
+ 
+    # 3. Apply category weights 
     if _SCORING_OK and params["category_weights"]:
         try:
-            problem = apply_category_weights(problem, params["category_weights"])
+            problem = apply_category_weights(
+                problem, params["category_weights"]
+            )
         except Exception as exc:
-            return _error(f"Scoring service error: {exc}", 500)
-
-    # Run solver
+            return _err(f"Scoring service error: {exc}", 500)
+ 
+    # 4. Run solver 
     try:
         t0         = time.time()
-        tour       = run_solver(params["algorithm"], problem, params["algorithm_params"])
+        tour       = run_solver(
+            params["algorithm"],
+            problem,
+            params["algorithm_params"],
+        )
         elapsed_ms = round((time.time() - t0) * 1000)
     except ValueError as exc:
-        return _error(str(exc), 400)
+        return _err(str(exc), 400)
     except Exception as exc:
-        return _error(f"Solver error: {exc}", 500)
-
-    return jsonify(_build_result(params["algorithm"], tour, problem, elapsed_ms)), 200
-
-
+        return _err(f"Solver error: {exc}", 500)
+ 
+    # 5. Return 
+    return jsonify(
+        _build_result(params["algorithm"], tour, problem, elapsed_ms)
+    ), 200
+ 
+ 
 # POST /api/solve/all
-
+ 
 @solve_bp.route("/solve/all", methods=["POST"])
 def solve_all():
     """Runs all comparison algorithms and returns a ranked leaderboard.
-
-    Algorithms compared: greedy, sa, grasp, tabu, ga_penalty.
-    All use the same configuration and default hyperparameters.
-
+ 
+    Runs: greedy, sa, grasp, tabu, ga_penalty (defined in COMPARISON_ALGORITHMS).
+    All use the same problem configuration with default hyperparameters.
+ 
     Request body (JSON):
-        hotel_id         (str, required)
-        time_budget      (int, required)
-        tour_day         (str, required)
-        start_time       (str, optional) — default "09:00"
-        category_weights (obj, optional)
-
-    Response (200):
+        hotel_id         str  required
+        time_budget      int  required   minutes, 60–1440
+        tour_day         str  required   e.g. "saturday"
+        start_time       str  optional   "HH:MM", default "09:00"
+        category_weights obj  optional   {"historical": 1.5, ...}
+ 
+    Response (200)::
+ 
         {
             "rankings": [
                 {
@@ -264,24 +280,31 @@ def solve_all():
                 ...
             ],
             "best_algorithm": "grasp",
-            "best_tour": { ...full tour result... },
-            "all_results":   { "grasp": {...}, "sa": {...}, ... },
-            "solver_errors": { "cplex": "CPLEX not installed" }  (if any)
+            "best_tour":   { ...full result... },
+            "all_results": { "grasp": {...}, "sa": {...}, ... },
+            "solver_errors": { "cplex": "not installed" }
         }
+ 
+    Responses:
+        200  Ranked comparison result.
+        400  Validation error.
+        404  hotel_id not found.
+        503  Solver service unavailable.
+        500  All solvers failed.
     """
     if not _SOLVER_OK:
-        return _error(
-            "Solver service not available — "
-            "implement services/solver_service.py first.", 503
+        return _err(
+            "Solver service unavailable — "
+            "implement services/solver_service.py.", 503
         )
-
-    # Validate
+ 
+    # 1. Validate 
     try:
         params = validate_solve_all_request(request.get_json(silent=True) or {})
     except ValidationError as exc:
         return jsonify({"error": exc.message, "field": exc.field}), 400
-
-    # Build problem
+ 
+    # 2. Build Problem 
     try:
         problem = build_problem(
             hotel_id    = params["hotel_id"],
@@ -292,32 +315,36 @@ def solve_all():
     except KeyError as exc:
         return jsonify({"error": str(exc)}), 404
     except Exception as exc:
-        return _error(f"Failed to build problem: {exc}", 500)
-
-    # Apply category weights
+        return _err(f"Problem construction failed: {exc}", 500)
+ 
+    # 3. Apply category weights 
     if _SCORING_OK and params["category_weights"]:
         try:
-            problem = apply_category_weights(problem, params["category_weights"])
+            problem = apply_category_weights(
+                problem, params["category_weights"]
+            )
         except Exception as exc:
-            return _error(f"Scoring service error: {exc}", 500)
-
-    # Run all algorithms
-    all_results: dict[str, dict] = {}
-    solver_errors: dict[str, str] = {}
-
+            return _err(f"Scoring service error: {exc}", 500)
+ 
+    # 4. Run all comparison algorithms 
+    all_results:   dict[str, dict] = {}
+    solver_errors: dict[str, str]  = {}
+ 
     for algorithm in COMPARISON_ALGORITHMS:
         try:
             t0         = time.time()
             tour       = run_solver(algorithm, problem, {})
             elapsed_ms = round((time.time() - t0) * 1000)
-            all_results[algorithm] = _build_result(algorithm, tour, problem, elapsed_ms)
+            all_results[algorithm] = _build_result(
+                algorithm, tour, problem, elapsed_ms
+            )
         except Exception as exc:
             solver_errors[algorithm] = str(exc)
-
+ 
     if not all_results:
-        return _error(f"All solvers failed: {solver_errors}", 500)
-
-    # Rank by total score
+        return _err(f"All solvers failed: {solver_errors}", 500)
+ 
+    # 5. Rank and return 
     ranked = sorted(
         all_results.values(),
         key=lambda r: r["total_score"],
@@ -325,27 +352,25 @@ def solve_all():
     )
     for i, r in enumerate(ranked):
         r["rank"] = i + 1
-
-    rankings = [
-        {
-            "rank":                   r["rank"],
-            "algorithm":              r["algorithm"],
-            "algorithm_label":        r["algorithm_label"],
-            "total_score":            r["total_score"],
-            "num_landmarks":          r["num_landmarks"],
-            "total_duration_minutes": r["total_duration_minutes"],
-            "execution_time_ms":      r["execution_time_ms"],
-        }
-        for r in ranked
-    ]
-
+ 
     response: dict[str, Any] = {
-        "rankings":       rankings,
+        "rankings": [
+            {
+                "rank":                   r["rank"],
+                "algorithm":              r["algorithm"],
+                "algorithm_label":        r["algorithm_label"],
+                "total_score":            r["total_score"],
+                "num_landmarks":          r["num_landmarks"],
+                "total_duration_minutes": r["total_duration_minutes"],
+                "execution_time_ms":      r["execution_time_ms"],
+            }
+            for r in ranked
+        ],
         "best_algorithm": ranked[0]["algorithm"],
         "best_tour":      ranked[0],
         "all_results":    all_results,
     }
     if solver_errors:
         response["solver_errors"] = solver_errors
-
+ 
     return jsonify(response), 200
