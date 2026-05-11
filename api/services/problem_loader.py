@@ -40,7 +40,7 @@ def build_problem(
         )
 
     return Problem(
-        hotel=hotel_id,
+        hotel= hotels[hotel_id],
         landmarks=landmarks,
         time_budget=time_budget,
         tour_day=Day.from_string(tour_day),
