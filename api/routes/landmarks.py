@@ -119,7 +119,7 @@ def get_hotels():
 def get_categories():
     """Returns all distinct landmark categories for the preference panel.
  
-    The user assigns a weight multiplier (0.0–5.0) per category.
+    The user assigns a weight multiplier (0.5–1.5) per category.
     Weights are sent as category_weights in /api/solve requests and
     applied to landmark scores before the solver runs.
  

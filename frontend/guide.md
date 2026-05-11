@@ -50,7 +50,7 @@ const response = await fetch('/api/solve', {
 
     // Optional
     start_time: '09:00',          // default is 09:00
-    category_weights: {           // multipliers per category (0.0 to 5.0)
+    category_weights: {           // multipliers per category (0.0 to 1.0)
       historical:   1.5,
       attraction:   1.0,
       shopping:     0.3,
