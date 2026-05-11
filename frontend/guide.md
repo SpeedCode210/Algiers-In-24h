@@ -50,7 +50,7 @@ const response = await fetch('/api/solve', {
 
     // Optional
     start_time: '09:00',          // default is 09:00
-    category_weights: {           // multipliers per category (0.0 to 1.0)
+    category_weights: {           // multipliers per category (0.4 to 1.6)
       historical:   1.5,
       attraction:   1.0,
       shopping:     0.3,
@@ -218,4 +218,4 @@ const result = await response.json();
 
 `historical` `religious` `attraction` `tradition_art` `shopping`
 
-Weight range: `0.0` to `1.0`. Omitting a category leaves its weight at `1.0`.
+Weight range: `0.4` to `1.6`. Omitting a category leaves its weight at `1.0`.

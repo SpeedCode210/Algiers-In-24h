@@ -49,8 +49,8 @@ VALID_CATEGORIES: set[str] = {
 
 MIN_TIME_BUDGET = 60     # 1 hour
 MAX_TIME_BUDGET = 1440   # 24 hours
-MIN_WEIGHT      = 0.0
-MAX_WEIGHT      = 1.0
+MIN_WEIGHT      = 0.4
+MAX_WEIGHT      = 1.6
 
 
 # ---------------------------------------------------------------------------

@@ -31,7 +31,7 @@ def _rank_to_weight(rank: int, n: int = _N_CATEGORIES, coef: float = _COEF) -> f
     Returns:
         Float weight multiplier to apply to interest_score.
     """
-    return ((n - rank) / (n - 1) - 0.5) * coef + 1
+    return ((n - rank) / (n - 1) - 0.5) * coef + 1.
 
 
 # ---------------------------------------------------------------------------
