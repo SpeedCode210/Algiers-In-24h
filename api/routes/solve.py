@@ -208,6 +208,7 @@ def solve():
         return jsonify({"error": exc.message, "field": exc.field}), 400
  
     # 2. Build Problem
+    try:
         problem = build_problem(
             hotel_id    = params["hotel_id"],
             time_budget = params["time_budget"],
