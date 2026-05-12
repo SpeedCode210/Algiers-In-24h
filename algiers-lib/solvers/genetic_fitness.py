@@ -173,4 +173,4 @@ class FeasibilityFitnessFunction(FitnessFunction):
         total_reward = sum(
             float(landmark.interest_score) for landmark in tour.visited_landmarks
         )
-        return total_reward + 2*(tour.problem.time_budget-total_duration)/tour.problem.time_budget # this is another interesting one , must be tested **5/total_duration**2+1 
+        return total_reward + (tour.problem.time_budget-total_duration)/tour.problem.time_budget # this is another interesting one , must be tested **5/total_duration**2+1 
