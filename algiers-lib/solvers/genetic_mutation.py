@@ -122,7 +122,7 @@ class Mutation:
 
                 diff = target_deadline - arrival_at_selected
 
-                score = candidate.interest_score / (diff +1)
+                score = candidate.interest_score**3 / (diff +1)
                 if score > best_score_for_selected:
                     best_score_for_selected = score
                     best_candidate_for_selected = candidate
