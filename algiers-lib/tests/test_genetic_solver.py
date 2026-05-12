@@ -18,7 +18,7 @@ from solvers.genetic_solver import GeneticSolver , TailoredGeneticSolver
 
 def load_dataset_problem() -> Problem:
     data_dir = Path(__file__).resolve().parents[1] / "data"
-    landmarks = loadLandmarks(str(data_dir / "landmarks.csv"))
+    landmarks = loadLandmarks(str(data_dir / "data.csv"))
     hotel = loadHotel(str(data_dir / "hotel.csv"))
 
     return Problem(hotel=hotel, landmarks=landmarks, time_budget=500, tour_day=Day.MONDAY)
