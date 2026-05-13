@@ -64,7 +64,7 @@ def infeasible_landmark_problem(sample_problem):
 
 def load_dataset_problem() -> Problem:
     data_dir = Path(__file__).resolve().parents[1] / "data"
-    landmarks = loadLandmarks(str(data_dir / "landmarks.csv"))
+    landmarks = loadLandmarks(str(data_dir / "data.csv"))
     hotel = loadHotel(str(data_dir / "hotel.csv"))
     return Problem(hotel=hotel, landmarks=landmarks, time_budget=500, tour_day=Day.MONDAY)
 
@@ -90,13 +90,18 @@ def format_route_details(tour: Tour) -> str:
             for slot in day_slots
         ) or "closed"
         lines.append(
-            f"{landmark.name} | arrival: {time_in_string(entry.arrival_time)} "
-            f"| start: {time_in_string(entry.visit_start_time)} "
-            f"| depart: {time_in_string(entry.departure_time)} "
-            f"| slots: {slot_info}"
-        )
+           f"{landmark.name} | arrival: {safe_time(entry.arrival_time)} "
+          f"| start: {safe_time(entry.visit_start_time)} "
+          f"| depart: {safe_time(entry.departure_time)} "
+         f"| slots: {slot_info}"
+      )
     return "\n".join(lines)
 
+def safe_time(minutes):
+    try:
+        return time_in_string(minutes)
+    except ValueError:
+        return f"INVALID({minutes})"
 
 class TestSelection:
 
