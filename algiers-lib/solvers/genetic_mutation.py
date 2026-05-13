@@ -7,12 +7,12 @@ from .genetic_augmented_representation import AugmentedRepresentation
 
 class Mutation:
     """Mutation operator for the genetic algorithm.
- 
+
     Applies stochastic modifications to a tour to introduce diversity into
     the population. Supports a tailored insertion strategy that uses timeline
     flexibility (max_shift) to find valid insertion positions, and a random
     deletion strategy.
- 
+
     Attributes:
         insertion_probability: Probability of performing an insertion mutation
             rather than a deletion when the tour is non-empty.
@@ -20,11 +20,11 @@ class Mutation:
 
     def __init__(self, insertion_probability: float = 0.5) -> None:
         """Initialize the mutation operator.
- 
+
         Args:
             insertion_probability: Probability in [0, 1] of inserting a landmark
                 rather than deleting one when the tour is non-empty. Defaults to 0.5.
- 
+
         Raises:
             ValueError: If insertion_probability is not in [0, 1].
         """
@@ -35,14 +35,14 @@ class Mutation:
 
     def mutate(self, tour: Tour) -> Tour:
         """Apply a single mutation to a copy of the given tour.
- 
+
         If the tour is empty, always performs an insertion. Otherwise, performs
         a tailored insertion with probability ``insertion_probability`` and a
         deletion otherwise.
- 
+
         Args:
             tour: The tour to mutate. A copy is made before any modification.
- 
+
         Returns:
             A mutated Tour. The original tour is not modified.
         """
@@ -58,20 +58,20 @@ class Mutation:
 
     def _tailored_insert(self, tour: Tour) -> Tour:
         """Insert a landmark at a time-feasible position using max_shift guidance.
- 
+
         Builds an augmented representation of the tour and searches for positions
         where a new landmark can be inserted before an existing one without
         violating that landmark's allowable start window. For each such position,
         the candidate with the best interest-to-slack ratio is selected. One
         insertion is then chosen at random from all feasible position-candidate
         pairs found.
- 
+
         Falls back to random insertion if no feasible position is found or if
         the tour has no timeline.
- 
+
         Args:
             tour: The tour to insert into. Modified in place.
- 
+
         Returns:
             The modified tour with one landmark inserted, or the original tour
             if no feasible insertion was found.
@@ -140,10 +140,10 @@ class Mutation:
 
     def _delete(self, tour: Tour) -> Tour:
         """Remove a randomly selected landmark from the tour.
- 
+
         Args:
             tour: The tour to modify. Modified in place.
- 
+
         Returns:
             The tour with one landmark removed, or unchanged if empty.
         """
@@ -156,13 +156,13 @@ class Mutation:
 
     def _insert(self, tour: Tour) -> Tour:
         """Insert a randomly selected feasible landmark at a random position.
- 
+
         If no feasible candidates are available, falls back to deletion if the
         tour is non-empty, or returns the tour unchanged if empty.
- 
+
         Args:
             tour: The tour to modify. Modified in place.
- 
+
         Returns:
             The tour with one landmark inserted, or the result of a deletion
             fallback if no candidates are available.
