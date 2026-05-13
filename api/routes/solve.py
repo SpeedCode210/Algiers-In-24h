@@ -122,8 +122,8 @@ def _format_stops(sim_entries, problem, leg_distances: list[float]) -> list[dict
             "interest_score":           entry.landmark.interest_score,
             "visit_duration_minutes":   entry.landmark.visit_duration,
             "arrival_time":             time_in_string(round(entry.arrival_time)),
-            "visit_start_time":         time_in_string(entry.visit_start_time),
-            "departure_time":           time_in_string(entry.departure_time),
+            "visit_start_time":         time_in_string(round(entry.visit_start_time)),
+            "departure_time":           time_in_string(round(entry.departure_time)),
             "waiting_minutes":          round(entry.waiting_time),
             "travel_from_prev_minutes": round(entry.arrival_time - prev_dep),
             "distance_from_prev_km":    (
