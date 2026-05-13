@@ -10,14 +10,14 @@ from .genetic_mutation import Mutation
 from .genetic_fitness import FitnessFunction
 from .genetic_selection import Selection
 
-class GeneticSolver(Solver):  
+class GeneticSolver(Solver):
     """Standard genetic algorithm solver for the Orienteering Problem with Time Windows.
- 
+
     Uses order-based crossover on raw Tour objects and supports optional elitism
     and culling strategies. The population is initialized with random tours and
     evolved over a fixed number of generations, with early stopping when fitness
     has not improved for 100 consecutive generations.
- 
+
     Attributes:
         fitness_function: Fitness function used to evaluate and rank tours.
         regenerations: Maximum number of generations to run.
@@ -45,10 +45,10 @@ class GeneticSolver(Solver):
         culling: bool = False,
         elite_proportion: float = 0.54,
         culling_proportion: float = 0.03,
-        patience : int =100,
+        patience: int = 100,
     ) -> None:
         """Initialize the genetic solver.
- 
+
         Args:
             problem: The OPTW problem instance to solve.
             fitness_function: Fitness function for evaluating tours.
@@ -68,7 +68,7 @@ class GeneticSolver(Solver):
                 Defaults to 0.1.
             culling_proportion: Fraction of population size to cull each generation.
                 Defaults to 0.1.
- 
+
         Raises:
             ValueError: If any parameter is outside its valid range.
         """
@@ -100,12 +100,12 @@ class GeneticSolver(Solver):
 
     def solve(self) -> Tour:
         """Run the genetic algorithm and return the best tour found.
- 
+
         Initializes the population with random tours, then evolves it for up
         to ``regenerations`` generations using tournament selection, crossover,
         and mutation. Terminates early if fitness does not improve for 100
         consecutive generations.
- 
+
         Returns:
             The best Tour found across all generations.
         """
@@ -116,7 +116,6 @@ class GeneticSolver(Solver):
         unchanged_generations = 0
         for _ in range(self.regenerations):
             next_population: list[Tour] = []
-            # this implemnts the ellitism that is ensuring that the fitness is always increasing
             if self.elitism:
                 elite_count = int(self.population_size * self.elite_proportion)
                 if elite_count > 0:
@@ -141,7 +140,6 @@ class GeneticSolver(Solver):
                 next_population.extend([child1, child2])
 
             next_population = next_population[: self.population_size]
-            #this implemnts culling that is we eliminate the worst performing children , they die ! this is not good for the OPTW problem .
             if self.culling:
                 cull_count = int(self.population_size * self.culling_proportion)
                 if cull_count > 0:

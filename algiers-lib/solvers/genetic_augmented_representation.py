@@ -8,12 +8,12 @@ from models.tour import Tour
 
 class AugmentedRepresentation:
     """Augmented representation for genetic algorithm optimization of tour routes.
- 
+
     Extends a tour representation with a timeline that includes flexibility
     (max_shift) values for each landmark visit. These values are used by the
     tailored crossover and mutation operators to determine valid cut points and
     insertion positions without re-simulating the full tour.
- 
+
     Attributes:
         landmarks: Ordered list of landmarks in the tour.
         problem: The optimization problem instance.
@@ -32,7 +32,7 @@ class AugmentedRepresentation:
         problem: Optional[Problem] = None,
     ) -> None:
         """Initialize an augmented representation.
- 
+
         Args:
             landmarks: Ordered list of landmarks in the tour route.
             problem: The optimization problem instance. Optional for basic
@@ -45,16 +45,16 @@ class AugmentedRepresentation:
     @classmethod
     def from_tour(cls, tour: Tour) -> "AugmentedRepresentation":
         """Create an augmented representation from a valid tour.
- 
+
         Runs the tour simulation to obtain the scheduled timeline, then performs
         a backward pass to compute the max_shift for each landmark. The max_shift
         at position i represents how much the visit start at i can be delayed
         while guaranteeing that all subsequent visits and the return to the hotel
         still fit within their time windows and the overall time budget.
- 
+
         Args:
             tour: A valid tour to convert. Must have a non-empty simulation result.
- 
+
         Returns:
             AugmentedRepresentation with a fully computed timeline. If the tour
             has no visited landmarks, the timeline will be empty.
@@ -102,26 +102,26 @@ class AugmentedRepresentation:
         return augmented
 
     @staticmethod
-    def _compute_closing_term(# this must be consulted 
+    def _compute_closing_term(
         day_slots: list,
         start_time: float,
         visit_duration: float,
         next_limit: float,
     ) -> float:
         """Compute the maximum allowable shift for a single landmark visit.
- 
+
         Finds the tightest constraint between the landmark's own closing time
         and the downstream propagated limit. The result is the largest delay
         that can be applied to start_time without violating the slot's closing
         time, capped by the downstream constraint next_limit.
- 
+
         Args:
             day_slots: Available time slots for the landmark on the tour day.
             start_time: Currently scheduled visit start time.
             visit_duration: Duration of the landmark visit in minutes.
             next_limit: Maximum allowable delay propagated from downstream
                 constraints (subsequent landmarks and time budget).
- 
+
         Returns:
             Maximum time shift in minutes that can be applied to start_time.
             Returns next_limit if the closing slack of every valid slot exceeds
