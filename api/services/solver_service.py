@@ -123,7 +123,12 @@ def run_solver(algorithm: str, problem: Problem, params: dict) -> Tour:
         )
 
     solver = factory(problem, params or {})
-    return solver.solve()
+    try:
+        return solver.solve()
+    except Exception as exc:
+        raise RuntimeError(
+            f"Solver '{algorithm}' raised an unexpected exception."
+        ) from exc
 
 
 def run_all_solvers(
