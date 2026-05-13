@@ -25,6 +25,7 @@ from solvers.genetic_fitness import (
     PenaltyFitnessFunction,
     FeasibilityFitnessFunction,
 )
+from solvers.cplex_solver import CPLEXSolver
 
 from schemas.request_schemas import COMPARISON_ALGORITHMS
 
@@ -85,6 +86,9 @@ def _make_ga_tailored(problem: Problem, params: dict):
         crossover_method="tailored",
     )
 
+def _make_cplex(problem: Problem, params: dict):
+    return CPLEXSolver(problem)
+
 
 _SOLVER_REGISTRY: dict[str, Any] = {
     "greedy":         _make_greedy,
@@ -96,6 +100,7 @@ _SOLVER_REGISTRY: dict[str, Any] = {
     "tabu":           _make_tabu,
     "ga":             _make_ga,
     "ga_tailored":    _make_ga_tailored,
+    "cplex":          _make_cplex,
 }
 
 
