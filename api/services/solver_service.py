@@ -6,8 +6,12 @@ import time
 from typing import Any
 
 # Ensure the library root is on the path so solver imports resolve.
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../algiers-lib"))
-
+_LIBRARY_ROOT = os.path.normpath(
+     os.path.abspath(os.path.join(os.path.dirname(__file__), "../../algiers-lib"))
+ )
+if _LIBRARY_ROOT not in {os.path.normpath(os.path.abspath(path)) for path in sys.path}:
+     sys.path.insert(0, _LIBRARY_ROOT)
+     
 from models.problem import Problem
 from models.tour import Tour
 
@@ -16,7 +20,7 @@ from solvers.greedy_for_app import RandomGreedy, TimeGreedy
 from solvers.simulated_annealing_solver import SimulatedAnnealingSolver
 from solvers.grasp_solver import GraspSolver
 from solvers.tabu_solver import TabuSolver
-from solvers.genetic_solver import GeneticSolver
+from solvers.genetic_solver import GeneticSolver, TailoredGeneticSolver
 from solvers.genetic_fitness import (
     PenaltyFitnessFunction,
     FeasibilityFitnessFunction,
@@ -72,7 +76,7 @@ def _make_ga(problem: Problem, params: dict):
     )
 
 def _make_ga_tailored(problem: Problem, params: dict):
-    return GeneticSolver(
+    return TailoredGeneticSolver(
         problem,
         fitness_function=FeasibilityFitnessFunction(),
         regenerations=int(params.get("regenerations", 1000)),
