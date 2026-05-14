@@ -1,0 +1,178 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Algiers-in-24h API",
+    "version": "1.0.0",
+    "description": "API for solving the Algiers-in-24h tour optimization problem."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Development server"
+    }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health check",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "API is running"
+          }
+        }
+      }
+    },
+    "/api/landmarks": {
+      "get": {
+        "tags": ["Data"],
+        "summary": "Get all landmarks",
+        "operationId": "getLandmarks",
+        "responses": {
+          "200": {
+            "description": "List of all landmarks"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/hotels": {
+      "get": {
+        "tags": ["Data"],
+        "summary": "Get all hotels",
+        "operationId": "getHotels",
+        "responses": {
+          "200": {
+            "description": "List of available hotels"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/categories": {
+      "get": {
+        "tags": ["Data"],
+        "summary": "Get landmark categories",
+        "operationId": "getCategories",
+        "responses": {
+          "200": {
+            "description": "List of categories"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/solve": {
+      "post": {
+        "tags": ["Solving"],
+        "summary": "Solve tour with one algorithm",
+        "operationId": "solveTour",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["algorithm", "hotel_id", "time_budget", "tour_day"],
+                "properties": {
+                  "algorithm": {
+                    "type": "string",
+                    "description": "Algorithm to use (e.g., greedy, sa, grasp, tabu, ga)"
+                  },
+                  "hotel_id": {
+                    "type": "string",
+                    "description": "ID of the hotel"
+                  },
+                  "time_budget": {
+                    "type": "integer",
+                    "description": "Time budget in minutes (60-1440)"
+                  },
+                  "tour_day": {
+                    "type": "string",
+                    "description": "Day of week (e.g., monday, tuesday, ...)"
+                  },
+                  "start_time": {
+                    "type": "string",
+                    "description": "Start time in HH:MM format (default: 09:00)"
+                  },
+                  "category_weights": {
+                    "type": "object",
+                    "description": "Category preference weights"
+                  },
+                  "algorithm_params": {
+                    "type": "object",
+                    "description": "Algorithm-specific parameters"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tour result"
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/solve/all": {
+      "post": {
+        "tags": ["Solving"],
+        "summary": "Run all comparison algorithms",
+        "operationId": "solveAll",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["hotel_id", "time_budget", "tour_day"],
+                "properties": {
+                  "hotel_id": {
+                    "type": "string"
+                  },
+                  "time_budget": {
+                    "type": "integer"
+                  },
+                  "tour_day": {
+                    "type": "string"
+                  },
+                  "start_time": {
+                    "type": "string"
+                  },
+                  "category_weights": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Comparison results"
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    }
+  }
+}
