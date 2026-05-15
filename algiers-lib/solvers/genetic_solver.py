@@ -137,6 +137,7 @@ class GeneticSolver(Solver):
                 if random.random() < self.mutation_rate:
                     child2 = self.mutation.mutate(child2)
 
+
                 next_population.extend([child1, child2])
 
             next_population = next_population[: self.population_size]
