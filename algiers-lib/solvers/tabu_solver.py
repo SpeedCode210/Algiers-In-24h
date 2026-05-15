@@ -210,41 +210,41 @@ class TabuSolver(Solver):
                 move = TabuMove(MoveType.REPLACE, tuple(sorted([weak.id, strong.id])))
                 neighbors.append((neighbor, move))
 
-        if phase == OscillationPhase.EXPANSION:
-            simulation = tour.simulation_cache()
-            slack = effective_budget - simulation.total_duration
-            unvisited = self.problem.feasible_candidates(tour)
+        # Standard insertion moves for all phases, limited by effective_budget
+        simulation = tour.simulation_cache()
+        slack = effective_budget - simulation.total_duration
+        unvisited = self.problem.feasible_candidates(tour)
 
-            ranked_insert: list[tuple[Landmark, float, int]] = []
-            for candidate in unvisited:
-                best_cost = float("inf")
-                best_position = 0
-                for position in range(len(visited) + 1):
-                    prev = self.problem.hotel if position == 0 else visited[position - 1]
-                    nxt = self.problem.hotel if position == len(visited) else visited[position]
-                    induced_cost = (
-                        self.problem.travel_time(prev, candidate)
-                        + self.problem.travel_time(candidate, nxt)
-                        - self.problem.travel_time(prev, nxt)
-                        + candidate.visit_duration
-                    )
-                    if induced_cost < best_cost:
-                        best_cost = induced_cost
-                        best_position = position
+        ranked_insert: list[tuple[Landmark, float, int]] = []
+        for candidate in unvisited:
+            best_cost = float("inf")
+            best_position = 0
+            for position in range(len(visited) + 1):
+                prev = self.problem.hotel if position == 0 else visited[position - 1]
+                nxt = self.problem.hotel if position == len(visited) else visited[position]
+                induced_cost = (
+                    self.problem.travel_time(prev, candidate)
+                    + self.problem.travel_time(candidate, nxt)
+                    - self.problem.travel_time(prev, nxt)
+                    + candidate.visit_duration
+                )
+                if induced_cost < best_cost:
+                    best_cost = induced_cost
+                    best_position = position
 
-                if best_cost <= slack:
-                    ranked_insert.append((candidate, best_cost, best_position))
+            if best_cost <= slack:
+                ranked_insert.append((candidate, best_cost, best_position))
 
-            ranked_insert.sort(
-                key=lambda item: item[0].interest_score / (item[1] + 1e-9),
-                reverse=True,
-            )
+        ranked_insert.sort(
+            key=lambda item: item[0].interest_score / (item[1] + 1e-9),
+            reverse=True,
+        )
 
-            for candidate, _, position in ranked_insert[:self.n_insert_candidates]:
-                neighbor = tour.copy()
-                neighbor.add_landmark(candidate, position)
-                move = TabuMove(MoveType.INSERT, (candidate.id,))
-                neighbors.append((neighbor, move))
+        for candidate, _, position in ranked_insert[:self.n_insert_candidates]:
+            neighbor = tour.copy()
+            neighbor.add_landmark(candidate, position)
+            move = TabuMove(MoveType.INSERT, (candidate.id,))
+            neighbors.append((neighbor, move))
 
         return neighbors
     
