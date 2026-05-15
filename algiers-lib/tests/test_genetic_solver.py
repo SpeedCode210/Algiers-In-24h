@@ -10,7 +10,7 @@ from models.tour import Tour
 from utils.time import time_in_string
 from solvers.genetic_mutation import Mutation
 from solvers.genetic_crossover import Crossover
-from solvers.genetic_fitness import (FeasibilityFitnessFunction, InfeasibilityFitnessFunction, PenaltyFitnessFunction)
+from solvers.genetic_fitness import (FeasibilityFitnessFunction, ScoreFitnessFunction)
 from solvers.genetic_selection import Selection 
 from solvers.genetic_augmented_representation import AugmentedRepresentation
 from solvers.genetic_solver import GeneticSolver , TailoredGeneticSolver
@@ -91,7 +91,7 @@ def test_genetic_solver_runs_with_penalty_fitness() -> None:
     problem = load_dataset_problem()
     solver = GeneticSolver(
         problem=problem,
-        fitness_function=PenaltyFitnessFunction(),
+        fitness_function=ScoreFitnessFunction(),
         regenerations=100,
         population_size=20,
         mutation_rate=0.1,
@@ -115,7 +115,7 @@ def test_genetic_solver_runs_with_infeasibility_fitness() -> None:
     problem = load_dataset_problem()
     solver = GeneticSolver(
         problem=problem,
-        fitness_function=InfeasibilityFitnessFunction(),
+        fitness_function=ScoreFitnessFunction(),
         regenerations=1,
         population_size=2,
         mutation_rate=0.1,
