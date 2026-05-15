@@ -46,6 +46,7 @@ class GeneticSolver(Solver):
         elite_proportion: float = 0.54,
         culling_proportion: float = 0.03,
         patience : int =100,
+        resolve: bool=True,
     ) -> None:
         """Initialize the genetic solver.
  
@@ -137,8 +138,9 @@ class GeneticSolver(Solver):
                     child1 = self.mutation.mutate(child1)
                 if random.random() < self.mutation_rate:
                     child2 = self.mutation.mutate(child2)
-                child1 = self._resolve_tour(child1)
-                child2 = self._resolve_tour(child2)
+                if (resolve):
+                    child1 = self._resolve_tour(child1)
+                    child2 = self._resolve_tour(child2)
 
 
                 next_population.extend([child1, child2])
