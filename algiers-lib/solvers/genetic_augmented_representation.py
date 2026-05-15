@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, cast
 from models.landmark import Landmark
 from models.problem import Problem
 from models.tour import Tour
+
+TimelineRow = tuple[float, float, float, float, float]
 
 
 class AugmentedRepresentation:
@@ -52,10 +54,14 @@ class AugmentedRepresentation:
         while guaranteeing that all subsequent visits and the return to the hotel
         still fit within their time windows and the overall time budget.
  
-        Args:
-            tour: A valid tour to convert. Must have a non-empty simulation result.
+        Parameters
+        ----------
+        tour : Tour
+            A valid tour to convert. Must have a non-empty simulation result.
  
-        Returns:
+        Returns
+        -------
+        AugmentedRepresentation
             AugmentedRepresentation with a fully computed timeline. If the tour
             has no visited landmarks, the timeline will be empty.
         """
@@ -98,7 +104,7 @@ class AugmentedRepresentation:
             max_shifts[index] = max_shift
             timeline[index][4] = max_shift
 
-        augmented.timeline = [tuple(entry) for entry in timeline]
+        augmented.timeline = cast(list[TimelineRow], [tuple(entry) for entry in timeline])
         return augmented
 
     @staticmethod

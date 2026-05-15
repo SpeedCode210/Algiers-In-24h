@@ -1,26 +1,14 @@
-"""
-landmark_analysis.py
-====================
-Analyse and visualise landmarks/attractions in Algiers.
-
-Usage
------
-    python landmark_analysis.py                         # uses default paths
-    python landmark_analysis.py --csv data.csv --out ./figures
-    python landmark_analysis.py --show                  # display in addition to saving
-"""
-
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
-from typing import Final
+from typing import Callable, Final
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
+from matplotlib.figure import Figure
 import numpy as np
 import pandas as pd
-from scipy.stats import gaussian_kde
 
 __all__ = [
     "load_landmark_data",
@@ -78,19 +66,40 @@ _ANNOTATION_FONTSIZE: Final[int] = 11
 
 
 def load_landmark_data(csv_path: str | Path) -> pd.DataFrame:
-    """Load landmark data from *csv_path* and normalise column names."""
+    """Load landmark data from *csv_path* and normalise column names.
+
+    Args:
+        csv_path: Path to the landmark CSV file.
+
+    Returns:
+        Normalised landmark data.
+    """
     df = pd.read_csv(csv_path, encoding="utf-8")
     df.columns = df.columns.str.strip().str.lower()
     return df
 
 
 def get_unique_landmarks(df: pd.DataFrame) -> pd.DataFrame:
-    """Return a deduplicated DataFrame with one row per landmark ID."""
+    """Return a deduplicated DataFrame with one row per landmark ID.
+
+    Args:
+        df: Landmark data that may contain duplicate rows.
+
+    Returns:
+        Deduplicated landmark data indexed by landmark ID.
+    """
     return df.drop_duplicates(subset="id")
 
 
 def count_landmarks_per_category(df: pd.DataFrame) -> pd.DataFrame:
-    """Count unique landmarks per category, preserving *CATEGORY_ORDER*."""
+    """Count unique landmarks per category, preserving *CATEGORY_ORDER*.
+
+    Args:
+        df: Landmark data to count by category.
+
+    Returns:
+        Category counts for unique landmarks, ordered by *CATEGORY_ORDER*.
+    """
     unique = get_unique_landmarks(df)
     counts = (
         unique.groupby("category")
@@ -104,16 +113,48 @@ def count_landmarks_per_category(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _numeric_column(series: pd.Series) -> np.ndarray:
-    """Coerce *series* to float, dropping NaN values, and return a NumPy array."""
+    """Coerce *series* to float, drop NaN values, and return a NumPy array.
+
+    Args:
+        series: Series of values that should be converted to numeric.
+
+    Returns:
+        Numeric values from the series as a float array.
+    """
     return pd.to_numeric(series, errors="coerce").dropna().to_numpy(dtype=float)
 
 
+def _kernel_density_estimate(values: np.ndarray, x: np.ndarray, bandwidth: float = 0.3) -> np.ndarray:
+    """Estimate a Gaussian kernel density on the specified grid.
+
+    Args:
+        values: Data values used to build the kernel density.
+        x: Points at which to evaluate the density.
+        bandwidth: Smoothing bandwidth for the Gaussian kernel.
+
+    Returns:
+        Density values evaluated at *x*.
+    """
+    if values.size == 0:
+        return np.zeros_like(x)
+
+    diff = x[:, None] - values[None, :]
+    kernels = np.exp(-0.5 * (diff / bandwidth) ** 2)
+    return np.sum(kernels, axis=1) / (len(values) * bandwidth * np.sqrt(2 * np.pi))
+
+
 def _save_or_show(
-    fig: plt.Figure,
+    fig: Figure,
     output_path: str | Path | None,
     show: bool,
 ) -> None:
-    """Save *fig* to *output_path* and/or display it, then close."""
+    """Save *fig* to *output_path* and/or display it, then close.
+
+    Args:
+        fig: Figure object to save or display.
+        output_path: Destination path for the saved figure. If None, the figure is not saved.
+        show: Whether to display the figure after generating it.
+    """
     if output_path is not None:
         path = Path(output_path)
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -131,9 +172,15 @@ def plot_landmark_category_counts(
     output_path: str | Path | None = None,
     show: bool = False,
 ) -> None:
-    """Plot a bar chart of unique landmark counts per category."""
+    """Plot a bar chart of unique landmark counts per category.
+
+    Args:
+        df: Landmark data used to compute category counts.
+        output_path: Path to save the generated figure. If None, the figure is not saved.
+        show: Whether to display the figure after creation.
+    """
     counts = count_landmarks_per_category(df)
-    labels = [CATEGORY_LABELS.get(c, c.title()) for c in counts["category"]]
+    labels: list[str] = [CATEGORY_LABELS.get(c, str(c)) for c in counts["category"]]
     values = counts["count"].tolist()
     colors = [CATEGORY_COLORS.get(c, CATEGORY_COLORS["unknown"]) for c in counts["category"]]
 
@@ -173,14 +220,19 @@ def plot_interest_score_distribution(
     output_path: str | Path | None = None,
     show: bool = False,
 ) -> None:
-    """Plot a histogram with KDE overlay of landmark interest scores."""
+    """Plot a histogram with KDE overlay of landmark interest scores.
+
+    Args:
+        df: Landmark data from which unique interest scores are extracted.
+        output_path: Path to save the generated figure. If None, the figure is not saved.
+        show: Whether to display the figure after creation.
+    """
     scores = _numeric_column(get_unique_landmarks(df)["interest_score"])
     mean_score = float(np.mean(scores))
     median_score = float(np.median(scores))
 
-    kde = gaussian_kde(scores, bw_method=0.3)
     x = np.linspace(scores.min() - 0.5, scores.max() + 0.5, 300)
-    density = kde(x)
+    density = _kernel_density_estimate(scores, x, bandwidth=0.3)
 
     fig, ax = plt.subplots(figsize=(11, 6))
     ax.hist(
@@ -236,7 +288,13 @@ def plot_visit_duration_by_category(
     output_path: str | Path | None = None,
     show: bool = False,
 ) -> None:
-    """Plot boxplots of recommended visit durations grouped by category."""
+    """Plot boxplots of recommended visit durations grouped by category.
+
+    Args:
+        df: Landmark data used to compute visit duration distributions.
+        output_path: Path to save the generated figure. If None, the figure is not saved.
+        show: Whether to display the figure after creation.
+    """
     unique = get_unique_landmarks(df)
     data = [
         _numeric_column(unique.loc[unique["category"] == cat, "visit_duration_minutes"]).tolist()
@@ -281,7 +339,13 @@ def plot_availability_heatmap(
     output_path: str | Path | None = None,
     show: bool = False,
 ) -> None:
-    """Plot a heatmap of landmark availability by day of week and category."""
+    """Plot a heatmap of landmark availability by day of week and category.
+
+    Args:
+        df: Landmark data with day and category availability information.
+        output_path: Path to save the generated figure. If None, the figure is not saved.
+        show: Whether to display the figure after creation.
+    """
     avail = df[["id", "day", "category"]].drop_duplicates()
     pivot = (
         avail.groupby(["day", "category"])
@@ -331,7 +395,7 @@ def plot_availability_heatmap(
 
 
 
-_FIGURES: Final[list[tuple[str, object]]] = [
+_FIGURES: Final[list[tuple[str, Callable[..., None]]]] = [
     ("landmarks_per_category.png", plot_landmark_category_counts),
     ("interest_score_distribution.png", plot_interest_score_distribution),
     ("visit_duration_by_category.png", plot_visit_duration_by_category),
