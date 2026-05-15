@@ -1,54 +1,178 @@
-\documentclass[12pt,a4paper]{report}
-
+\documentclass[11pt]{article}
+\usepackage{mathptmx}
 \usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usepackage[english]{babel}
 \usepackage{geometry}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{amsmath, amssymb}
 \usepackage{fancyhdr}
-\usepackage{setspace}
-\usepackage{titlesec}
-
-\geometry{margin=1in}
-\setstretch{1.2}
+\geometry{a4paper, margin=1in, bottom=1.2in}
 
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\leftmark}
-\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[R]{\thepage}
 
-\title{Report Title}
-\author{Author Name}
-\date{\today}
+\setlength{\parindent}{0pt}
 
 \begin{document}
+	
 
-\maketitle
-\tableofcontents
-\newpage
+	\thispagestyle{empty} 
+	
+	\begin{center}
+		\textbf{\LARGE The National Higher School of Artificial Intelligence}\\[0.5cm]
+		\textbf{\LARGE Introduction to AI Course Project}\\[0.5cm]
+		\textbf{\LARGE Spring 2026}\\[2.5cm]
+		
+		{\Huge Introduction to AI Project Paper}\\[1cm]
+		{\LARGE Algiers in 24 hours}\\[2.5cm]
+		
+	\end{center}
+	
+	\Large Student list:\\[0.2cm]
+	
+	% Cover page table with correct proportions and row heights
+	\renewcommand{\arraystretch}{2} % Makes rows taller
+	\begin{tabular}{|p{11.5cm}|p{3.5cm}|}
+		\hline
+		\textbf{Full name} & \textbf{Group} \\
+		\hline
+		& \\
+		\hline
+		& \\
+		\hline
+		& \\
+		\hline
+		& \\
+		\hline
+		& \\
+		\hline
+	\end{tabular}
+	
+	\vspace{1cm}
+	% Indented footer text
 
-\chapter{Introduction}
-% Your introduction here.
+	
+	
+	% --- PAGE 2: ABSTRACT ---
+	\newpage
+	\setcounter{page}{1} % Start numbering at 1
+	\vspace*{0.5cm}
+	
+	{\huge \textbf{Abstract}}\\[1.5cm]
+	\input{sections/abstract}
+	
+	
+	% --- PAGE 3: TABLE OF CONTENTS / LIMITS ---
+	\newpage
+	\vspace*{1cm}
+	
+	% Dotted lines matching the image
+	Abstract \dotfill 1\\[0.8em]
+	Introduction. \dotfill 1\\[0.8em]
+	State of the Art. \dotfill 2\\[0.8em]
+	Data Set Building. \dotfill 4\\[0.8em]
+	Problem Solving techniques. \dotfill 5\\[0.8em]
+	Application Design. \dotfill 8\\[0.8em]
+	Results and Analysis. \dotfill 10\\[0.8em]
+	Discussion. \dotfill 12\\[0.8em]
+	Conclusion. \dotfill 13\\[0.8em]
+	References \dotfill 13\\[0.8em]
+	Appendix A:\dotfill \\[0.8em]
+	Appendix B:  \dotfill \\[2.5cm]
+	
 
-\chapter{Background}
-% Background information.
+	
+	
+	% --- PAGE 4: INTRODUCTION ---
+	\newpage
+	\vspace*{0.5cm}
+	
+	{\huge  Introduction}\\[1cm]
+	\input{sections/introduction}
 
-\chapter{Methodology}
-% Describe your methods.
+	
+	
+	% --- PAGE 5: STATE OF THE ART ---
+	\newpage
+	\vspace*{0.5cm}
+	
+	{\huge  State of the Art}\\[1cm]
+	\input{sections/state_of_the_art}
 
-\chapter{Results}
-% Present your results.
+	
+	
+	% --- PAGE 6: DATA SET BUILDING ---
+	\newpage
+	\vspace*{0.5cm}
+	
+	{\huge  Data Set Building}\\[1cm]
+	\input{sections/dataset}
 
-\chapter{Discussion}
-% Discuss your findings.
+	
+	
+	% --- PAGE 7: PROBLEM SOLVING TECHNIQUES ---
+	\newpage
+	\vspace*{0.5cm}
+	
+	{\huge  Problem Solving techniques}\\[1cm]
+	\input{sections/problem_solving}
+	
+	
+	% --- PAGE 8: APPLICATION DESIGN ---
+	\newpage
+	\vspace*{0.5cm}
+	
+	{\huge  Application Design }\\[1cm]
+	\input{sections/application_design}
 
-\chapter{Conclusion}
-% Conclude your report.
+	
+	
+	% --- PAGE 9: RESULTS AND ANALYSIS ---
+	\newpage
+	\vspace*{0.5cm}
+	
+	{\huge  Results and Analysis}\\[1cm]
+	\input{sections/results_analysis}
+	
+	
+	% --- PAGE 10: DISCUSSION ---
+	\newpage
+	\vspace*{0.5cm}
+	
+	{\huge  Discussion}\\[1cm]
+	\input{sections/discussion}
 
-\bibliographystyle{plain}
-\bibliography{references}
+	
+	
+	% --- PAGE 11: CONCLUSION ---
+	\newpage
+	\vspace*{0.5cm}
+	
+	{\huge  Conclusion}\\[1cm]
+	\input{sections/conclusion}
 
+	
+	
+	% --- PAGE 12: REFERENCES ---
+	\newpage
+	\vspace*{0.5cm}
+	
+	{\huge  References}\\[1cm]
+	\input{sections/references}
+	
+	
+	% --- PAGE 13: APPENDIX A ---
+	\newpage
+	\vspace*{0.5cm}
+	
+	{\huge  Appendix A:}\\[1cm]
+	\input{sections/appendix_a}
+	
+	
+	% --- PAGE 14: APPENDIX B ---
+	\newpage
+	\vspace*{0.5cm}
+	
+	{\huge  Appendix B:}\\[1cm]
+	\input{sections/appendix_b}
+	
 \end{document}
