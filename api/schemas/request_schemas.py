@@ -33,15 +33,10 @@ VALID_ALGORITHMS: set[str] = set(ALGORITHM_LABELS.keys())
 # One representative per conceptual family.
 COMPARISON_ALGORITHMS: list[str] = [
     "greedy",
-    "greedy_ratio",
-    "greedy_nearest",
-    "greedy_random",
     "sa",
     "grasp",
     "tabu",
     "ga",
-    "ga_tailored",
-    "cplex",
 ]
 
 VALID_CATEGORIES: set[str] = {
