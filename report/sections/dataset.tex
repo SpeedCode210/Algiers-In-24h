@@ -1,1 +1,110 @@
-% Describe dataset collection, preprocessing, characteristics, summary statistics, and visualizations.
+
+\subsection*{3.1\quad Data Collection}
+
+We created a dataset of 58 tourist landmarks in Algiers, classified into five landmark categories: historical, attractions, traditional and artistic, shopping, and religious sites.
+
+Each entry in the dataset has GPS coordinates, the time the site is open to visitors, an estimate for how long it takes to visit, and a user rating from either Google Maps or TripAdvisor. Public sources were used to check the hours of operation, although much of the data was obtained from Google Maps directly. \hyperref[tab:attributes]{Table~\ref*{tab:attributes}} presents the attributes, attribute types, and methods used to obtain the data.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Dataset attribute descriptions.}
+  \label{tab:attributes}
+  \small
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabular}{|p{0.18\linewidth}|p{0.10\linewidth}|p{0.17\linewidth}|p{0.41\linewidth}|}
+    \hline
+    \textbf{Attribute} & \textbf{Type} & \textbf{Source} & \textbf{Description} \\
+    \hline
+    Name & Text & Manually & Full official name of the landmark \\
+    \hline
+    Category & Text & Manually & Thematic group assigned to one of five classes \\
+    \hline
+    Latitude & Float & Google Maps & WGS84 decimal degrees, manually verified \\
+    \hline
+    Longitude & Float & Google Maps & WGS84 decimal degrees, manually verified \\
+    \hline
+    Opening hours & Text & Official listing & Structured time-window per day (e.g.\ 09:00--19:00) \\
+    \hline
+    Visit duration & Integer & Estimation & Expected time on-site in minutes \\
+    \hline
+    Google rating & Float & Google Maps & Aggregated user score on a 1--5 scale \\
+    \hline
+    TripAdvisor rating & Float & TripAdvisor & Aggregated user score on a 1--5 scale (missing for 18 sites) \\
+    \hline
+    Interest Score & Float & Computed & Google + TripAdvisor, or Google $\times$ 2 when TripAdvisor is missing, mapped to 1--10 \\
+    \hline
+  \end{tabular}
+\end{table}
+
+\subsection*{3.2\quad Preprocessing}
+
+\begin{itemize}
+  \item \textbf{Coordinate verification:} All GPS coordinates were manually cross-checked
+        using Google Maps satellite view to avoid positioning errors.
+
+  \item \textbf{Interest score calculation:} An overall Interest Score was calculated on a
+        1--10 scale. When both ratings are available, the score is defined as Google +
+        TripAdvisor; when only a Google rating exists (18 landmarks, 31\%), the score is
+        set to Google $\times$ 2, maintaining scale consistency.
+
+  \item \textbf{Category assignment:} Each landmark was classified into one of five
+        categories: historical, attraction, tradition \& art, religious, and shopping. This
+        enables interest-based filtering in the Day Planner application and improves the
+        tourist experience.
+
+  \item \textbf{Opening-hours standardisation:} Time windows used by the optimiser were
+        converted into structured formats (e.g.\ 09:00--17:00). For venues with split
+        opening hours (for example, 11:00--12:30 and 15:00--17:30), multiple time windows
+        were defined for each day.
+\end{itemize}
+
+\subsection*{3.3\quad Descriptive Statistics and Characteristics of the Dataset}
+
+The dataset contains 58 unique landmarks divided into five categories. Numerical descriptive statistics are shown in \hyperref[tab:stats]{Table~\ref*{tab:stats}}, while the descriptive visualisations are shown in \hyperref[fig:score_distribution]{Figure~\ref*{fig:score_distribution}} and \hyperref[fig:category_counts]{Figure~\ref*{fig:category_counts}}. Because two landmarks were marked as continuously closed, the visualisations are based only on the remaining 56 landmarks that are available to the planner.
+
+The numerical summary is based on variables that directly influence recommendation and
+route optimisation: the calculated Interest Score, the two external rating sources, and the
+estimated visit duration. These statistics are used to measure the quality of the selected
+landmarks and the practicality of including them in daily itineraries.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Descriptive statistics for numerical attributes.}
+  \label{tab:stats}
+  \begin{tabular}{|l|c|c|c|c|}
+    \hline
+    \textbf{Metric} & \textbf{Interest score} & \textbf{Google} & \textbf{TripAdvisor} & \textbf{Duration (h)} \\
+    \hline
+    $n$         & 58    & 58    & 40    & 57    \\
+    \hline
+    Mean        & 8.376 & 4.266 & 4.123 & 1.544 \\
+    \hline
+    Median      & 8.600 & 4.400 & 4.200 & 1.500 \\
+    \hline
+    Std dev     & 0.853 & 0.412 & 0.488 & 0.836 \\
+    \hline
+    Min         & 5.600 & 3.000 & 2.000 & 0.500 \\
+    \hline
+    Max         & 10.000& 5.000 & 4.800 & 3.000 \\
+    \hline
+  \end{tabular}
+\end{table}
+
+The Interest Scores range from 5.6 to 10.0 with an average of 8.38. This means that the data set is generally of high quality with good reviews. The Google and TripAdvisor ratings are highly correlated (averages of 4.27 and 4.12 respectively) which validates the summation-based scoring formula. The average visit duration of 1.54\,h per landmark is directly fed to the optimiser when constructing feasible itineraries within a fixed time budget.
+
+
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}[t]{0.53\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{../algiers-lib/interest_score_distribution.png}
+    \captionof{figure}{Distribution of Interest Scores with KDE overlay. Dashed = mean; dotted = median.}
+    \label{fig:score_distribution}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.45\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{../algiers-lib/landmarks_per_category.png}
+    \captionof{figure}{Landmark count per category for the 56 available landmarks.}
+    \label{fig:category_counts}
+  \end{minipage}
+\end{figure}
