@@ -184,8 +184,15 @@ def plot_landmark_category_counts(
     values = counts["count"].tolist()
     colors = [CATEGORY_COLORS.get(c, CATEGORY_COLORS["unknown"]) for c in counts["category"]]
 
-    fig, ax = plt.subplots(figsize=(10, 6))
-    bars = ax.bar(labels, values, color=colors, edgecolor="black", linewidth=0.7)
+    fig, ax = plt.subplots(figsize=(8, 5))
+    bars = ax.bar(
+        labels,
+        values,
+        color=colors,
+        edgecolor="black",
+        linewidth=0.7,
+        width=0.6,
+    )
 
     ax.set_title(
         f"Landmarks per category  (n = {sum(values)})",
