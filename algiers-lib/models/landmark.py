@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from enum import IntEnum
+import random
 from typing import Optional
 
 class Day(IntEnum):
@@ -245,7 +246,7 @@ def loadHotel(hotel_path: str = "../data/hotel.csv") -> Landmark:
         Landmark: The hotel landmark.
     """
     df = pd.read_csv(hotel_path)
-    row = df.iloc[0]
+    row = df.iloc[random.randrange(len(df))]
 
     full_day_slot = TimeSlot(open_time=0, close_time=1439)
     slots = {day: [full_day_slot] for day in Day}

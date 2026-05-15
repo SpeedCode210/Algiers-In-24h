@@ -17,6 +17,7 @@ from flask_cors import CORS
 
 from routes.landmarks import landmarks_bp
 from routes.solve import solve_bp
+from routes.docs import docs_bp
 
 # App factory
 
@@ -29,6 +30,7 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 # Register blueprints — all routes are prefixed with /api
 app.register_blueprint(landmarks_bp, url_prefix="/api")
 app.register_blueprint(solve_bp,     url_prefix="/api")
+app.register_blueprint(docs_bp)
 
 
 # Health check
