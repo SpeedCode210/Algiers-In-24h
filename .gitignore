@@ -30,6 +30,10 @@ logs/
 *.toc
 *synctex.gz
 texput.log
+*.pdf
+*.bcf
+*.run.xml
+*.xml
 
 # Local test artifacts and benchmark outputs (ignore user-created test scripts)
 # Ignore the ad-hoc Tabu benchmark script and any ad-hoc solver tests
