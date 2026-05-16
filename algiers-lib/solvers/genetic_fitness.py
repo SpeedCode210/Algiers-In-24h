@@ -76,30 +76,10 @@ class FitnessFunction:
         return invalid_count, total_duration
 
 
-class PenaltyFitnessFunction(FitnessFunction):
-    """Fitness function that penalizes time-window violations and overtime.
-
-    Computes fitness as the total interest score of visited landmarks minus
-    penalties for visiting landmarks outside their time windows and for
-    exceeding the overall time budget.
-
-    Attributes:
-        invalid_penalty: Score deducted per landmark visited outside its
-            time window.
-        overtime_penalty: Score deducted per minute the tour exceeds the
-            time budget.
+class ScoreFitnessFunction(FitnessFunction):
+    """Fitness function that returns just the total score .
+    this uses the evaluate 
     """
-    def __init__(self, invalid_penalty: float = 2.0, overtime_penalty: float = 1.0) -> None:
-        """Initialize the penalty fitness function.
-
-        Args:
-            invalid_penalty: Penalty applied per time-window violation.
-                Defaults to 2.0.
-            overtime_penalty: Penalty applied per minute over the time budget.
-                Defaults to 1.0.
-        """
-        self.invalid_penalty = invalid_penalty
-        self.overtime_penalty = overtime_penalty
 
     def fitness(self, tour: Tour) -> float:
         """Compute fitness with penalties for violations and overtime.
@@ -108,49 +88,14 @@ class PenaltyFitnessFunction(FitnessFunction):
             tour: The tour to evaluate.
 
         Returns:
-            Fitness score rounded to the nearest integer. Can be negative if
-            penalties outweigh the interest score.
+            Total interest score of all visited landmarks.
         """
         invalid_count, total_duration = self._evaluate_tour(tour)
-        raw_score = (
-            tour.total_score()
-            - self.invalid_penalty * invalid_count
-            - self.overtime_penalty * max(total_duration - tour.problem.time_budget, 0)
-        )
-        return raw_score
+        return total_duration
 
 
-class InfeasibilityFitnessFunction(PenaltyFitnessFunction):
-    """Fitness function that strongly penalizes infeasible tours.
 
-    Extends PenaltyFitnessFunction by returning a heavily negative score
-    for tours with time-window violations, proportional to the gap between
-    the tour's interest score and the maximum possible interest score. Empty
-    tours receive negative infinity. Feasible tours are scored identically
-    to PenaltyFitnessFunction.
-    """
-    def fitness(self, tour: Tour) -> float:
-        """Compute fitness with strong infeasibility penalization.
-
-        Args:
-            tour: The tour to evaluate.
-
-        Returns:
-            ``float('-inf')`` for empty tours, a large negative value for
-            infeasible tours scaled by the interest gap, or the penalty-based
-            score for feasible tours.
-        """
-        invalid_count= self._evaluate_tour(tour)[0]
-        if len(tour.visited_landmarks) == 0:
-            return NEGATIVE_INFINITY
-        if invalid_count > 0:
-            total_possible_interest = sum(
-                float(landmark.interest_score) for landmark in tour.problem.landmarks
-            )
-            return tour.total_score() - total_possible_interest*invalid_count
-        return super().fitness(tour)
-
-
+# this is used in the Tailored genetic solver 
 class FeasibilityFitnessFunction(FitnessFunction):
     """Fitness function for use when all tours in the population are guaranteed feasible.
 
@@ -168,7 +113,7 @@ class FeasibilityFitnessFunction(FitnessFunction):
             Total interest score of all visited landmarks plus a normalized
             bonus for remaining time budget.
         """
-        total_duration = self._evaluate_tour(tour)[1]
+        invalid_count, total_duration = self._evaluate_tour(tour)
         total_reward = sum(
             float(landmark.interest_score) for landmark in tour.visited_landmarks
         )

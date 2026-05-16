@@ -22,7 +22,7 @@ from solvers.grasp_solver import GraspSolver
 from solvers.tabu_solver import TabuSolver
 from solvers.genetic_solver import GeneticSolver, TailoredGeneticSolver
 from solvers.genetic_fitness import (
-    PenaltyFitnessFunction,
+    ScoreFitnessFunction,
     FeasibilityFitnessFunction,
 )
 from solvers.cplex_solver import CPLEXSolver
@@ -69,7 +69,7 @@ def _make_tabu(problem: Problem, params: dict):
 def _make_ga(problem: Problem, params: dict):
     return GeneticSolver(
         problem,
-        fitness_function=PenaltyFitnessFunction(),
+        fitness_function=ScoreFitnessFunction(),
         regenerations=int(params.get("regenerations", 1000)),
         population_size=int(params.get("population_size", 1075)),
         mutation_rate=float(params.get("mutation_rate", 0.8)),

@@ -43,8 +43,8 @@ def time_in_string(minutes: int) -> str:
             raise ValueError("Minutes cannot be negative")
         if minutes >= 24 * 60:
             raise ValueError("Minutes cannot exceed 1439")
-        hours = minutes // 60
-        remaining_minutes = minutes % 60
+        hours = int(minutes // 60)
+        remaining_minutes = int(minutes % 60)
         return f"{hours:02d}:{remaining_minutes:02d}"
     except ValueError:
         raise ValueError("Invalid minutes value")

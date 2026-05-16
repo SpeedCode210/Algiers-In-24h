@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Algiers in 24 Hours — Tourist Optimizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="favicon.png">
+</head>
+<body data-theme="dark">
+
+<div id="map"></div>
+<div id="toast"></div>
+
+<!-- TOKEN SCREEN -->
+<div id="token-screen">
+  <div class="ts-eyebrow">Algiers · Algeria</div>
+  <div class="ts-title">Tourist <span>Optimizer</span></div>
+  <p class="ts-sub">Maximize your Interest Score across Algiers landmarks within your time budget. Choose your algorithm, set limits, and compare routes.</p>
+  <input class="ts-input" id="token-input" type="text" placeholder="Enter Mapbox public token  (pk.eyJ1Ijo…)"/>
+  <div class="ts-err" id="ts-err"></div>
+  <button class="ts-btn" id="load-btn">Load Map</button>
+  <p class="ts-note">Get a free token at <a href="https://mapbox.com" target="_blank">mapbox.com</a> — no credit card required</p>
+</div>
+
+<!-- PANEL TOGGLE -->
+<button id="panel-toggle" title="Toggle sidebar">☰</button>
+
+<!-- PANEL -->
+<div id="panel">
+  <div id="panel-header">
+    <div class="panel-header-top">
+      <div>
+        <div class="eyebrow">Algiers · Algeria</div>
+        <h1>Tourist <span>Optimizer</span></h1>
+      </div>
+      <div id="theme-toggle" title="Toggle light/dark mode">
+        <div id="theme-toggle-knob"></div>
+      </div>
+    </div>
+    <p class="subtitle">Configure your tour, run algorithms, compare ranked results.</p>
+  </div>
+
+  <div id="panel-tabs">
+    <button class="ptab active" id="optimize-tab">Optimize</button>
+    <button class="ptab" id="ranking-tab">Rankings</button>
+  </div>
+
+  <!-- OPTIMIZE TAB -->
+  <div class="tab-pane active" id="tab-optimize">
+    <div id="controls">
+      <!-- Budget Range -->
+      <div>
+        <div class="ctrl-label">Time Budget <span id="budget-val">08:00 – 20:00</span></div>
+        <div class="range-slider-wrap" id="budget-range-wrap">
+          <div class="range-track" id="range-track">
+            <div class="range-fill" id="range-fill"></div>
+            <input type="range" id="budget-start" min="0" max="23.5" value="8" step="0.5" class="range-input range-start"/>
+            <input type="range" id="budget-end"   min="0" max="24"   value="20" step="0.5" class="range-input range-end"/>
+          </div>
+          <div class="range-labels">
+            <span class="range-tick-label">00:00</span>
+            <span class="range-tick-label">06:00</span>
+            <span class="range-tick-label">12:00</span>
+            <span class="range-tick-label">18:00</span>
+            <span class="range-tick-label">24:00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hotel -->
+      <div>
+        <div class="ctrl-label">Starting Hotel</div>
+        <select id="hotel-select"></select>
+      </div>
+
+      <!-- Algorithm -->
+      <div>
+        <div class="ctrl-label">Solver</div>
+        <div class="algo-row">
+
+        </div>
+        <div class="algo-timelimit-note">Search time limit: 30s max</div>
+      </div>
+
+      <!-- Categories (draggable, ordered) -->
+      <div>
+        <div class="ctrl-label">Categories <span style="font-size:10px;color:var(--text-muted);font-style:italic;letter-spacing:0;text-transform:none;">drag to prioritize</span></div>
+        <div class="cats-section">
+          <div class="cats-container" id="cat-filter"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM AREA: pinned optimize button -->
+    <div id="optimize-btn-area">
+      <div id="progress-bar-wrap">
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="progress-label" id="progress-label">Initializing…</div>
+      </div>
+      <button id="optimize-btn">Optimize Tour</button>
+    </div>
+  </div>
+
+  <!-- RANKING TAB -->
+  <div class="tab-pane" id="tab-ranking">
+    <div id="ranking-header" style="padding:8px 16px 6px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);font-weight:500;flex-shrink:0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--glass-border);">
+      <span>Past Routes</span>
+      <button id="clear-all-rankings" style="background:none;border:none;color:var(--text-muted);font-size:10px;cursor:pointer;padding:2px 6px;border-radius:4px;transition:color .15s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text-muted)'">Clear All</button>
+    </div>
+    <div id="ranking-list"></div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div id="stats">
+  <div class="stat-card"><div class="stat-val" id="s-count">—</div><div class="stat-lbl">Stops</div></div>
+  <div class="stat-card"><div class="stat-val" id="s-time">—</div><div class="stat-lbl">Total Time</div></div>
+  <div class="stat-card"><div class="stat-val" id="s-score">—</div><div class="stat-lbl">Interest Score</div></div>
+  <div class="stat-card"><div class="stat-val" id="s-km">—</div><div class="stat-lbl">Distance km</div></div>
+  <button id="tour-guide-btn" title="View tour itinerary">
+    <div class="tg-btn-dot"></div>
+    🗺 Tour Guide
+  </button>
+</div>
+
+<!-- ALGO INDICATOR -->
+<div id="algo-indicator">
+  <div class="algo-indicator-inner">
+    <div class="algo-indicator-dot"></div>
+    <span>Last run:</span>
+    <span class="algo-name-tag" id="algo-ind-name">—</span>
+    <span id="algo-ind-time" style="margin-left:auto;font-size:10px;color:var(--text-muted);"></span>
+  </div>
+</div>
+
+<!-- LANDMARK DRAWER -->
+<div id="lm-drawer">
+  <div class="lm-drawer-inner">
+    <button class="lm-drawer-close" id="lm-drawer-close">✕</button>
+    <div class="lm-cat-stripe" id="lm-stripe"></div>
+    <div class="lm-drawer-body">
+      <div class="lm-drawer-eyebrow" id="lm-eyebrow">Attraction</div>
+      <div class="lm-drawer-name" id="lm-name">Landmark Name</div>
+      <div class="lm-drawer-grid">
+        <div class="lm-drawer-stat"><div class="lm-drawer-stat-val" id="lm-score">—</div><div class="lm-drawer-stat-lbl">Score</div></div>
+        <div class="lm-drawer-stat"><div class="lm-drawer-stat-val" id="lm-rating">—</div><div class="lm-drawer-stat-lbl">Rating</div></div>
+        <div class="lm-drawer-stat"><div class="lm-drawer-stat-val" id="lm-dur">—</div><div class="lm-drawer-stat-lbl">Visit</div></div>
+        <div class="lm-drawer-stat"><div class="lm-drawer-stat-val" id="lm-dist">—</div><div class="lm-drawer-stat-lbl">km away</div></div>
+      </div>
+      <div id="lm-route-badge"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- TOUR GUIDE OVERLAY -->
+<div id="tour-guide-overlay">
+  <div class="tg-panel">
+    <div class="tg-header">
+      <div class="tg-header-left">
+        <div class="tg-eyebrow">Itinerary Review</div>
+        <div class="tg-title">Your Tour <span>Guide</span></div>
+        <div class="tg-subtitle" id="tg-subtitle">All landmarks visited in order</div>
+      </div>
+      <button class="tg-close-btn" id="tg-close-btn">✕</button>
+    </div>
+    <div class="tg-summary-bar">
+      <div class="tg-sum-stat"><div class="tg-sum-val" id="tg-s-stops">—</div><div class="tg-sum-lbl">Stops</div></div>
+      <div class="tg-sum-divider"></div>
+      <div class="tg-sum-stat"><div class="tg-sum-val" id="tg-s-time">—</div><div class="tg-sum-lbl">Total Time</div></div>
+      <div class="tg-sum-divider"></div>
+      <div class="tg-sum-stat"><div class="tg-sum-val" id="tg-s-score">—</div><div class="tg-sum-lbl">Score</div></div>
+      <div class="tg-sum-divider"></div>
+      <div class="tg-sum-stat"><div class="tg-sum-val" id="tg-s-km">—</div><div class="tg-sum-lbl">km</div></div>
+      <div class="tg-sum-divider"></div>
+      <div class="tg-sum-stat"><div class="tg-sum-val" id="tg-s-algo" style="font-size:13px;">—</div><div class="tg-sum-lbl">Algorithm</div></div>
+    </div>
+    <div class="tg-scroll" id="tg-stops-list"></div>
+  </div>
+</div>
+
+<script type="module" src="js/main.js">
+</script>
+</body>
+</html>
