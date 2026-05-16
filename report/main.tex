@@ -24,9 +24,8 @@
   top=2.5cm, bottom=2.5cm,
   left=2.5cm, right=2.5cm
 ]{geometry}
-\usepackage{tikz} 
+\usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc, shadows, fit, backgrounds}
-
 
 % ── Line spacing ─────────────────────────────────────────────
 \linespread{1.0}
@@ -35,15 +34,22 @@
 \usepackage{titlesec}
 \titleformat{\section}{\normalfont\large\bfseries}{\thesection.}{0.5em}{}
 \titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection.}{0.5em}{}
-\titlespacing*{\section}{0pt}{12pt}{6pt}
-\titlespacing*{\subsection}{0pt}{8pt}{4pt}
+\titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection.}{0.5em}{}
+\titlespacing*{\section}{0pt}{8pt}{4pt}
+\titlespacing*{\subsection}{0pt}{5pt}{2pt}
+\titlespacing*{\subsubsection}{0pt}{4pt}{1pt}
+% run-in headings used in problem_solving.tex
+\titlespacing{\paragraph}{0pt}{4pt}{2pt}
+\titlespacing{\subparagraph}{0pt}{2pt}{1pt}
 
 % ── Paragraph spacing ────────────────────────────────────────
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt}
+\setlength{\parskip}{3pt}
 
 % ── Mathematics ──────────────────────────────────────────────
 \usepackage{amsmath, amssymb}
+\setlength{\abovedisplayskip}{3pt}
+\setlength{\belowdisplayskip}{3pt}
 
 % ── Figures and tables ───────────────────────────────────────
 \usepackage{graphicx}
@@ -51,7 +57,8 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{float}
-\captionsetup{font=small, labelfont=bf}
+\usepackage{placeins}
+\captionsetup{font=small, labelfont=bf, skip=4pt}
 
 % ── Hyperlinks ───────────────────────────────────────────────
 \usepackage[
@@ -72,7 +79,7 @@
 % ── Miscellaneous ────────────────────────────────────────────
 \usepackage[expansion=false]{microtype}
 \usepackage{enumitem}
-\setlist{noitemsep, topsep=4pt}
+\setlist{noitemsep, topsep=2pt}
 
 \begin{document}
 
@@ -85,16 +92,22 @@
   {\LARGE\bfseries Algiers in 24 Hours:\\[6pt]
    A Time-Constrained Orienteering Approach\\
    to Tourist Route Optimisation}\\[2cm]
-  {\normalsize
-  \begin{tabular}{ll}
+  {\large
+  \begin{tabular}{p{7cm} p{3cm}}
     \textbf{Full Name} & \textbf{Group} \\
     \hline
-    & \\
-    & \\
-    & \\
-    & \\
-    & \\
-    & \\
+    Raouf Ould Ali               & G7  \\
+    \hline
+    Mohamed Zakaria Razam        & G7  \\
+    \hline
+    Ahmed Adnane Meddah          & G8  \\
+    \hline
+    Mohamed Charaf Eddine Deghboudj & G5 \\
+    \hline
+    Yacine Mouloud               & G7  \\
+    \hline
+    Aboubakr Bendahmane          & G10 \\
+    \hline
   \end{tabular}}
 \end{titlepage}
 
@@ -106,27 +119,21 @@
 \section{Introduction}
 \input{sections/introduction}
 
-\newpage
 \section{State of the Art}
 \input{sections/state_of_the_art}
 
-\newpage
 \section{Dataset Building}
 \input{sections/dataset}
 
-\newpage
 \section{Problem Solving Techniques}
 \input{sections/problem_solving}
 
-\newpage
 \section{Application Design}
 \input{sections/application_design}
 
-\newpage
 \section{Results and Analysis}
 \input{sections/results_analysis}
 
-\newpage
 \section{Discussion}
 \input{sections/discussion}
 
