@@ -1,1 +1,322 @@
-% Add BibTeX references here.
+@book{pardalos2013handbook,
+  title     = {Handbook of Combinatorial Optimization},
+  edition   = {2},
+  editor    = {Pardalos, P. M. and Du, D.-Z. and Graham, R. L.},
+  year      = {2013},
+  publisher = {Springer},
+  doi       = {10.1007/978-1-4419-7997-1},
+  url       = {https://doi.org/10.1007/978-1-4419-7997-1}
+}
+
+@misc{solomon50,
+  title        = {Solomon TOPTW Instances -- 50 nodes},
+  howpublished = {\url{https://www.mech.kuleuven.be/en/mim/op/instances/righiniTOPTW1}},
+  note         = {KU Leuven, MIM Operations Research}
+}
+
+@misc{solomon100,
+  title        = {Solomon TOPTW Instances -- 100 nodes},
+  howpublished = {\url{https://www.mech.kuleuven.be/en/mim/op/instances/righiniTOPTW2}},
+  note         = {KU Leuven, MIM Operations Research}
+}
+
+@misc{righini_salani,
+  author       = {Righini, Giovanni and Salani, Matteo},
+  title        = {Optimal solutions for the TOPTW -- benchmark instances},
+  howpublished = {\url{https://www.mech.kuleuven.be/en/mim/op/RighiniSalani}}
+}
+@article{fischetti_solving_1998,
+	title = {Solving the Orienteering Problem through Branch-and-Cut},
+	volume = {10},
+	issn = {1091-9856},
+	url = {https://pubsonline.informs.org/doi/10.1287/ijoc.10.2.133},
+	doi = {10.1287/ijoc.10.2.133},
+	abstract = {In the Orienteering Problem ({OP}), we are given an undirected graph with edge weights and node prizes. The problem calls for a simple cycle whose total edge weight does not exceed a given threshold, while visiting a subset of nodes with maximum total prize. This {NP}-hard problem arises in routing and scheduling applications. We describe a branch-and-cut algorithm for finding an optimal {OP} solution. The algorithm is based on several families of valid inequalities. We also introduce a family of cuts, called conditional cuts, which can cut off the optimal {OP} solution, and propose an effective way to use them within the overall branch-and-cut framework. Exact and heuristic separation algorithms are described, as well as heuristic procedures to produce near-optimal {OP} solutions. An extensive computational analysis on several classes of both real-world and random instances is reported. The algorithm proved to be able to solve to optimality large-scale instances involving up to 500 nodes, within acceptable computing time. This compares favorably with previous published methods.},
+	pages = {133--148},
+	number = {2},
+	journaltitle = {{INFORMS} Journal on Computing},
+	publisher = {{INFORMS}},
+	author = {Fischetti, Matteo and González, Juan José Salazar and Toth, Paolo},
+	urldate = {2026-05-16},
+	date = {1998-05},
+	keywords = {branch and cut, Mathematical programming, Orienteering problem},
+}
+
+@article{Tsiligiridis,
+author = {Tsiligiridis, Theodore},
+year = {1984},
+month = {09},
+pages = {797-809},
+title = {Heuristic Methods Applied to Orienteering},
+volume = {35},
+journal = {Journal of the Operational Research Society},
+doi = {10.1057/jors.1984.162}
+}
+@article{golden,
+author = {Golden, Bruce and Levy, L. and Vohra, Rakesh},
+year = {1987},
+month = {06},
+pages = {307-318},
+title = {The orienteering problem},
+volume = {34},
+journal = {Nav Res Logist},
+doi = {10.1002/1520-6750(198706)34:3<307::AID-NAV3220340302>3.0.CO;2-D}
+}
+@article{77719d57-9aea-3d04-aeff-58a2183cbee5,
+ ISSN = {01605682, 14769360},
+ URL = {http://www.jstor.org/stable/2583018},
+ abstract = {The orienteering problem with time windows, denoted by OPTW, belongs to a class of routeing and scheduling problems that arise in physical distribution. It may be modelled as a problem on a graph. It considers a set of nodes (customers), each with an associated profit and service duration (time window), and a set of arcs, each with an associated travel time. The objective of the problem is to construct an acyclic path beginning at a specified origin and ending at a specified destination that maximizes the total profit while observing time window constraints on all nodes and not exceeding a designated time limit. The problem is classified as NP-hard and, thus, an exact algorithm that executes in reasonable computational time is unlikely to exist. Since the problem is highly-constrained, we were able to develop a heuristic (referred to as the 'tree' heuristic) based upon an exhaustive search of the feasible solution space. The tree heuristic systematically generates a list of feasible paths and then selects the most profitable path from the list. In comparison with an insertion heuristic, the tree heuristic was found to produce improved values of total profit for heavily-constrained, modest-sized problems with reasonable computational effort.},
+ author = {Marisa G. Kantor and Moshe B. Rosenwein},
+ journal = {The Journal of the Operational Research Society},
+ number = {6},
+ pages = {629--635},
+ publisher = {Palgrave Macmillan Journals},
+ title = {The Orienteering Problem with Time Windows},
+ urldate = {2026-05-16},
+ volume = {43},
+ year = {1992}
+}
+
+@article{RIGHINI20091191,
+title = {Decremental state space relaxation strategies and initialization heuristics for solving the Orienteering Problem with Time Windows with dynamic programming},
+journal = {Computers \& Operations Research},
+volume = {36},
+number = {4},
+pages = {1191-1203},
+year = {2009},
+issn = {0305-0548},
+doi = {https://doi.org/10.1016/j.cor.2008.01.003},
+url = {https://www.sciencedirect.com/science/article/pii/S030505480800004X},
+author = {Giovanni Righini and Matteo Salani},
+keywords = {Combinatorial optimization, Traveling salesman problem, Shortest path problem, Dynamic programming},
+abstract = {We present an exact optimization algorithm for the Orienteering Problem with Time Windows (OPTW). The algorithm is based on bi-directional and bounded dynamic programming with decremental state space relaxation. We compare different strategies proposed in the literature to guide decremental state space relaxation: our experiments on instances derived from the literature show that there is no dominance between these strategies. We also propose a new heuristic technique to initialize the critical vertex set and we provide experimental evidence of its effectiveness.}
+}
+@article{LABADIE201215,
+title = {The Team Orienteering Problem with Time Windows: An LP-based Granular Variable Neighborhood Search},
+journal = {European Journal of Operational Research},
+volume = {220},
+number = {1},
+pages = {15-27},
+year = {2012},
+issn = {0377-2217},
+doi = {https://doi.org/10.1016/j.ejor.2012.01.030},
+url = {https://www.sciencedirect.com/science/article/pii/S0377221712000653},
+author = {Nacima Labadie and Renata Mansini and Jan Melechovský and Roberto {Wolfler Calvo}},
+keywords = {Team Orienteering Problem, Time windows, Variable Neighborhood Search, LP-based granularity},
+abstract = {The Team Orienteering Problem (TOP) is a known NP-hard problem that typically arises in vehicle routing and production scheduling contexts. In this paper we introduce a new solution method to solve the TOP with hard Time Window constraints (TOPTW). We propose a Variable Neighborhood Search (VNS) procedure based on the idea of exploring, most of the time, granular instead of complete neighborhoods in order to improve the algorithm’s efficiency without loosing effectiveness. The method provides a general way to deal with granularity for those routing problems based on profits and complicated by time constraints. Extensive computational results are reported on standard benchmark instances. Performance of the proposed algorithm is compared to optimal solution values, when available, or to best known solution values obtained by state-of-the-art algorithms. The method comes out to be, on average, quite effective allowing to improve the best know values for 25 test instances.}
+}
+@article{Archetti,
+author = {Archetti, C. and Speranza, M.Grazia and Hertz, Alain},
+year = {2006},
+month = {11},
+pages = {64-73},
+title = {A Tabu Search Algorithm for the Split Delivery Vehicle Routing Problem},
+volume = {40},
+journal = {Transportation Science},
+doi = {10.1287/trsc.1040.0103}
+}
+
+@article{feo_greedy_1995,
+	title = {Greedy Randomized Adaptive Search Procedures},
+	volume = {6},
+	issn = {1573-2916},
+	url = {https://doi.org/10.1007/BF01096763},
+	doi = {10.1007/BF01096763},
+	abstract = {Today, a variety of heuristic approaches are available to the operations research practitioner. One methodology that has a strong intuitive appeal, a prominent empirical track record, and is trivial to efficiently implement on parallel processors is {GRASP} (Greedy Randomized Adaptive Search Procedures). {GRASP} is an iterative randomized sampling technique in which each iteration provides a solution to the problem at hand. The incumbent solution over all {GRASP} iterations is kept as the final result. There are two phases within each {GRASP} iteration: the first intelligently constructs an initial solution via an adaptive randomized greedy function; the second applies a local search procedure to the constructed solution in hope of finding an improvement. In this paper, we define the various components comprising a {GRASP} and demonstrate, step by step, how to develop such heuristics for combinatorial optimization problems. Intuitive justifications for the observed empirical behavior of the methodology are discussed. The paper concludes with a brief literature review of {GRASP} implementations and mentions two industrial applications.},
+	pages = {109--133},
+	number = {2},
+	journaltitle = {Journal of Global Optimization},
+	shortjournal = {J Glob Optim},
+	author = {Feo, Thomas A. and Resende, Mauricio G. C.},
+	urldate = {2026-05-16},
+	date = {1995-03-01},
+	langid = {english},
+	keywords = {Combinatorial optimization, computer implementation, {GRASP}, search heuristic},
+}
+
+@inproceedings{Karbowska,
+author = {Karbowska-Chilinska, Joanna and Zabielski, Paweł},
+year = {2012},
+month = {09},
+pages = {},
+title = {A Genetic Algorithm vs. Local Search Methods for Solving the Orienteering Problem in Large Networks},
+volume = {7828},
+isbn = {978-3-642-37342-8},
+doi = {10.1007/978-3-642-37343-5_2}
+}
+
+@misc{montemanni2023antcolonyteamorienteering,
+      title={An Ant Colony System for the Team Orienteering Problem with Time Windows}, 
+      author={Roberto Montemanni and Luca Maria Gambardella},
+      year={2023},
+      eprint={2305.07305},
+      archivePrefix={arXiv},
+      primaryClass={math.OC},
+      url={https://arxiv.org/abs/2305.07305}, 
+}
+
+@article{Vansteenwegen2011,
+  author    = {Vansteenwegen, Pieter and Souffriau, Wouter and Van Oudheusden, Dirk},
+  title     = {The orienteering problem: A survey},
+  journal   = {European Journal of Operational Research},
+  volume    = {209},
+  number    = {1},
+  pages     = {1--10},
+  year      = {2011},
+  doi       = {10.1016/j.ejor.2010.03.045},
+}
+
+@article{Gunawan2016,
+  author    = {Gunawan, Aldy and Lau, Hoong Chuin and Vansteenwegen, Pieter},
+  title     = {Orienteering problem: A survey of recent variants, solution
+               approaches and applications},
+  journal   = {European Journal of Operational Research},
+  volume    = {255},
+  number    = {2},
+  pages     = {315--332},
+  year      = {2016},
+  doi       = {10.1016/j.ejor.2016.04.059},
+}
+
+% ── Exact Methods ────────────────────────────────────────────────────────────
+
+@article{Righini2009,
+  author    = {Righini, Giovanni and Salani, Matteo},
+  title     = {Decremental state-space relaxation strategies and initialization
+               heuristics for solving the orienteering problem with time windows
+               with dynamic programming},
+  journal   = {Computers \& Operations Research},
+  volume    = {36},
+  number    = {4},
+  pages     = {1191--1203},
+  year      = {2009},
+  doi       = {10.1016/j.cor.2008.01.003},
+}
+
+% ── Tabu Search ──────────────────────────────────────────────────────────────
+
+@article{Tang2005,
+  author    = {Tang, Hui and Miller-Hooks, Elise},
+  title     = {A tabu search heuristic for the team orienteering problem},
+  journal   = {Computers \& Operations Research},
+  volume    = {32},
+  number    = {6},
+  pages     = {1379--1407},
+  year      = {2005},
+  doi       = {10.1016/j.cor.2003.11.008},
+}
+
+% ── Metaheuristic Comparisons ─────────────────────────────────────────────────
+
+@inproceedings{Liang2002,
+  author    = {Liang, Yun-Chia and Kulturel-Konak, Sadan and Smith, Alice E.},
+  title     = {Meta heuristics for the orienteering problem},
+  booktitle = {Proceedings of the 2002 Congress on Evolutionary Computation
+               (CEC 2002)},
+  volume    = {1},
+  pages     = {384--389},
+  year      = {2002},
+  doi       = {10.1109/cec.2002.1006265},
+}
+
+% ── Simulated Annealing / Acceptance Functions ────────────────────────────────
+
+@article{Kirkpatrick1983,
+  author    = {Kirkpatrick, Scott and Gelatt, Charles D. and Vecchi, Mario P.},
+  title     = {Optimization by simulated annealing},
+  journal   = {Science},
+  volume    = {220},
+  number    = {4598},
+  pages     = {671--680},
+  year      = {1983},
+  doi       = {10.1126/science.220.4598.671},
+}
+
+% ── Iterated Local Search / VNS ──────────────────────────────────────────────
+
+@article{Vansteenwegen2009,
+  author    = {Vansteenwegen, Pieter and Souffriau, Wouter and Vanden Berghe,
+               Greet and Van Oudheusden, Dirk},
+  title     = {Iterated local search for the team orienteering problem with
+               time windows},
+  journal   = {Computers \& Operations Research},
+  volume    = {36},
+  number    = {12},
+  pages     = {3281--3290},
+  year      = {2009},
+  doi       = {10.1016/j.cor.2009.03.008},
+}
+
+% ── GRASP ─────────────────────────────────────────────────────────────────────
+
+@incollection{Soufriau2008,
+  author    = {Souffriau, Wouter and Vansteenwegen, Pieter and Vanden Berghe,
+               Greet and Van Oudheusden, Dirk},
+  title     = {A greedy randomised adaptive search procedure for the team
+               orienteering problem},
+  booktitle = {Adaptive and Multilevel Metaheuristics},
+  series    = {Studies in Computational Intelligence},
+  volume    = {136},
+  pages     = {23--38},
+  publisher = {Springer},
+  year      = {2008},
+  doi       = {10.1007/978-3-540-79438-7_13},
+}
+
+% ── Deep Reinforcement Learning ───────────────────────────────────────────────
+
+@inproceedings{Kool2019,
+  author    = {Kool, Wouter and van Hoof, Herke and Welling, Max},
+  title     = {Attention, Learn to Solve Routing Problems!},
+  booktitle = {7th International Conference on Learning Representations (ICLR)},
+  year      = {2019},
+  url       = {https://openreview.net/forum?id=ByxBFsRqYm},
+}
+
+@article{Gama2020,
+  author    = {Gama, Rodrigo and Fernandes, Heli},
+  title     = {A reinforcement learning approach to the orienteering problem
+               with time windows},
+  journal   = {arXiv preprint arXiv:2010.05436},
+  year      = {2020},
+  url       = {https://arxiv.org/abs/2010.05436},
+}
+
+@inproceedings{Reijnen2024,
+  author    = {Reijnen, Rik and Zhang, Yingqian and Lau, Hoong Chuin
+               and Bukhsh, Zaharah},
+  title     = {Operator selection in adaptive large neighbourhood search using
+               deep reinforcement learning},
+  booktitle = {Proceedings of the International Conference on Automated
+               Planning and Scheduling (ICAPS)},
+  year      = {2024},
+}
+
+% ── Stochastic / Time-Dependent OP ───────────────────────────────────────────
+
+@article{Verbeeck2013,
+  author    = {Verbeeck, Christof and Sörensen, Kenneth and Aghezzaf, El-Houssaine
+               and Vansteenwegen, Pieter},
+  title     = {A fast solution method for the time-dependent orienteering problem},
+  journal   = {European Journal of Operational Research},
+  volume    = {236},
+  number    = {2},
+  pages     = {419--432},
+  year      = {2014},
+  doi       = {10.1016/j.ejor.2013.11.038},
+}
+
+% ── ALNS ─────────────────────────────────────────────────────────────────────
+
+@article{GunawanALNS2017,
+  author    = {Gunawan, Aldy and Lau, Hoong Chuin and Vansteenwegen, Pieter
+               and Lu, Kun},
+  title     = {Well-tuned algorithms for the team orienteering problem with
+               time windows},
+  journal   = {Journal of the Operational Research Society},
+  volume    = {68},
+  number    = {8},
+  pages     = {861--876},
+  year      = {2017},
+  doi       = {10.1057/s41274-017-0244-1},
+}
