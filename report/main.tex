@@ -70,7 +70,7 @@
 
 % ── Bibliography (APA 7th edition) ───────────────────────────
 \usepackage[
-  style=apa,
+  style=numeric,  % ← Change this from 'apa' to 'numeric'
   backend=biber,
   natbib=true
 ]{biblatex}
@@ -143,12 +143,9 @@
 \newpage
 \printbibliography[heading=bibintoc, title={References}]
 
-\newpage
-\appendix
-\section{Screenshots of the System}
 \input{sections/appendix_a}
 
-\section{Who Did What}
+\newpage
 \input{sections/appendix_b}
 
 \end{document}

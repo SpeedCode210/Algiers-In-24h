@@ -40,9 +40,9 @@ The interaction between the user and the three modules follows a deterministic w
 \end{enumerate}
 
 
-\begin{table}[h]
+\begin{figure}[htbp]
 \centering
-\caption{API Endpoint Specifications}
+\captionof{table}{API Endpoint Specifications}
 \label{table:api_endpoints}
 \begin{tabular}{|l|p{8cm}|}
 \hline
@@ -52,10 +52,10 @@ The interaction between the user and the three modules follows a deterministic w
 \texttt{/api/categories} & Returns landmark categories for user ranking. \\ \hline
 \texttt{/api/solve} & Accepts constraints (budget, weights, algorithm) and returns an optimized tour. \\ \hline
 \end{tabular}
-\end{table}
 
-\begin{figure}[htbp]
-\centering
+\vspace{1.5cm}
+
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
     node distance=1.5cm,
     font=\sffamily\small,
@@ -106,7 +106,8 @@ The interaction between the user and the three modules follows a deterministic w
     \node (libRect) [draw=green!50, dashed, thick, rounded corners, inner sep=0.4cm, fit=(solver), label={[green!60!black]below:ENGINE (AlgiersLIB)}] {};
 \end{scope}
 
-\end{tikzpicture}
+\end{tikzpicture}%
+}
     \caption{System Architecture of the Application.}
     \label{fig:system-architecture}
 \end{figure}

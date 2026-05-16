@@ -73,7 +73,7 @@ class FitnessFunction:
 
         return_travel_time = tour.problem.travel_time(current_position, tour.problem.hotel)
         total_duration = float((current_time + return_travel_time) - tour.problem.start_time)
-        return invalid_count, total_duration
+        return total_duration
 
 
 class ScoreFitnessFunction(FitnessFunction):
