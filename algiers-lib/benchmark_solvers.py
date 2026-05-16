@@ -21,7 +21,7 @@ from solvers.greedy_solver import GreedySolver
 from solvers.genetic_solver import GeneticSolver, TailoredGeneticSolver
 from solvers.grasp_solver import GraspSolver
 from solvers.simulated_annealing_solver import SimulatedAnnealingSolver
-from solvers.genetic_fitness import FeasibilityFitnessFunction, PenaltyFitnessFunction
+from solvers.genetic_fitness import FeasibilityFitnessFunction
 from solvers.tabu_solver import TabuSolver
 # Try to import cplex solver
 from solvers.cplex_solver import CPLEXSolver

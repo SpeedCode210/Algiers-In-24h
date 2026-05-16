@@ -1,8 +1,8 @@
 from solvers.greedy_solver import GreedySolver
 from solvers.grasp_solver import GraspSolver
 from solvers.tabu_solver import TabuSolver
-from solvers.genetic_solver import GeneticSolver
-from solvers.genetic_fitness import PenaltyFitnessFunction, FeasibilityFitnessFunction
+from solvers.genetic_solver import GeneticSolver,TailoredGeneticSolver
+from solvers.genetic_fitness import ScoreFitnessFunction, FeasibilityFitnessFunction
 from solvers.simulated_annealing_solver import SimulatedAnnealingSolver, AcceptanceFunction
 
 try:
@@ -31,13 +31,13 @@ solver_configs = [
     (
         GeneticSolver,
         {
-            'fitness_function': PenaltyFitnessFunction(),
+            'fitness_function': ScoreFitnessFunction(),
         },
         'Genetic',
         '_genetic'
     ),
     (
-        GeneticSolver,
+        TailoredGeneticSolver,
         {
             'fitness_function': FeasibilityFitnessFunction(),
         },
@@ -51,7 +51,7 @@ if CPLEXSolver is not None:
         (
             CPLEXSolver,
             {
-                'time_limit': 30,
+                'time_limit': 60,
             },
             'CPLEX (Exact)',
             '_cplex'
