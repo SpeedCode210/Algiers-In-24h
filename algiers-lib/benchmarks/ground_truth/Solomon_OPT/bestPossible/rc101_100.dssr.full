@@ -1,0 +1,41 @@
+
+Iteration: 1  NoloopNodes: 6  -> 4 19 22 35 70 96
+Time elapsed: 0.09(s)
+Prize:229  Customers:8
+Usr :  65  11  12  11  9  10  4  70
+Time :  11.10  59.00  74.00  89.00  104.30  119.30  170.50  199.10
+
+Best Feasible Path
+Prize:219  Customers:9
+Usr :  65  11  12  78  79  4  1  70  100
+Time :  11.10  59.00  74.00  95.00  117.10  145.50  162.50  191.30  205.70
+
+Iteration: 2  NoloopNodes: 7  -> 4 11 19 22 35 70 96
+Time elapsed: 0.16(s)
+Prize:229  Customers:11
+Usr :  65  69  2  6  7  6  46  4  1  70  100
+Time :  11.10  41.00  75.60  95.00  108.00  121.00  136.00  148.00  165.00  193.80  208.20
+
+Best Feasible Path
+Prize:219  Customers:9
+Usr :  65  11  12  78  79  4  1  70  100
+Time :  11.10  59.00  74.00  95.00  117.10  145.50  162.50  191.30  205.70
+
+Iteration: 3  NoloopNodes: 8  -> 4 6 11 19 22 35 70 96
+Time elapsed: 0.24(s)
+Prize:219  Customers:9
+Usr :  65  11  12  78  79  4  1  70  100
+Time :  11.10  59.00  74.00  95.00  117.10  145.50  162.50  191.30  205.70
+
+Best Feasible Path
+Prize:219  Customers:9
+Usr :  65  11  12  78  79  4  1  70  100
+Time :  11.10  59.00  74.00  95.00  117.10  145.50  162.50  191.30  205.70
+
+
+tempSet1/rc101_100 & 219 & 9 & 3 & 8 & 0.24(s)
+
+Best Feasible Path
+Prize:219  Customers:9
+Usr :  65  11  12  78  79  4  1  70  100
+Time :  11.10  59.00  74.00  95.00  117.10  145.50  162.50  191.30  205.70
