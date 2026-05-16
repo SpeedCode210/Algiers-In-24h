@@ -52,7 +52,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 # ---------------------------------------------------------------------------
 ALGO_ORDER = [
     "Greedy", "GRASP", "SA", "Tabu",
-    "Genetic-Tailored", "Genetic-Penalty", "Genetic-Infeas",
+    "Genetic-Tailored", "Genetic-score",
     "CPLEX",
 ]
 
@@ -62,8 +62,7 @@ PALETTE = {
     "SA":                "#55A868",
     "Tabu":              "#C44E52",
     "Genetic-Tailored":  "#8172B3",
-    "Genetic-Penalty":   "#A78DC4",
-    "Genetic-Infeas":    "#CDB4E0",
+    "Genetic-score":   "#A78DC4",
     "CPLEX":             "#937860",
 }
 
