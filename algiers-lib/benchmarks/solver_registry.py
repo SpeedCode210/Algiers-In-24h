@@ -11,8 +11,8 @@ Stochastic solvers are run NUM_RUNS times (see runner.py) and results are
 aggregated (mean score, std, best, worst).  Deterministic solvers run once.
 
 CPLEX configuration:
-    - Algiers    : 30 min time limit (ground truth)
-    - Solomon-50 : 30 min time limit (ground truth)
+    - Algiers    : 60 s time limit (regular solver, no ground truth)
+    - Solomon-50 : 600 s time limit (ground truth on screened instances)
     - Solomon-100: NO CPLEX (uses Righini & Salani ground truth files)
     - Solomon-200: 60 s time limit
 """
@@ -46,18 +46,20 @@ SolverEntry = dict[str, Any]
 
 
 def _make(name: str, factory: Callable[[Problem], Any],
-          stochastic: bool = False) -> SolverEntry:
-    return {"name": name, "factory": factory, "stochastic": stochastic}
+          stochastic: bool = False, **kwargs) -> SolverEntry:
+    entry = {"name": name, "factory": factory, "stochastic": stochastic}
+    entry.update(kwargs)
+    return entry
 
 
-def _stochastic(name: str, factory: Callable[[Problem], Any]) -> SolverEntry:
+def _stochastic(name: str, factory: Callable[[Problem], Any], **kwargs) -> SolverEntry:
     """Shorthand for a stochastic solver entry."""
-    return _make(name, factory, stochastic=True)
+    return _make(name, factory, stochastic=True, **kwargs)
 
 
-def _deterministic(name: str, factory: Callable[[Problem], Any]) -> SolverEntry:
+def _deterministic(name: str, factory: Callable[[Problem], Any], **kwargs) -> SolverEntry:
     """Shorthand for a deterministic solver entry."""
-    return _make(name, factory, stochastic=False)
+    return _make(name, factory, stochastic=False, **kwargs)
 
 
 # ---------------------------------------------------------------------------
@@ -72,7 +74,7 @@ ALGIERS_VARIANTS: list[SolverEntry] = [
     _stochastic("GRASP-a0.1-30it",  lambda p: GraspSolver(p, iterations=30,  alpha=0.1)),
     _stochastic("GRASP-a0.3-50it",  lambda p: GraspSolver(p, iterations=50,  alpha=0.3)),
     _stochastic("GRASP-a0.5-50it",  lambda p: GraspSolver(p, iterations=50,  alpha=0.5)),
-    _stochastic("GRASP-a0.3-100it", lambda p: GraspSolver(p, iterations=100, alpha=0.3)),
+    
 
     # Simulated Annealing (stochastic) -- vary acceptance, temperature, reheating
     _stochastic("SA-Boltzmann", lambda p: SimulatedAnnealingSolver(
@@ -93,19 +95,19 @@ ALGIERS_VARIANTS: list[SolverEntry] = [
         reheating_rate=0.95, max_iterations=80_000)),
 
     # Tabu (stochastic) -- vary tenure, iterations, oscillation slack
-    _stochastic("Tabu-Default",    lambda p: TabuSolver(p)),
-    _stochastic("Tabu-LongTenure", lambda p: TabuSolver(p, tabu_tenure=40)),
-    _stochastic("Tabu-MoreIter",   lambda p: TabuSolver(p, max_iterations=400)),
-    _stochastic("Tabu-LargeSlack", lambda p: TabuSolver(p, oscillation_slack=480.0)),
+    _deterministic("Tabu-Default",    lambda p: TabuSolver(p)),
+    _stochastic("Tabu-randTenure", lambda p: TabuSolver(p, tabu_tenure=None)),
+    _deterministic("Tabu-LongTenure", lambda p: TabuSolver(p, tabu_tenure=40)),
+    _deterministic("Tabu-LargeSlack", lambda p: TabuSolver(p, oscillation_slack=480.0)),
 
     # Genetic (stochastic) -- two fitness functions
-    _stochastic("Genetic-Feasibility",   lambda p: TailoredGeneticSolver(p, FeasibilityFitnessFunction())),
-    _stochastic("Genetic-Score",        lambda p: GeneticSolver(p, ScoreFitnessFunction())),
+    _stochastic("Genetic-Tailored",   lambda p: TailoredGeneticSolver(p, FeasibilityFitnessFunction())),
+    _stochastic("Genetic-Score",      lambda p: GeneticSolver(p, ScoreFitnessFunction())),
 ]
 
 if _HAS_CPLEX:
     ALGIERS_VARIANTS.append(
-        _deterministic("CPLEX-30m", lambda p: CPLEXSolver(p, time_limit=1800))
+        _deterministic("CPLEX-60s", lambda p: CPLEXSolver(p, time_limit=60))
     )
 
 
@@ -114,40 +116,57 @@ if _HAS_CPLEX:
 # ---------------------------------------------------------------------------
 ALGIERS_BEST_VARIANTS: list[SolverEntry] = [
     _deterministic("Greedy",   lambda p: GreedySolver(p, use_ratio=True)),
-    _stochastic("GRASP",    lambda p: GraspSolver(p, iterations=50, alpha=0.3)),
-    _stochastic("SA",       lambda p: SimulatedAnnealingSolver(
+    _stochastic("GRASP",       lambda p: GraspSolver(p, iterations=50, alpha=0.3)),
+    _stochastic("SA-Boltzmann", lambda p: SimulatedAnnealingSolver(
+        p, acceptance_criterion=AcceptanceFunction.BOLTZMANN,
+        initial_temperature=70, cooling_rate=0.97,
+        reheating_rate=0, max_iterations=80_000)),
+    _stochastic("SA-Cauchy",    lambda p: SimulatedAnnealingSolver(
+        p, acceptance_criterion=AcceptanceFunction.CAUCHY,
+        initial_temperature=70, cooling_rate=0.97,
+        reheating_rate=0, max_iterations=80_000)),
+    _stochastic("SA",           lambda p: SimulatedAnnealingSolver(
         p, initial_temperature=70, cooling_rate=0.97, max_iterations=60_000)),
-    _stochastic("Tabu",     lambda p: TabuSolver(p)),
-    _stochastic("Genetic-Tailored",   lambda p: TailoredGeneticSolver(
+    _deterministic("Tabu",          lambda p: TabuSolver(p)),
+    _stochastic("Tabu-Random",      lambda p: TabuSolver(p, tabu_tenure=None)),
+    _stochastic("Genetic-Tailored", lambda p: TailoredGeneticSolver(
         p, FeasibilityFitnessFunction())),
-    _stochastic("Genetic-Score",      lambda p: GeneticSolver(
-        p, ScoreFitnessFunction())),
+    _stochastic("Genetic-Score", lambda p: GeneticSolver(
+        p, ScoreFitnessFunction()), time_limit=200),
 ]
 
 if _HAS_CPLEX:
     ALGIERS_BEST_VARIANTS.append(
-        _deterministic("CPLEX", lambda p: CPLEXSolver(p, time_limit=1800))
+        _deterministic("CPLEX", lambda p: CPLEXSolver(p, time_limit=60))
     )
 
 
 # ---------------------------------------------------------------------------
-# B. SOLOMON-50 -- one best variant per family + CPLEX (30 min, ground truth)
+# B. SOLOMON-50 -- Boltzmann + Cauchy (instead of SA), Tabu + Tabu-Random,
+#    Genetic-Tailored + Genetic-Score(200s), CPLEX (ground truth)
 # ---------------------------------------------------------------------------
 SOLOMON_50_VARIANTS: list[SolverEntry] = [
     _deterministic("Greedy",   lambda p: GreedySolver(p, use_ratio=True)),
-    _stochastic("GRASP",    lambda p: GraspSolver(p, iterations=50, alpha=0.3)),
-    _stochastic("SA",       lambda p: SimulatedAnnealingSolver(
-        p, initial_temperature=70, cooling_rate=0.97, max_iterations=60_000)),
-    _stochastic("Tabu",     lambda p: TabuSolver(p)),
-    _stochastic("Genetic-Tailored",   lambda p: TailoredGeneticSolver(
+    _stochastic("GRASP",       lambda p: GraspSolver(p, iterations=50, alpha=0.3)),
+    _stochastic("SA-Boltzmann", lambda p: SimulatedAnnealingSolver(
+        p, acceptance_criterion=AcceptanceFunction.BOLTZMANN,
+        initial_temperature=70, cooling_rate=0.97,
+        reheating_rate=0, max_iterations=80_000)),
+    _stochastic("SA-Cauchy",    lambda p: SimulatedAnnealingSolver(
+        p, acceptance_criterion=AcceptanceFunction.CAUCHY,
+        initial_temperature=70, cooling_rate=0.97,
+        reheating_rate=0, max_iterations=80_000)),
+    _deterministic("Tabu",          lambda p: TabuSolver(p)),
+    _stochastic("Tabu-Random",      lambda p: TabuSolver(p, tabu_tenure=None)),
+    _stochastic("Genetic-Tailored", lambda p: TailoredGeneticSolver(
         p, FeasibilityFitnessFunction())),
-    _stochastic("Genetic-Score",      lambda p: GeneticSolver(
-        p, ScoreFitnessFunction())),
+    _stochastic("Genetic-Score", lambda p: GeneticSolver(
+        p, ScoreFitnessFunction()), time_limit=200),
 ]
 
 if _HAS_CPLEX:
     SOLOMON_50_VARIANTS.append(
-        _deterministic("CPLEX", lambda p: CPLEXSolver(p, time_limit=1800))
+        _deterministic("CPLEX", lambda p: CPLEXSolver(p, time_limit=600))
     )
 
 

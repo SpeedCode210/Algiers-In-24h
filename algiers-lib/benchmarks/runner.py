@@ -99,8 +99,24 @@ MAX_PER_GROUP: dict[str, int | None] = {
 NUM_RUNS: int = 5
 
 # Number of CPU cores for parallel execution (1 = sequential mode).
-# Defaults to the number of physical cores (os.cpu_count() on most systems).
-# On your 8-core/16-thread machine, this will be 8.
+# Defaults to all available logical cores (os.cpu_count()).
+#
+# IMPORTANT — when to use parallelism vs sequential:
+#
+#   Parallelism is BENEFICIAL when running the SAME solver on MULTIPLE
+#   independent instances simultaneously (e.g. Solomon-50 screening: each
+#   worker handles one instance and gets dedicated CPU time).
+#
+#   Parallelism is HARMFUL when running MULTIPLE DIFFERENT solvers on a
+#   SINGLE instance (e.g. Algiers): all solvers compete for the same CPU
+#   cores, each gets only a fraction of available cycles, so iteration-
+#   based solvers (SA, Tabu, Genetic) complete far fewer iterations per
+#   wall-clock second than they would alone — producing significantly
+#   worse results than sequential execution.
+#
+#   run_group() automatically detects the single-instance case and forces
+#   sequential execution regardless of this value.  For Solomon screening
+#   (many instances, one solver), full parallelism is used.
 NUM_WORKERS: int = os.cpu_count() or 4
 
 # Set to True to override MAX_PER_GROUP and run everything
@@ -136,6 +152,7 @@ def run_single_solver(
         "landmarks_visited":  0,
         "total_duration":     0.0,
         "optimality_gap_pct": None,
+        "timed_out":          False,
         "error":              None,
     }
 
@@ -145,12 +162,23 @@ def run_single_solver(
         tour: Tour = solver.solve()
         result["time_s"] = time.perf_counter() - t0
 
+        # Post-execution timeout check: if entry has a "time_limit" metadata
+        # key and the solver exceeded it, mark the result as timed-out / invalid.
+        # The score is still recorded (best score the solver produced).
+        entry_time_limit = entry.get("time_limit")
+        if entry_time_limit is not None and result["time_s"] > entry_time_limit:
+            result["timed_out"] = True
+
         if tour is not None:
             sim = tour.simulation_cache()
             result["score"]             = tour.total_score()
             result["valid"]             = sim.is_valid
             result["landmarks_visited"] = len(tour.visited_landmarks)
             result["total_duration"]    = sim.total_duration
+
+            # If the solver timed out, the tour is unreliable -- mark invalid
+            if result["timed_out"]:
+                result["valid"] = False
 
         if ground_truth and ground_truth > 0 and result["score"] is not None:
             gap = (ground_truth - result["score"]) / ground_truth * 100.0
@@ -233,7 +261,21 @@ def run_group(
     Stochastic solvers (entry["stochastic"] == True) are run *num_runs* times
     per instance.  Deterministic solvers run exactly once.
 
-    When num_workers > 1, tasks are distributed across CPU cores:
+    Parallelism strategy
+    --------------------
+    Parallelism is only beneficial when independent instances can be spread
+    across workers (many-instances case, e.g. Solomon-50 with 5 instances:
+    each worker handles one instance and gets exclusive CPU time).
+
+    When there is only ONE instance (e.g. Algiers), running all solvers in
+    parallel is actively harmful: every solver competes with every other for
+    the same CPU cores, so iteration-based solvers (SA, Tabu, Genetic) see a
+    fraction of their intended iteration throughput and converge to much worse
+    solutions than they would running sequentially.  This function therefore
+    forces sequential execution whenever len(instances) == 1, regardless of
+    the num_workers argument.
+
+    For the multi-instance case, tasks are distributed across CPU cores:
       - Linux/macOS: 'fork' context (fast, no pickling)
       - Windows:     'spawn' context + cloudpickle/dill serialization
 
@@ -247,13 +289,29 @@ def run_group(
         group_label   : Label string added to every row (e.g. "Solomon-50").
         num_runs      : Number of runs for stochastic solvers (default: NUM_RUNS).
         num_workers   : Number of CPU cores for parallel execution (default: NUM_WORKERS).
-                        Set to 1 to force sequential execution.
+                        Automatically overridden to 1 when len(instances) == 1
+                        to prevent CPU contention degrading solver quality.
 
     Returns:
         pd.DataFrame with one row per (instance, solver, run) combination.
     """
     ground_truths = ground_truths or {}
     rows: list[dict[str, Any]] = []
+
+    # -----------------------------------------------------------------------
+    # KEY FIX: single-instance groups must always run sequentially.
+    # Running 10 solvers in parallel on one instance means every solver gets
+    # ~1/10 of CPU bandwidth — iteration-based solvers (SA 80k iters, Tabu,
+    # Genetic) complete far fewer iterations per wall-clock second and converge
+    # to significantly worse solutions than when given exclusive CPU access.
+    # -----------------------------------------------------------------------
+    if len(instances) == 1:
+        effective_workers = 1
+        if num_workers > 1:
+            print(f"  [Sequential mode] Single-instance group '{group_label}': "
+                  f"running solvers sequentially so each gets full CPU bandwidth.")
+    else:
+        effective_workers = num_workers
 
     # -- Build flat task list: (inst_idx, var_idx, run_id) -----------------
     task_keys: list[tuple[int, int, int]] = []
@@ -265,7 +323,7 @@ def run_group(
     total_tasks = len(task_keys)
 
     # -- Try parallel execution -----------------------------------------------
-    if num_workers > 1 and total_tasks > 1:
+    if effective_workers > 1 and total_tasks > 1:
         global _mp_state
         _mp_state = {
             "instances": instances,
@@ -293,7 +351,7 @@ def run_group(
         else:
             method_label = "spawn" if use_spawn else "fork"
             print(f"  Parallel mode ({method_label}): {total_tasks} tasks on "
-                  f"{num_workers} CPU cores")
+                  f"{effective_workers} CPU cores")
             try:
                 if use_spawn:
                     # Serialize state with cloudpickle/dill, pass as bytes to workers.
@@ -303,13 +361,13 @@ def run_group(
                     #   worker: cloudpickle.loads(bytes) -> state with live lambdas
                     state_bytes = _pickle_ext.dumps(_mp_state)
                     pool_kwargs = {
-                        "processes": num_workers,
+                        "processes": effective_workers,
                         "initializer": _mp_init_worker,
                         "initargs": (state_bytes,),
                     }
                 else:
                     # fork: child inherits parent memory, no serialization needed
-                    pool_kwargs = {"processes": num_workers}
+                    pool_kwargs = {"processes": effective_workers}
 
                 with ctx.Pool(**pool_kwargs) as pool:
                     for done, (rec, (ii, jj, rid)) in enumerate(
@@ -321,6 +379,8 @@ def run_group(
                         n_runs = num_runs if is_stoch else 1
                         rl = f" (run {rid+1}/{n_runs})" if is_stoch else ""
                         status = f"score={rec['score']:.1f}  t={rec['time_s']:.2f}s"
+                        if rec.get("timed_out"):
+                            status += "  [TIMEOUT]"
                         if rec["optimality_gap_pct"] is not None:
                             status += f"  gap={rec['optimality_gap_pct']:.2f}%"
                         elif rec.get("error"):
@@ -563,7 +623,184 @@ def load_s100_ground_truth() -> dict[str, float]:
 
 
 # ---------------------------------------------------------------------------
-# CPLEX pre-pass helper (Solomon-50 only)
+# CPLEX instance screening (pre-select easy instances, parallel)
+# ---------------------------------------------------------------------------
+
+_screen_mp_state: dict[str, Any] = {}
+
+
+def _screen_init_worker(serialized_state: bytes) -> None:
+    """Initialize a spawned worker for parallel screening."""
+    global _screen_mp_state
+    if _pickle_ext is not None:
+        _screen_mp_state = _pickle_ext.loads(serialized_state)
+    else:
+        import pickle as _std_pickle
+        _screen_mp_state = _std_pickle.loads(serialized_state)
+
+
+def _screen_one_task(idx: int) -> dict[str, Any]:
+    """Run CPLEX screening on one instance in a worker process."""
+    st = _screen_mp_state
+    inst_name, prob = st["instances"][idx]
+    timeout = st["screen_timeout"]
+    result: dict[str, Any] = {
+        "inst_name": inst_name,
+        "easy": False,
+        "elapsed": 0.0,
+        "score": None,
+        "error": None,
+    }
+    try:
+        from solvers.cplex_solver import CPLEXSolver
+        solver = CPLEXSolver(prob, time_limit=timeout)
+        t0 = time.perf_counter()
+        tour = solver.solve()
+        elapsed = time.perf_counter() - t0
+        result["elapsed"] = elapsed
+
+        if tour is not None and elapsed < timeout * 0.95:
+            result["easy"] = True
+            result["score"] = tour.total_score()
+        elif tour is None:
+            result["error"] = "no solution"
+        else:
+            result["error"] = "timeout"
+    except Exception as exc:
+        result["error"] = str(exc)[:80]
+
+    return result
+
+
+def screen_easy_instances(
+    instances: list[tuple[str, Any]],
+    screen_timeout: int = 600,
+    max_keep: int = 5,
+    num_workers: int = NUM_WORKERS,
+) -> list[tuple[str, Any]]:
+    """Pre-screen instances with a short CPLEX run to find easy ones.
+
+    Runs CPLEX with a moderate time limit (screen_timeout seconds) on each
+    candidate instance IN PARALLEL across CPU cores.  Instances where CPLEX
+    terminates well before the timeout are considered "easy" and kept.
+    Instances that hit the timeout are skipped entirely (too complex).
+
+    This avoids wasting 30 minutes per hard instance in the full benchmark.
+    On an 8-core machine, screening 20+ instances takes ~10 min wall-clock
+    instead of ~200 min sequential.
+
+    Args:
+        instances      : List of (instance_name, Problem) tuples to screen.
+        screen_timeout : CPLEX time limit in seconds for screening (default 600).
+        max_keep       : Maximum number of easy instances to return (default 5).
+        num_workers    : Number of parallel workers (default: NUM_WORKERS).
+
+    Returns:
+        List of (instance_name, Problem) tuples that CPLEX solved within
+        screen_timeout seconds, limited to max_keep entries.
+    """
+    try:
+        from solvers.cplex_solver import CPLEXSolver
+    except ImportError:
+        print("  [WARN] CPLEX not available -- cannot screen instances.")
+        print("         Returning all instances as-is.")
+        return instances[:max_keep]
+
+    print(f"\n{'='*60}")
+    print(f"  SCREENING: CPLEX pre-check ({screen_timeout}s per instance)")
+    print(f"  Candidates: {len(instances)} instances, keeping up to {max_keep}")
+    print(f"  Workers: {num_workers} CPU cores (parallel)")
+    print(f"{'='*60}")
+    print()
+
+    results_all: list[dict[str, Any]] = []
+
+    if num_workers > 1 and len(instances) > 1:
+        # -- Parallel screening -----------------------------------------------
+        global _screen_mp_state
+        _screen_mp_state = {
+            "instances": instances,
+            "screen_timeout": screen_timeout,
+        }
+
+        use_spawn = False
+        try:
+            ctx = multiprocessing.get_context("fork")
+        except ValueError:
+            use_spawn = True
+            ctx = multiprocessing.get_context("spawn")
+
+        if use_spawn and not _HAS_PICKLE_EXT:
+            print("  [WARN] Windows + no cloudpickle/dill -- falling back to sequential.\n")
+            # Fall through to sequential below
+        else:
+            method_label = "spawn" if use_spawn else "fork"
+            print(f"  Parallel screening ({method_label}): {len(instances)} instances ...")
+            try:
+                if use_spawn:
+                    state_bytes = _pickle_ext.dumps(_screen_mp_state)
+                    pool_kwargs = {
+                        "processes": num_workers,
+                        "initializer": _screen_init_worker,
+                        "initargs": (state_bytes,),
+                    }
+                else:
+                    pool_kwargs = {"processes": num_workers}
+
+                with ctx.Pool(**pool_kwargs) as pool:
+                    for idx, res in enumerate(
+                        pool.imap_unordered(_screen_one_task, range(len(instances)), chunksize=1),
+                        1,
+                    ):
+                        results_all.append(res)
+                        status = "OK" if res["easy"] else f"SKIP ({res['error']})"
+                        t_str = f"{res['elapsed']:.1f}s"
+                        score_str = f", score={res['score']:.0f}" if res["score"] else ""
+                        print(f"  [{idx}/{len(instances)}] {res['inst_name']:<15} {status:<25} {t_str}{score_str}")
+                        # Early stop: if we already have enough easy ones AND
+                        # all remaining submitted tasks are done
+            except Exception as exc:
+                print(f"  [WARN] Parallel screening error: {exc}")
+                print(f"  Falling back to sequential.\n")
+                results_all = []  # reset and fall through
+
+    # -- Sequential screening (fallback or single worker) -------------------
+    if not results_all:
+        for idx, (inst_name, prob) in enumerate(instances, 1):
+            res = _screen_one_task(idx - 1)
+            results_all.append(res)
+            status = "OK" if res["easy"] else f"SKIP ({res['error']})"
+            t_str = f"{res['elapsed']:.1f}s"
+            score_str = f", score={res['score']:.0f}" if res["score"] else ""
+            print(f"  [{idx}/{len(instances)}] {inst_name:<15} {status:<25} {t_str}{score_str}")
+
+    # -- Collect results ----------------------------------------------------
+    # Build lookup from name -> (inst_name, prob)
+    name_to_prob = {n: (n, p) for n, p in instances}
+
+    easy_results = [r for r in results_all if r["easy"]]
+    easy_results.sort(key=lambda r: r["elapsed"])  # fastest first
+    easy: list[tuple[str, Any]] = [
+        name_to_prob[r["inst_name"]] for r in easy_results[:max_keep]
+    ]
+    skipped: list[str] = [r["inst_name"] for r in results_all if not r["easy"]]
+
+    # Summary
+    print()
+    print(f"  Screening results:")
+    print(f"    Easy (kept)  : {len(easy)} -- {[n for n, _ in easy]}")
+    print(f"    Hard (skipped): {len(skipped)} -- {skipped}")
+    print(f"{'='*60}\n")
+
+    if len(easy) < max_keep:
+        print(f"  [NOTE] Only found {len(easy)} easy instances (wanted {max_keep}).")
+        print(f"         The benchmark will run on these {len(easy)} instances.\n")
+
+    return easy
+
+
+# ---------------------------------------------------------------------------
+# CPLEX pre-pass helper (ground truth for selected instances)
 # ---------------------------------------------------------------------------
 
 def run_cplex_ground_truth(
@@ -708,7 +945,7 @@ def collect_all_results(
         print("\n" + "=" * 60)
         print("GROUP: Algiers dataset (parameter sensitivity)")
         print(f"  Multi-run: stochastic solvers x{NUM_RUNS}, deterministic x1")
-        print(f"  Parallel:  {NUM_WORKERS} CPU cores")
+        print(f"  Execution: sequential (single instance -- each solver gets full CPU)")
         print("=" * 60)
         _count(ALGIERS_VARIANTS, "Algiers")
         name, problem = load_algiers_problem()
@@ -717,6 +954,7 @@ def collect_all_results(
             [(name, problem)],
             ALGIERS_VARIANTS,
             group_label="Algiers",
+            num_workers=1,   # single instance: sequential so solvers don't compete for CPU
         )
         frames["algiers"] = df_alg
         print_group_summary(df_alg)

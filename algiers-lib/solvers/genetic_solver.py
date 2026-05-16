@@ -307,7 +307,8 @@ class TailoredGeneticSolver(Solver):
                     child1 = self.mutation.mutate(child1)
                 if random.random() < self.mutation_rate:
                     child2 = self.mutation.mutate(child2)
-
+                child1 = self._resolve_tour(child1)
+                child2 = self._resolve_tour(child2)
                 next_population.extend([child1, child2])
 
             next_population = next_population[: self.population_size]
@@ -341,6 +342,33 @@ class TailoredGeneticSolver(Solver):
             
 
         return best
+    def _resolve_tour(self, tour: Tour) -> Tour:
+        """Repair an infeasible tour by iteratively removing the least valuable landmark.
+
+        Checks whether the tour is valid. If it is not, removes the landmark
+        whose absence causes the smallest drop in the total score (i.e. the one
+        contributing the least interest), then re-checks validity. This continues,
+        removing one additional landmark per round, until the tour becomes valid
+        or no landmarks remain.
+
+        The landmark with the least effect on the score is the one with the
+        lowest interest_score, since score is purely additive.
+
+        Args:
+            tour: The tour to repair. Modified in place.
+
+        Returns:
+            The repaired Tour. If the tour was already valid it is returned
+            unchanged. If it cannot be made valid, the empty tour is returned.
+        """
+        while tour.visited_landmarks and not tour.is_valid():
+            weakest = min(
+                tour.visited_landmarks,
+                key=lambda landmark: landmark.interest_score,
+            )
+            tour.remove_landmark(weakest)
+
+        return tour
 
     def augmented_representation(self, tour: Tour) -> AugmentedRepresentation:
         """Convert a tour to its augmented representation.

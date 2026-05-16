@@ -5,6 +5,22 @@ Key differences from the standard Problem:
 - Travel time uses Euclidean distance (x,y grid coords) instead of Haversine.
 - Provides parse_solomon_file() to load .txt benchmark instances directly.
 - All landmarks are scheduled open on Day.MONDAY for simplicity.
+
+TOPTW file format (one line per node):
+    i  x  y  d  S  f  a  list  O  C
+    0  1  2  3  4  5  6   7    8  9
+
+    i = vertex number
+    x = x coordinate        -> stored in latitude
+    y = y coordinate        -> stored in longitude
+    d = service duration    -> visit_duration
+    S = profit / score      -> interest_score
+    f, a, list = not relevant (list length depends on a; for Solomon a=1 so
+                 exactly one extra column, giving indices 5,6,7 for f,a,list)
+    O = opening time        -> parts[8]
+    C = closing time        -> parts[9]
+
+Node 0 is the depot: no O/C columns, last column is the time horizon (Tmax).
 """
 
 from __future__ import annotations
@@ -44,15 +60,22 @@ class BenchmarkProblem(Problem):
 
     @staticmethod
     def parse_solomon_file(filepath: str | Path) -> "BenchmarkProblem":
-        """Parse a Solomon OPTW .txt file and return a BenchmarkProblem.
+        """Parse a Solomon TOPTW .txt file and return a BenchmarkProblem.
 
-        File format::
+        Column mapping (0-indexed after splitting each data line):
+            0  i        vertex number
+            1  x        x coordinate
+            2  y        y coordinate
+            3  d        service duration  (visit_duration)
+            4  S        profit / score    (interest_score)
+            5  f        not used
+            6  a        not used
+            7  list     not used  (one extra column for Solomon where a=1)
+            8  O        opening time of time window
+            9  C        closing time of time window
 
-            <nVeh> <maxRoute> <nNodes> <nDays>
-            <dayId> <timeBudget>
-            <id> <x> <y> <score> <duration> <f1> <f2> <f3> <open> <close>
-            ...
-            # Node 0 (depot) has only one trailing value (time-horizon), no open/close.
+        Node 0 (depot) has no O/C columns; its last column is the time
+        horizon, used as the time budget (Tmax).
 
         Args:
             filepath: Path to the .txt benchmark file.
@@ -63,20 +86,21 @@ class BenchmarkProblem(Problem):
         filepath = Path(filepath)
         lines = [ln.strip() for ln in filepath.read_text().splitlines() if ln.strip()]
 
-        # Extract true time budget from the depot line
+        # Extract true time budget from the depot line (node 0)
+        # Depot format: 0  x  y  d  S  f  a  list  <time_horizon>
+        # The time horizon is the last (9th, index 8) column for node 0.
         time_budget = 0
         for raw in lines[2:]:
             parts = raw.split()
             if parts and int(parts[0]) == 0:
-                # Depot line: parts[8] is the close time (time horizon)
-                time_budget = int(float(parts[8]))
+                # Depot: last column is close time / time horizon
+                time_budget = int(float(parts[-1]))
                 break
-        
+
         if time_budget <= 0:
-            # Fallback
+            # Fallback to header line if depot parse failed
             time_budget = int(lines[1].split()[1])
 
-        # Build a single full-day slot for the hotel (open 0 .. time_budget)
         HORIZON = max(time_budget, 4000)
         hotel_slot = TimeSlot(open_time=0, close_time=HORIZON)
         hotel_schedule = WeeklySchedule(
@@ -92,11 +116,12 @@ class BenchmarkProblem(Problem):
             parts = raw.split()
             if not parts:
                 continue
-            node_id = int(parts[0])
-            x = float(parts[1])
-            y = float(parts[2])
-            score = float(parts[3])
-            duration = int(float(parts[4]))
+
+            node_id  = int(parts[0])
+            x        = float(parts[1])
+            y        = float(parts[2])
+            duration = int(float(parts[3]))    # d = service duration
+            score    = float(parts[4])         # S = profit / interest score
 
             if node_id == 0:
                 # Depot / hotel — no time window columns
@@ -112,15 +137,21 @@ class BenchmarkProblem(Problem):
                 )
                 hotel = lm
             else:
-                # Regular landmark with [open, close] columns
-                open_t = int(float(parts[8]))
+                # Regular landmark: columns 8 and 9 are open/close times
+                open_t  = int(float(parts[8]))
                 close_t = int(float(parts[9]))
 
-                # Ensure valid slot (close > open)
+                # Solomon TOPTW defines close_t as the latest *start* time.
+                # Our TimeSlot.contains() checks (arrival + duration <= close_time),
+                # so we extend close_time by duration at parse time to match that
+                # convention without modifying the shared landmark structure.
+                close_t = close_t + duration
+
+                # Ensure valid slot (close must be strictly after open)
                 if close_t <= open_t:
                     close_t = open_t + max(duration, 1)
 
-                slot = TimeSlot(open_time=open_t, close_time=close_t)
+                slot     = TimeSlot(open_time=open_t, close_time=close_t)
                 schedule = WeeklySchedule(schedule={tour_day: [slot]})
 
                 lm = Landmark(
