@@ -1,0 +1,112 @@
+% Present the application architecture, modules, and implementation technologies.
+
+The proposed system is architected as a modular, three-tier application designed to solve the \textbf{Orienteering Problem with Time Windows (OPTW)} within the urban context of Algiers. The design emphasizes the separation of concerns through a layered architecture, ensuring that the mathematical optimization logic remains decoupled from the service delivery and the user interface.
+
+\subsection{Core Logic Layer: AlgiersLIB}
+The foundation of the application is \texttt{AlgiersLIB}, a standalone Python library dedicated to modeling the problem domain and implementing optimization heuristics. To ensure extensibility, it utilizes the \textbf{Strategy Design Pattern}. An abstract base class, \texttt{Solver}, defines the interface for all optimization procedures, allowing the system to remain "open for extension but closed for modification."
+
+\subsection{Service Layer: Flask REST API}
+Built with the \textbf{Flask} framework, this layer manages data persistence, request validation, and the execution pipeline. Following the \textit{KISS} principle, the system utilizes \textbf{CSV flat-files} for data storage, which is optimal for the static nature of the landmark dataset ($\approx 50$ points). 
+
+A critical performance optimization in this layer is the \textbf{Two-Phase Distance Calculation}. Because the meta-heuristics evaluate millions of potential routes, querying a real-world routing API during the search phase would be catastrophically slow and expensive. Instead, a \textbf{memoization-based caching system} computes a fast Haversine (straight-line) distance matrix for the solver loops. The Mapbox Directions API is strictly reserved for the final output phase to fetch accurate road geometries. Furthermore, a dedicated schema layer (\texttt{request\_schemas.py}) ensures "Garbage In, Garbage Out" protection by validating user inputs before they reach the solvers.
+
+\subsection{Interface Layer: Frontend and UX}
+The frontend is developed using \textbf{Vanilla HTML5, CSS3, and JavaScript} to ensure a lightweight client-side footprint without the overhead of heavy frameworks. The UI is spatially divided to maximize usability: a left-hand configuration panel, a central interactive map canvas, a right-hand itinerary overlay, and a bottom KPI (Key Performance Indicator) dashboard.
+
+A key feature of the interface is the preference weighting logic. The user visually ranks five specific landmark categories (\textbf{Attraction, Historical, Shopping, Religious, and Tradition/Art}). To dynamically adjust the importance of each category, the system converts the user-assigned rank ($r$) into a score multiplier ($W_r$) using an amplification coefficient ($C = 1.2$) across the total number of categories ($n = 5$):
+\begin{equation}
+    W_r = \left(\frac{n - r}{n - 1} - 0.5\right) \times C + 1
+\end{equation}
+Using this formula, the ranks from 1 (best) to 5 (worst) map to a targeted multiplier spread of $\mathbf{\{1.6, 1.3, 1.0, 0.7, 0.4\}}$. These weights are passed directly to the \texttt{ScoringService} to adjust the objective function of the selected solver.
+
+To gamify the user experience and abstract the mathematical complexity of the solvers for non-technical users, the system maps each of its optimization algorithms to a specific "Pokemon" persona reflecting its operational behavior. This roster spans simple greedy approaches (e.g., \textit{Piplup}, \textit{Bunnelby}), advanced meta-heuristics and evolutionary methods (e.g., \textit{Mewtwo} for Tabu Search, \textit{Eevee} for Genetic Algorithms), up to an exact IBM ILOG CPLEX solver (\textit{Magnemite}) serving as the optimal baseline.
+
+
+\subsection{User Operational Flow}
+The interaction between the user and the three modules follows a deterministic workflow:
+
+\begin{enumerate}
+    \item \textbf{Initialization:} In the left panel, the user defines the global constraints: the time window (start/end times), the starting hotel, and the specific day of the week (which enforces dynamic opening/closing hours for the OPTW constraints).
+    \item \textbf{Personalization:} The user ranks the five landmark categories via a drag-and-drop interface. The Frontend calculates the required weight multipliers ($1.6$ to $0.4$) and selects a Solver.
+    \item \textbf{Request Orchestration:} The parameters are sent via an asynchronous AJAX request to the \texttt{/api/solve} endpoint.
+    \item \textbf{Backend Execution (Pipe-and-Filter Pattern):}
+    \begin{itemize}
+        \item The \texttt{ProblemLoader} initializes constraints and validates the dataset.
+        \item The \texttt{ScoringService} applies the rank formula to compute a weighted score for every landmark.
+        \item The \texttt{SolverService} executes the selected strategy using the cached Haversine matrix for speed, operating under a strict \textbf{30-second maximum search time limit}.
+        \item The \texttt{RoutingService} fetches final road-network polylines from Mapbox for the optimized path.
+    \end{itemize}
+    \item \textbf{Visualization and Comparison:} After computation, the central Mapbox canvas renders the route. The bottom bar displays four primary KPIs: \textbf{Total Stops, Total Time, Distance (KM), and overall Interest Score}. The right-hand \textbf{Tour Guide} overlay provides a step-by-step itinerary, detailing each node's category, point value, and allocated visit duration. The solution is also added to a \textbf{Ranking Table}, allowing the user to seamlessly benchmark different algorithms.
+\end{enumerate}
+
+
+\begin{table}[h]
+\centering
+\caption{API Endpoint Specifications}
+\label{table:api_endpoints}
+\begin{tabular}{|l|p{8cm}|}
+\hline
+\textbf{Endpoint} & \textbf{Description} \\ \hline
+\texttt{/api/landmarks} & Retrieves the dataset of landmarks and metadata. \\ \hline
+\texttt{/api/hotels} & Retrieves the list of available starting locations. \\ \hline
+\texttt{/api/categories} & Returns landmark categories for user ranking. \\ \hline
+\texttt{/api/solve} & Accepts constraints (budget, weights, algorithm) and returns an optimized tour. \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.5cm,
+    font=\sffamily\small,
+    % Define Styles
+    process/.style={rectangle, draw, fill=blue!10, text width=3.5cm, minimum height=1.2cm, text centered, rounded corners, drop shadow},
+    api/.style={rectangle, draw, fill=orange!10, text width=3.5cm, minimum height=1.2cm, text centered, rounded corners, drop shadow},
+    lib/.style={rectangle, draw, fill=green!10, text width=3.5cm, minimum height=1.2cm, text centered, rounded corners, drop shadow},
+    database/.style={cylinder, draw, shape border rotate=90, fill=gray!10, text width=1.5cm, minimum height=1cm, text centered, drop shadow},
+    arrow/.style={-Stealth, thick, color=gray!70}
+]
+
+% --- FRONTEND LAYER ---
+\node (init) [process] {\textbf{1. Initialization}\\Define Budget, Hotel, \& Time};
+\node (perso) [process, below=of init] {\textbf{2. Personalization}\\Rank Categories \& Select Solver};
+
+% --- API LAYER ---
+\node (request) [api, right=2.5cm of perso] {\textbf{3. API Request}\\POST /api/solve\\(JSON Payload)};
+\node (loader) [api, below=0.5cm of request] {\textbf{4a. ProblemLoader}\\Validate Constraints};
+\node (scoring) [api, below=0.5cm of loader] {\textbf{4b. Scoring Service}\\Apply Weight Formula (1.6 - 0.4)};
+
+% --- AlgiersLIB LAYER ---
+\node (solver) [lib, below=0.5cm of scoring] {\textbf{4c. Solver Service}\\Execute Strategy Pattern};
+
+% --- EXTERNAL/DATA LAYER ---
+\node (mapbox) [process, right=2.5cm of solver, fill=purple!10] {\textbf{4d. Routing Service}\\Mapbox API (Road Geometry)};
+\node (csv) [database, right=2cm of request] {CSV Data \& Cache};
+
+% --- FINAL OUTPUT ---
+\node (visual) [process, below=8.5cm of perso] {\textbf{5. Visualization}\\Map, Tour Guide \& Local Rankings};
+
+% --- CONNECTIONS ---
+\draw [arrow] (init) -- (perso);
+\draw [arrow] (perso) -- (request);
+\draw [arrow] (request) -- (loader);
+\draw [arrow] (loader) -- (scoring);
+\draw [arrow] (scoring) -- (solver);
+\draw [arrow] (solver) -- (mapbox);
+\draw [arrow] (mapbox) |- ($(visual.east) + (0, 0.2)$);
+\draw [arrow] (solver) -| (visual);
+
+\draw [arrow, dashed] (csv) -- (request);
+\draw [arrow, dashed] (csv) |- (loader);
+
+% --- BOXES AROUND MODULES ---
+\begin{scope}[on background layer]
+    \node (frontRect) [draw=blue!50, dashed, thick, rounded corners, inner sep=0.4cm, fit=(init) (perso) (visual), label={[blue]above:FRONTEND (Vanilla JS)}] {};
+    \node (apiRect) [draw=orange!50, dashed, thick, rounded corners, inner sep=0.4cm, fit=(request) (loader) (scoring) (mapbox) (csv), label={[orange]above:API (Flask)}] {};
+    \node (libRect) [draw=green!50, dashed, thick, rounded corners, inner sep=0.4cm, fit=(solver), label={[green!60!black]below:ENGINE (AlgiersLIB)}] {};
+\end{scope}
+
+\end{tikzpicture}
+    \caption{System Architecture of the Application.}
+    \label{fig:system-architecture}
+\end{figure}

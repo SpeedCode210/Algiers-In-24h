@@ -1,10 +1,17 @@
-import random
+from __future__ import annotations
+
+import os
 import sys
-from pathlib import Path   
+import time
+from typing import Any
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-
-from models.landmark import Day, Landmark, TimeSlot, WeeklySchedule, loadLandmarks ,loadHotel
+# Ensure the library root is on the path so solver imports resolve.
+_LIBRARY_ROOT = os.path.normpath(
+     os.path.abspath(os.path.join(os.path.dirname(__file__), "../../algiers-lib"))
+ )
+if _LIBRARY_ROOT not in {os.path.normpath(os.path.abspath(path)) for path in sys.path}:
+     sys.path.insert(0, _LIBRARY_ROOT)
+     
 from models.problem import Problem
 from models.tour import Tour
 from utils.time import time_in_string
@@ -98,16 +105,12 @@ def test_genetic_solver_runs_with_penalty_fitness() -> None:
         crossover_method="order",
     )
 
-    best = solver.solve()
-
-    assert isinstance(best, Tour)
-    assert best.problem is problem
-    assert len(best.visited_landmarks) > 0
-
-    print(
-        f"test_genetic_solver_runs_with_penalty_fitness: PASSED - best route length={len(best.visited_landmarks)} - total score={best.total_score():.1f} - total time={best.simulation_cache().total_duration:.1f} min\n"
-        f"route: {format_route(best)}\n"
-        f"details:\n{format_route_details(best)}"
+def _make_grasp(problem: Problem, params: dict):
+    return GraspSolver(
+        problem,
+        iterations=int(params.get("iterations", 50)),
+        alpha=float(params.get("alpha", 0.3)),
+        max_local_search_iters=int(params.get("max_local_search_iters", 30)),
     )
 
 
@@ -122,47 +125,112 @@ def test_genetic_solver_runs_with_infeasibility_fitness() -> None:
         crossover_method="order",
     )
 
-    best = solver.solve()
-
-    assert isinstance(best, Tour)
-    assert best.problem is problem
-    assert len(best.visited_landmarks) > 0
-    assert best.is_valid()
-
-    print(
-        f"test_genetic_solver_runs_with_infeasibility_fitness: PASSED - best route length={len(best.visited_landmarks)} - total score={best.total_score():.1f} - total time={best.simulation_cache().total_duration:.1f} min\n"
-        f"route: {format_route(best)}\n"
-        f"details:\n{format_route_details(best)}"
+def _make_ga(problem: Problem, params: dict):
+    return GeneticSolver(
+        problem,
+        fitness_function=ScoreFitnessFunction(),
+        regenerations=int(params.get("regenerations", 1000)),
+        population_size=int(params.get("population_size", 1075)),
+        mutation_rate=float(params.get("mutation_rate", 0.8)),
+        crossover_method="order",
     )
 
-
-def test_genetic_solver_runs_with_feasibility_fitness() -> None:
-    problem = load_dataset_problem()
-    solver = TailoredGeneticSolver(
-        problem=problem,
+def _make_ga_tailored(problem: Problem, params: dict):
+    return TailoredGeneticSolver(
+        problem,
         fitness_function=FeasibilityFitnessFunction(),
-        regenerations=4,
-        population_size=2,
-        mutation_rate=0.5,
+        regenerations=int(params.get("regenerations", 1000)),
+        population_size=int(params.get("population_size", 1075)),
+        mutation_rate=float(params.get("mutation_rate", 0.8)),
         crossover_method="tailored",
     )
 
-    best = solver.solve()
-
-    assert isinstance(best, Tour)
-    assert best.problem is problem
-    assert len(best.visited_landmarks) > 0
-    #assert best.is_valid()
-
-    """print(
-        f"test_genetic_solver_runs_with_feasibility_fitness: PASSED - best route length={len(best.visited_landmarks)} - total score={best.total_score():.1f} - total time={best.simulation_cache().total_duration:.1f} min\n"
-        f"route: {format_route(best)}\n"
-        f"details:\n{format_route_details(best)}"
-    )"""
+def _make_cplex(problem: Problem, params: dict):
+    return CPLEXSolver(problem)
 
 
-if __name__ == "__main__":
-    print ("-------------------this is the start of the second test-------------------")
-    test_genetic_solver_runs_with_feasibility_fitness()
-    print("ALL genetic solver tests executed.")
+_SOLVER_REGISTRY: dict[str, Any] = {
+    "greedy":         _make_greedy,
+    "greedy_ratio":   _make_greedy_ratio,
+    "greedy_nearest": _make_greedy_nearest,
+    "greedy_random":  _make_greedy_random,
+    "sa":             _make_sa,
+    "grasp":          _make_grasp,
+    "tabu":           _make_tabu,
+    "ga":             _make_ga,
+    "ga_tailored":    _make_ga_tailored,
+    "cplex":          _make_cplex,
+}
 
+
+def run_solver(algorithm: str, problem: Problem, params: dict) -> Tour:
+    """Instantiate and run the requested solver, returning the best Tour.
+
+    Args:
+        algorithm: Frontend algorithm ID (e.g. ``"grasp"``).
+        problem:   Fully configured Problem instance (scores already adjusted).
+        params:    Algorithm hyperparameters from the request body. May be
+                   empty — each factory supplies sensible defaults.
+
+    Returns:
+        Best Tour found by the solver.
+
+    Raises:
+        ValueError: If ``algorithm`` is not in the registry.
+        RuntimeError: If the solver raises an unexpected exception.
+    """
+    factory = _SOLVER_REGISTRY.get(algorithm)
+    if factory is None:
+        raise ValueError(
+            f"Unknown algorithm '{algorithm}'. "
+            f"Valid options: {sorted(_SOLVER_REGISTRY)}"
+        )
+
+    solver = factory(problem, params or {})
+    try:
+        return solver.solve()
+    except Exception as exc:
+        raise RuntimeError(
+            f"Solver '{algorithm}' raised an unexpected exception."
+        ) from exc
+
+
+def run_all_solvers(
+    problem: Problem,
+) -> tuple[list[dict], dict[str, str]]:
+    """Run every algorithm listed in COMPARISON_ALGORITHMS.
+
+    Runs each solver sequentially with default hyperparameters, times
+    each run, and collects results.  Solver failures are caught and
+    reported in the errors dict rather than crashing the whole request.
+
+    Args:
+        problem: Fully configured Problem instance.
+
+    Returns:
+        A tuple of:
+            - ``results``: list of dicts, each containing ``algorithm``,
+              ``tour``, and ``elapsed_ms``.  Sorted by total_score desc.
+            - ``errors``: dict mapping algorithm ID to error message for
+              any solver that raised an exception.
+    """
+    results: list[dict] = []
+    errors:  dict[str, str] = {}
+
+    for algorithm in COMPARISON_ALGORITHMS:
+        if algorithm not in _SOLVER_REGISTRY:
+            errors[algorithm] = f"Algorithm '{algorithm}' not in registry."
+            continue
+        try:
+            t0   = time.time()
+            tour = run_solver(algorithm, problem, {})
+            elapsed_ms = round((time.time() - t0) * 1000)
+            results.append({
+                "algorithm":  algorithm,
+                "tour":       tour,
+                "elapsed_ms": elapsed_ms,
+            })
+        except Exception as exc:
+            errors[algorithm] = str(exc)
+    results.sort(key=lambda r: r["tour"].total_score(), reverse=True)
+    return results, errors

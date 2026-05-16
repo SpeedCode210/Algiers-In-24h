@@ -90,7 +90,7 @@ class ScoreFitnessFunction(FitnessFunction):
         Returns:
             Total interest score of all visited landmarks.
         """
-        total_duration = self._evaluate_tour(tour)
+        invalid_count, total_duration = self._evaluate_tour(tour)
         return total_duration
 
 
@@ -113,7 +113,7 @@ class FeasibilityFitnessFunction(FitnessFunction):
             Total interest score of all visited landmarks plus a normalized
             bonus for remaining time budget.
         """
-        total_duration = self._evaluate_tour(tour)[1]
+        invalid_count, total_duration = self._evaluate_tour(tour)
         total_reward = sum(
             float(landmark.interest_score) for landmark in tour.visited_landmarks
         )

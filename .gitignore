@@ -20,17 +20,27 @@ logs/
 *.log
 .env            # Environment variables (sensitive data)
 
-report/*.out
-report/*.aux
-report/*.toc
-report/*.pdf
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.toc
+*synctex.gz
+texput.log
+*.pdf
+*.bcf
+*.run.xml
+*.xml
 
 # Local test artifacts and benchmark outputs (ignore user-created test scripts)
 # Ignore the ad-hoc Tabu benchmark script and any ad-hoc solver tests
-algiers-lib/benchmarks
+
 
 # Benchmark results / history produced by running the benchmark
 algiers-lib/solvers/benchmarks/
 algiers-lib/solvers/benchmarks/*
-algiers-lib/results/
+
 
