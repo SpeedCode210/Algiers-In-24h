@@ -1,0 +1,22 @@
+\begin{table}[htbp]
+\centering
+\caption{Algorithm performance on Solomon-100 dataset. Scores and times shown as mean $\pm$ std over 5 runs. Ground truth: Righini \& Salani bestPossible. SA uses Boltzmann acceptance with exponential cooling. Greedy uses lexicographic $(\text{score},\,-\text{travel})$ priority.}
+\label{tab:results_s100}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{l rrr}
+\toprule
+\textbf{Algorithm}
+& \textbf{Score} & \textbf{Time (s)} & \textbf{Gap (\%)} \\
+\midrule
+  Greedy-Score & 186.4 $\pm$ 66.6 & 0.01 $\pm$ 0.01 & 39.92 \\
+  Greedy-Ratio & 148.5 $\pm$ 45.0 & 0.01 $\pm$ 0.01 & 51.48 \\
+  GRASP & 291.5 $\pm$ 53.5 & 10.58 $\pm$ 4.33 & 3.95 \\
+  SA-Boltzmann & 193.6 $\pm$ 62.6 & 0.12 $\pm$ 0.02 & 37.22 \\
+  SA-Cauchy & 213.3 $\pm$ 62.1 & 0.12 $\pm$ 0.02 & 30.57 \\
+  Tabu & 282.3 $\pm$ 47.9 & 1.15 $\pm$ 0.13 & 6.59 \\
+  Genetic-Tailored & 290.8 $\pm$ 51.4 & 12.07 $\pm$ 4.85 & 3.98 \\
+  Genetic-Score & 172.5 $\pm$ 46.5 & 48.18 $\pm$ 21.59 & 43.28 \\
+\bottomrule
+\end{tabular}
+\end{table}

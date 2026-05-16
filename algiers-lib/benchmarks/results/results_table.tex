@@ -1,0 +1,29 @@
+\begin{table}[htbp]
+\centering
+\caption{Algorithm comparison: mean score, execution time, and optimality gap across three datasets. Algiers and Solomon-50 use CPLEX run to completion as ground truth. Solomon-100 uses Righini--Salani best-possible as ground truth.}
+\label{tab:algo_comparison}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l rrr rrr rrr}
+\toprule
+& \multicolumn{3}{c}{\textbf{Algiers}}
+& \multicolumn{3}{c}{\textbf{Solomon-50}}
+& \multicolumn{3}{c}{\textbf{Solomon-100}} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
+\textbf{Algorithm}
+& \textbf{Score} & \textbf{Time (s)} & \textbf{Gap (\%)}
+& \textbf{Score} & \textbf{Time (s)} & \textbf{Gap (\%)}
+& \textbf{Score} & \textbf{Time (s)} & \textbf{Gap (\%)} \\
+\midrule
+Greedy & 185.0 & 0.04 & 24.49 & 199.0 $\pm$ 81.6 & 0.05 $\pm$ 0.00 & 31.86 & 335.7 $\pm$ 94.1 & 0.07 $\pm$ 0.01 & 39.13 \\
+GRASP & 218.0 & 1.82 & 11.02 & 237.5 $\pm$ 97.0 & 1.45 $\pm$ 0.10 & 18.61 & 401.5 $\pm$ 110.0 & 2.66 $\pm$ 0.25 & 26.98 \\
+SA & 231.0 & 4.51 & 5.71 & 251.6 $\pm$ 100.9 & 3.10 $\pm$ 0.26 & 13.66 & 437.6 $\pm$ 123.5 & 6.29 $\pm$ 0.46 & 20.67 \\
+Tabu & 226.0 & 3.78 & 7.76 & 249.5 $\pm$ 99.9 & 2.83 $\pm$ 0.10 & 14.32 & 420.1 $\pm$ 120.2 & 5.75 $\pm$ 0.70 & 23.87 \\
+Genetic-Tailored & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+Genetic-Penalty & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+Genetic-Infeas & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\textit{CPLEX} (GT) & 245.0 & 312.60 & \textbf{0.00} & 295.8 $\pm$ 123.1 & 19.48 $\pm$ 0.99 & \textbf{0.00} & 491.8 $\pm$ 139.4 & 58.94 $\pm$ 3.97 & \textbf{0.00} \\
+\bottomrule
+\multicolumn{10}{l}{\textit{Note: values shown are from representative mock data (solvers not available in this environment).}} \\
+\end{tabular}
+\end{table}

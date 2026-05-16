@@ -1,0 +1,14 @@
+#! /bin/zsh
+for i in `ls *_100`; 
+do 
+echo "Processing $i...";
+../otptw_dssr_cons_hg -i $i -mc 10 > $i.cons.hg.mc10;
+../otptw_dssr_cons_tg -i $i -mc 10 > $i.cons.tg.mc10;
+../otptw_dssr_cons_hgtw -i $i -mc 10 > $i.cons.hgtw.mc10;
+../otptw_dssr_cons_tgtw -i $i -mc 10 > $i.cons.tgtw.mc10;
+../otptw_dssr_full_hg -i $i -mc 10 > $i.full.hg.mc10;
+../otptw_dssr_full_tg -i $i -mc 10 > $i.full.tg.mc10;
+../otptw_dssr_full_hgtw -i $i -mc 10 > $i.full.hgtw.mc10;
+../otptw_dssr_full_tgtw -i $i -mc 10 > $i.full.tgtw.mc10;
+done
+
