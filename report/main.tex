@@ -1,54 +1,144 @@
-\documentclass[12pt,a4paper]{report}
+% ============================================================
+%  Algiers in 24 Hours — Introduction to AI Project Report
+%  National Higher School of Artificial Intelligence — Spring 2026
+%
+%  Compiler  : pdfLaTeX  (do NOT use XeLaTeX or LuaLaTeX)
+%  Font      : Times New Roman 11pt  (enforced by \usepackage{mathptmx})
+%  Margins   : 2.5 cm all sides  (set by geometry)
+%  Spacing   : Single  (do NOT change \linespread)
+%  References: APA 7th edition  (use \parencite{key} in text)
+%  Citation  : Add your .bib entries to references.bib
+%  Page limit: 13 pages STRICT (Appendices excluded)
+% ============================================================
 
-\usepackage[utf8]{inputenc}
+\documentclass[11pt, a4paper]{article}
+
+% ── Encoding & font ─────────────────────────────────────────
 \usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usepackage[english]{babel}
-\usepackage{geometry}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{amsmath, amssymb}
-\usepackage{fancyhdr}
-\usepackage{setspace}
+\usepackage[utf8]{inputenc}
+\usepackage{mathptmx}
+
+% ── Page geometry ────────────────────────────────────────────
+\usepackage[
+  a4paper,
+  top=2.5cm, bottom=2.5cm,
+  left=2.5cm, right=2.5cm
+]{geometry}
+
+% ── Line spacing ─────────────────────────────────────────────
+\linespread{1.0}
+
+% ── Section heading style ────────────────────────────────────
 \usepackage{titlesec}
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection.}{0.5em}{}
+\titlespacing*{\section}{0pt}{12pt}{6pt}
+\titlespacing*{\subsection}{0pt}{8pt}{4pt}
 
-\geometry{margin=1in}
-\setstretch{1.2}
+% ── Paragraph spacing ────────────────────────────────────────
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
 
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[L]{\leftmark}
-\fancyhead[R]{\thepage}
+% ── Mathematics ──────────────────────────────────────────────
+\usepackage{amsmath, amssymb}
 
-\title{Report Title}
-\author{Author Name}
-\date{\today}
+% ── Figures and tables ───────────────────────────────────────
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\captionsetup{font=small, labelfont=bf}
+
+% ── Hyperlinks ───────────────────────────────────────────────
+\usepackage[
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=black
+]{hyperref}
+
+% ── Bibliography (APA 7th edition) ───────────────────────────
+\usepackage[
+  style=apa,
+  backend=biber,
+  natbib=true
+]{biblatex}
+\addbibresource{references.bib}
+
+% ── Miscellaneous ────────────────────────────────────────────
+\usepackage{microtype}
+\usepackage{enumitem}
+\setlist{noitemsep, topsep=4pt}
 
 \begin{document}
 
-\maketitle
-\tableofcontents
+\begin{titlepage}
+  \centering
+  \vspace*{1cm}
+  {\large The National Higher School of Artificial Intelligence\\[4pt]
+   Introduction to AI Course Project\\[4pt]
+   Spring 2026}\\[2cm]
+  {\LARGE\bfseries Algiers in 24 Hours:\\[6pt]
+   A Time-Constrained Orienteering Approach\\
+   to Tourist Route Optimisation}\\[2cm]
+  {\normalsize
+  \begin{tabular}{ll}
+    \textbf{Full Name} & \textbf{Group} \\
+    \hline
+    & \\
+    & \\
+    & \\
+    & \\
+    & \\
+    & \\
+  \end{tabular}}
+\end{titlepage}
+
 \newpage
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
+\input{sections/abstract}
 
-\chapter{Introduction}
-% Your introduction here.
+\section{Introduction}
+\input{sections/introduction}
 
-\chapter{Background}
-% Background information.
+\newpage
+\section{State of the Art}
+\input{sections/state_of_the_art}
 
-\chapter{Methodology}
-% Describe your methods.
+\newpage
+\section{Dataset Building}
+\input{sections/dataset}
 
-\chapter{Results}
-% Present your results.
+\newpage
+\section{Problem Solving Techniques}
+\input{sections/problem_solving}
 
-\chapter{Discussion}
-% Discuss your findings.
+\newpage
+\section{Application Design}
+\input{sections/application_design}
 
-\chapter{Conclusion}
-% Conclude your report.
+\newpage
+\section{Results and Analysis}
+\input{sections/results_analysis}
 
-\bibliographystyle{plain}
-\bibliography{references}
+\newpage
+\section{Discussion}
+\input{sections/discussion}
+
+\section{Conclusion}
+\input{sections/conclusion}
+
+\newpage
+\printbibliography[heading=bibintoc, title={References}]
+
+\newpage
+\appendix
+\section{Screenshots of the System}
+\input{sections/appendix_a}
+
+\section{Who Did What}
+\input{sections/appendix_b}
 
 \end{document}
