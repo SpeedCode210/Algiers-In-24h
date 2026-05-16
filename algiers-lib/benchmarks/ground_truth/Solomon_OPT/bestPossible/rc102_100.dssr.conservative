@@ -1,0 +1,52 @@
+
+Iteration: 1  NoloopNodes: 7  -> 2 4 22 26 34 50 96
+Time elapsed: 1.29(s)
+Prize:271  Customers:11
+Usr :  36  37  36  40  38  41  54  94  96  94  80
+Time :  43.00  56.00  69.00  85.00  100.30  116.70  141.90  164.00  180.30  196.60  216.60
+
+Best Feasible Path
+Prize:223  Customers:8
+Usr :  36  37  38  40  1  4  2  70
+Time :  43.00  56.00  75.00  90.30  135.30  152.30  167.60  191.90
+
+Iteration: 2  NoloopNodes: 8  -> 2 4 22 26 34 36 50 96
+Time elapsed: 2.63(s)
+Prize:269  Customers:10
+Usr :  98  12  11  12  11  78  2  4  1  70
+Time :  14.10  43.40  59.00  74.00  89.00  115.00  148.60  163.90  180.90  209.70
+
+Best Feasible Path
+Prize:209  Customers:8
+Usr :  98  12  11  78  2  4  1  70
+Time :  14.10  43.40  59.00  90.00  123.60  141.00  158.00  186.80
+
+Iteration: 3  NoloopNodes: 9  -> 2 4 11 22 26 34 36 50 96
+Time elapsed: 3.95(s)
+Prize:266  Customers:10
+Usr :  65  12  11  78  79  7  4  7  2  70
+Time :  11.10  48.50  63.50  90.00  112.10  133.50  150.50  167.50  184.50  208.80
+
+Best Feasible Path
+Prize:266  Customers:10
+Usr :  65  12  11  78  79  7  4  5  2  70
+Time :  11.10  48.50  63.50  90.00  112.10  133.50  150.50  165.50  185.60  209.90
+
+Iteration: 4  NoloopNodes: 10  -> 2 4 7 11 22 26 34 36 50 96
+Time elapsed: 5.38(s)
+Prize:266  Customers:10
+Usr :  65  12  11  78  79  7  4  5  2  70
+Time :  11.10  48.50  63.50  90.00  112.10  133.50  150.50  165.50  185.60  209.90
+
+Best Feasible Path
+Prize:266  Customers:10
+Usr :  65  12  11  78  79  7  4  5  2  70
+Time :  11.10  48.50  63.50  90.00  112.10  133.50  150.50  165.50  185.60  209.90
+
+
+tempSet1/rc102_100 & 266 & 10 & 4 & 10 & 5.39(s)
+
+Best Feasible Path
+Prize:266  Customers:10
+Usr :  65  12  11  78  79  7  4  5  2  70
+Time :  11.10  48.50  63.50  90.00  112.10  133.50  150.50  165.50  185.60  209.90

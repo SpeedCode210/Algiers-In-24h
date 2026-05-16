@@ -1,0 +1,10 @@
+#! /bin/zsh
+for i in `ls *_100`; 
+do 
+echo "Processing $i...";
+../otptw_dssr_conservative $i > $i.conservative;
+../otptw_dssr_only_max $i > $i.only_max;
+../otptw_dssr_full $i > $i.full;
+../otptw_exact $i > $i.exact;
+done
+

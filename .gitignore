@@ -27,10 +27,10 @@ report/*.pdf
 
 # Local test artifacts and benchmark outputs (ignore user-created test scripts)
 # Ignore the ad-hoc Tabu benchmark script and any ad-hoc solver tests
-algiers-lib/benchmarks
+
 
 # Benchmark results / history produced by running the benchmark
 algiers-lib/solvers/benchmarks/
 algiers-lib/solvers/benchmarks/*
-algiers-lib/results/
+
 
