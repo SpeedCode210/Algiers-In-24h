@@ -75,13 +75,13 @@
   natbib=true
 ]{biblatex}
 \addbibresource{references.bib}
-
 % ── Miscellaneous ────────────────────────────────────────────
 \usepackage[expansion=false]{microtype}
 \usepackage{enumitem}
 \setlist{noitemsep, topsep=2pt}
 
 \begin{document}
+\sloppy
 
 \begin{titlepage}
   \centering
@@ -92,8 +92,10 @@
   {\LARGE\bfseries Algiers in 24 Hours:\\[6pt]
    A Time-Constrained Orienteering Approach\\
    to Tourist Route Optimisation}\\[2cm]
-  {\large
-  \begin{tabular}{p{7cm} p{3cm}}
+  {\Large
+  \renewcommand{\arraystretch}{1.8}
+  \begin{tabular}{|p{9cm}|p{3.5cm}|}
+    \hline
     \textbf{Full Name} & \textbf{Group} \\
     \hline
     Raouf Ould Ali               & G7  \\
@@ -143,6 +145,9 @@
 \newpage
 \printbibliography[heading=bibintoc, title={References}]
 
+\newpage
+\appendix
+\section{Screenshots of the System}
 \input{sections/appendix_a}
 
 \newpage
