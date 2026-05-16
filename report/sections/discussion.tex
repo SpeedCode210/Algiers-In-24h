@@ -1,1 +1,117 @@
 % Interpret the results, discuss limitations, and outline future improvements.
+
+The experimental results reveal a nuanced performance landscape in
+which solution quality, computational cost, and constraint
+satisfaction trade off in ways that both confirm and extend the
+findings reported in the orienteering literature.
+
+\subsection{Interpretation of Results}
+
+The most striking result is the parity between GRASP and Tabu
+Search at the highest observed tour quality of 98.7, both visiting
+11 landmarks within the eight-hour budget, yet with a wall-clock
+time ratio of approximately 27:1 in favour of Tabu Search (0.37
+seconds versus 10.18 seconds). This finding is consistent with the
+comparative analysis of \textcite{Liang2002}, who observed that
+Tabu Search and population-based heuristics achieve comparable
+solution quality on orienteering benchmarks, and with
+\textcite{Tang2005}, who demonstrated that adaptive memory
+mechanisms in Tabu Search enable rapid convergence through
+structured neighbourhood pruning. The successive-filtering
+candidate strategy implemented in our Tabu Search --- ranking
+landmarks by induced travel cost relative to interest score ---
+appears to be the principal factor responsible for its
+computational efficiency, effectively reducing the neighbourhood
+evaluation burden without sacrificing solution quality.
+
+Simulated Annealing with the Cauchy acceptance criterion (96.9,
+11 landmarks) consistently outperforms the Boltzmann variant
+(95.3, 11 landmarks), a result attributable to the heavier tails
+of the Cauchy distribution, which sustain a higher probability of
+accepting deteriorating moves at intermediate temperatures and
+thereby reduce premature convergence. This echoes the theoretical
+expectations discussed by \textcite{Gunawan2016}, who note that
+acceptance-function design is a primary differentiator of
+Simulated Annealing variants on constrained routing problems.
+
+The Genetic Algorithm (68.3--90.0 across configurations) exhibits
+greater variance than single-solution methods, which is consistent
+with the sensitivity of population-based approaches to crossover
+operator design on time-windowed instances. The order crossover
+and tailored crossover implementations produced different fitness
+landscapes, and the relatively modest performance of the penalty
+fitness function relative to the feasibility-oriented variant
+suggests that soft-constraint handling significantly affects
+search trajectory for this problem class.
+
+The most academically interesting result is the underperformance
+of the CPLEX exact solver (61.8--88.2, 7--10 landmarks) relative
+to GRASP and Tabu Search. Three explanations are plausible. First,
+CPLEX required 30.2 seconds to terminate, suggesting that the
+branch-and-bound search tree was not fully explored within the
+available computation budget, and the best integer solution found
+at termination is consequently a feasible but sub-optimal
+incumbent. Second, the Mixed Integer Linear Programming
+formulation introduces symmetry constraints and big-$M$
+linearisations for time-window propagation that tighten the
+feasible region relative to the heuristic representations. Third,
+the haversine-based travel matrix, while consistent across all
+solvers, produces a non-integer cost structure that may slow LP
+relaxation bounds. \textcite{Righini2009} observed similar
+behaviour and addressed it through decremental state-space
+relaxation; incorporating such techniques would likely close the
+gap between CPLEX and the leading metaheuristics.
+
+\subsection{Limitations}
+
+Several limitations constrain the generalisability of these
+results. First, travel times are computed from straight-line
+haversine distances at a fixed average urban speed of 25 km/h.
+Real road distances in Algiers, which the backend routing service
+retrieves from MAPBOX API, are systematically longer and temporally
+variable due to traffic. The algorithms were therefore optimising
+a surrogate objective that diverges from the true tourist
+experience. Second, landmark interest scores were assigned through
+a weighted combination of public ratings and expert judgement, a
+process that introduces subjectivity and limits
+reproducibility. Third, the dataset is confined to 56 landmarks
+in the Algiers wilaya, a scale at which all tested algorithms
+remain tractable; results may not extrapolate to larger
+metropolitan datasets. Finally, the time-window representation
+assumes deterministic opening hours, whereas real tourist sites
+may close unexpectedly or have dynamic crowd-dependent effective
+visit durations.
+
+\subsection{Future Work}
+
+Several directions offer meaningful improvements. Within the
+classical metaheuristic paradigm, Adaptive Large Neighbourhood
+Search (ALNS) represents the current state of the art for
+time-constrained orienteering \parencite{Gunawan2016}, with its
+self-tuning destroy-and-repair operators addressing the principal
+weakness of both GRASP (construction diversity) and Tabu Search
+(neighbourhood breadth). Iterated Local Search with the MaxShift
+data structure of \textcite{Vansteenwegen2009} would provide an
+efficient feasibility oracle that reduces the per-iteration cost
+of neighbourhood evaluation from $O(n)$ to $O(1)$.
+
+At the frontier of the field, deep reinforcement learning (DRL)
+approaches have demonstrated near-optimal performance on routing
+problems of this scale. \textcite{Kool2019} showed that an
+Attention Model trained with the REINFORCE policy gradient
+algorithm learns generalisable construction heuristics for TSP and
+related problems; \textcite{Gama2020} extended this framework
+directly to the OPTW. Hybrid DRL-ALNS architectures, in which a
+learned policy selects neighbourhood operators dynamically
+\parencite{Reijnen2024}, represent the most promising direction
+for achieving both solution quality and sub-second inference
+times. A further extension of direct practical relevance is the
+Stochastic Orienteering Problem, in which travel times are drawn
+from a distribution reflecting real traffic conditions; this
+formulation is underexplored in the literature
+\parencite{Vansteenwegen2011} and maps naturally onto the
+Algiers urban context. Finally, extending the single-day
+formulation to the Team Orienteering Problem with Time Windows
+\parencite{Gunawan2016} would enable multi-day, multi-guide
+itinerary planning, substantially increasing the practical utility
+of the system.

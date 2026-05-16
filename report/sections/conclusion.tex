@@ -1,1 +1,34 @@
 % Summarize the key findings, contributions, and implications of the project.
+
+This paper presented \textit{Algiers in 24 Hours}, a tourist route
+optimisation system grounded in the Time-Constrained Orienteering
+Problem with Time Windows. Six algorithmic approaches spanning the
+full spectrum from deterministic construction to exact
+branch-and-bound were implemented, integrated into a common model
+layer, and evaluated on a curated dataset of 56 Algiers landmarks
+with verified GPS coordinates, opening hours, and interest scores.
+
+The principal finding is that Tabu Search with Strategic
+Oscillation achieves solution quality equivalent to GRASP (98.7
+interest score, 11 landmarks) at a fraction of the computational
+cost (0.37 versus 10.18 seconds), establishing it as the
+recommended solver for real-time deployment contexts. Simulated
+Annealing with the Cauchy acceptance criterion provides a
+competitive alternative (96.9) with moderate runtime. The
+underperformance of CPLEX relative to leading metaheuristics
+underscores the known intractability of the OPTW for branch-and-bound
+approaches under realistic time budgets, and motivates the design
+of hybrid exact-heuristic methods as a direction for future
+investigation.
+
+Beyond algorithmic contribution, this work produces a reusable,
+open-source problem model class for the Algerian tourist
+orienteering context --- a domain absent from existing benchmark
+libraries --- and a full-stack web application through which
+algorithm behaviour can be explored interactively by non-expert
+users. The gap between the best heuristic score and the CPLEX
+incumbent across all experiments defines a concrete quality target
+for future work. Closing that gap through Adaptive Large
+Neighbourhood Search or learned construction heuristics, while
+extending the formulation to multi-day and stochastic settings,
+constitutes the principal agenda for subsequent research.
