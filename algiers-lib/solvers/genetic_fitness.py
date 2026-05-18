@@ -73,7 +73,7 @@ class FitnessFunction:
 
         return_travel_time = tour.problem.travel_time(current_position, tour.problem.hotel)
         total_duration = float((current_time + return_travel_time) - tour.problem.start_time)
-        return total_duration
+        return  invalid_count, total_duration
 
 
 class ScoreFitnessFunction(FitnessFunction):
@@ -90,8 +90,11 @@ class ScoreFitnessFunction(FitnessFunction):
         Returns:
             Total interest score of all visited landmarks.
         """
-        invalid_count, total_duration = self._evaluate_tour(tour)
-        return total_duration
+        invalid , duration = self._evaluate_tour(tour)
+        total_reward = sum(
+            float(landmark.interest_score) for landmark in tour.visited_landmarks
+        )
+        return total_reward**3/ (1 + invalid)  # Penalize by dividing by (1 + number of invalid visits)
 
 
 
