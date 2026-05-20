@@ -94,7 +94,7 @@ class ScoreFitnessFunction(FitnessFunction):
         total_reward = sum(
             float(landmark.interest_score) for landmark in tour.visited_landmarks
         )
-        return total_reward**3/ (1 + duration) - invalid # Penalize by dividing by (1 + number of invalid visits)
+        return total_reward**3/ (1 + duration) # Penalize by dividing by (1 + number of invalid visits)
 
 # this is used in the Tailored genetic solver 
 class FeasibilityFitnessFunction(FitnessFunction):
