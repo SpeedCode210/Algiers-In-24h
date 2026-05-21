@@ -716,3 +716,64 @@ body.panel-collapsed #lm-drawer { left: 20px; }
 .tg-btn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); flex-shrink: 0; animation: tgPulse 2s infinite; }
 @keyframes tgPulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.6;transform:scale(1.4);} }
 
+
+
+/* Solver Tooltip Card Styling */
+.solver-tooltip-card {
+  position: absolute;
+  top: 90px; /* Adjust based on your layout spacing */
+  left: 0;
+  width: 100%;
+  max-width: 360px;
+  background: var(--panel-bg, rgba(20, 26, 38, 0.98));
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.15));
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: translateY(-5px);
+}
+
+.solver-tooltip-card.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.solver-tooltip-card img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+}
+
+.tl-content {
+  flex: 1;
+}
+
+.tl-content h3 {
+  margin: 0 0 2px 0;
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  color: var(--text-main, #f0ece4);
+}
+
+.tl-content h4 {
+  margin: 0 0 8px 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted, #888);
+}
+
+.tl-content p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-main, #e0e0e0);
+}
