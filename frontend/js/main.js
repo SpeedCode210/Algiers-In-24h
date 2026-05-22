@@ -8,16 +8,16 @@ const MAPBOX_API_KEY = "pk.eyJ1IjoibW9oYW1lZGVnaGJvdWRqIiwiYSI6ImNtb24ybnZsaTBrO
 const API_LINK = "http://127.0.0.1:5000/api/";
 
 const SOLVERS = new Map([
-  ["greedy", ["Greedy (Score Priority)", "Piplup"]],
-  ["greedy_ratio", ["Greedy (Score/Time Ratio)", "Bunnelby"]],
-  ["greedy_nearest", ["Greedy (Nearest Neighbor)", "Shroomish"]],
-  ["greedy_random", ["Greedy (Random)", "Froakie"]],
-  ["sa", ["Simulated Annealing", "Tinkaton"]],
-  ["grasp", ["GRASP", "Rayquaza"]],
-  ["tabu", ["Tabu Search", "Mewto"]],
-  ["ga", ["Genetic Algorithm", "Eevee"]],
-  ["ga_tailored", ["Tailored Genetic Algorithm", "Jolteon"]],
-  ["cplex", ["CPLEX (Exact)", "Magnemite"]]
+  ["greedy", ["Greedy (Score Priority)", "Piplup", "Prioritizes and visits landmarks with the highest immediate interest score within your schedule."]],
+  ["greedy_ratio", ["Greedy (Score/Time Ratio)", "Bunnelby", "Optimizes efficiency by selecting locations that offer the maximum score for the least amount of travel and visit time."]],
+  ["greedy_nearest", ["Greedy (Nearest Neighbor)", "Shroomish", "Always moves to the closest unvisited landmark to drastically cut down driving distances."]],
+  ["greedy_random", ["Greedy (Random)", "Froakie", "Keeps adding landmarks randomly until filling the time window. Suitable for users who wanna be surprised and try unexpected experiences."]],
+  ["sa", ["Simulated Annealing", "Tinkaton", "A metaheuristic that avoids getting stuck in local routing loops by occasionally accepting worse paths early on, refining into a near-optimal tour."]],
+  ["grasp", ["GRASP", "Rayquaza", "Combines randomized greedy start phases with local search enhancements to repeatedly construct high-quality alternatives."]],
+  ["tabu", ["Tabu Search", "Mewtwo", "Uses a mathematical memory log to explicitly ban recent route modifications, forcing exploration of unexplored, highly efficient tour variations."]],
+  ["ga", ["Genetic Algorithm", "Eevee", "Simulates biological evolution over hundreds of generations by pairing up and mutating routes to find hidden optimization paths."]],
+  ["ga_tailored", ["Tailored Genetic Algorithm", "Jolteon", "An advanced structural mutation build customized specifically for the unique terrain layout and categories of Algiers."]],
+  ["cplex", ["CPLEX (Exact)", "Magnemite", "Solves the tour mathematically down to absolute global perfection. Yields the definitive highest score, but computation scales sharply with stops."]]
 ]);
 
 /* ─── STATE ─── */
@@ -57,18 +57,6 @@ const categoryMap = categories.reduce((map, c, index) => {
 
 var categoryOrder = Object.keys(categoryMap); // order array
 Object.keys(categoryMap).forEach(function (k) { activeCategories[k] = true; });
-
-
-/* ALGORITHMS */
-loadAlgorithms();
-function loadAlgorithms() {
-  let algosContainer = document.getElementsByClassName('algo-row')[0];
-  let flag = true;
-  SOLVERS.forEach((value, key, map) => {
-    algosContainer.innerHTML += `<button class="algo-btn${flag ? ' active' : ''}" data-algo="${key}" title="${value[0]}">${value[1]}</button>`;
-    flag = false;
-  });
-}
 
 /* ─── TABS ─── */
 function switchTab(name) {
@@ -250,13 +238,54 @@ function placeHotelMarker() {
     .addTo(map);
 }
 
-/* ─── ALGO BUTTONS ─── */
+/* ─── ALGO BUTTONS & HOVER TOOLTIPS ─── */
 function setupAlgoButtons() {
+  let algosContainer = document.getElementsByClassName('algo-row')[0];
+  let flag = true;
+  
+  // Render buttons
+  SOLVERS.forEach((value, key, map) => {
+    algosContainer.innerHTML += `<button class="algo-btn${flag ? ' active' : ''}" data-algo="${key}">${value[1]}</button>`;
+    flag = false;
+  });
+
+  const tooltip = document.getElementById('solver-tooltip');
+  const tlImg = document.getElementById('tl-img');
+  const tlName = document.getElementById('tl-name');
+  const tlAlgo = document.getElementById('tl-algo');
+  const tlDesc = document.getElementById('tl-desc');
+
+  // Attach event handlers
   document.querySelectorAll('.algo-btn').forEach(function (btn) {
+    // Click active behavior
     btn.addEventListener('click', function () {
       document.querySelectorAll('.algo-btn').forEach(function (b) { b.classList.remove('active'); });
       btn.classList.add('active');
       selectedAlgo = btn.dataset.algo;
+    });
+
+    // Hover Enter
+    btn.addEventListener('mouseenter', function () {
+      const algoKey = btn.dataset.algo;
+      const data = SOLVERS.get(algoKey);
+      
+      if (data) {
+        const [algoFullName, mascotName, description] = data;
+        
+        // Populate Tooltip Data
+        tlName.textContent = mascotName;
+        tlAlgo.textContent = algoFullName;
+        tlDesc.textContent = description;
+        tlImg.src = `img/${mascotName}.png`; // Accesses files from your existing ./img directory
+        
+        // Show tooltip card
+        tooltip.classList.add('visible');
+      }
+    });
+
+    // Hover Exit
+    btn.addEventListener('mouseleave', function () {
+      tooltip.classList.remove('visible');
     });
   });
 }
