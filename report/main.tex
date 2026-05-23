@@ -24,6 +24,9 @@
   top=2.5cm, bottom=2.5cm,
   left=2.5cm, right=2.5cm
 ]{geometry}
+\usepackage{tikz} 
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc, shadows, fit, backgrounds}
+
 
 % ── Line spacing ─────────────────────────────────────────────
 \linespread{1.0}
@@ -60,14 +63,14 @@
 
 % ── Bibliography (APA 7th edition) ───────────────────────────
 \usepackage[
-  style=apa,
+  style=numeric,  % ← Change this from 'apa' to 'numeric'
   backend=biber,
   natbib=true
 ]{biblatex}
 \addbibresource{references.bib}
 
 % ── Miscellaneous ────────────────────────────────────────────
-\usepackage{microtype}
+\usepackage[expansion=false]{microtype}
 \usepackage{enumitem}
 \setlist{noitemsep, topsep=4pt}
 
@@ -107,7 +110,6 @@
 \section{State of the Art}
 \input{sections/state_of_the_art}
 
-\newpage
 \section{Dataset Building}
 \input{sections/dataset}
 
@@ -115,7 +117,6 @@
 \section{Problem Solving Techniques}
 \input{sections/problem_solving}
 
-\newpage
 \section{Application Design}
 \input{sections/application_design}
 
@@ -123,7 +124,7 @@
 \section{Results and Analysis}
 \input{sections/results_analysis}
 
-\newpage
+
 \section{Discussion}
 \input{sections/discussion}
 
@@ -133,12 +134,9 @@
 \newpage
 \printbibliography[heading=bibintoc, title={References}]
 
-\newpage
-\appendix
-\section{Screenshots of the System}
 \input{sections/appendix_a}
 
-\section{Who Did What}
+\newpage
 \input{sections/appendix_b}
 
 \end{document}

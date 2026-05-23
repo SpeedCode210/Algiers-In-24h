@@ -338,8 +338,8 @@ class ExperimentsRunner:
         # Load problem
         try:
             problem = self.load_problem(
-                landmarks_file="data.csv",
-                hotel_file="hotel.csv",
+                landmarks_file="data/data.csv",
+                hotel_file="data/hotel.csv",
                 time_budget=480,
                 tour_day=Day.MONDAY,
                 start_time=540,

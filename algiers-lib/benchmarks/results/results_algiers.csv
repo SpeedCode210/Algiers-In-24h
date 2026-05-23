@@ -1,0 +1,7 @@
+solver,score,time_s,optimality_gap_pct,instance,group
+Greedy,185.0,0.04,24.49,Algiers,Algiers
+GRASP,218.0,1.82,11.02,Algiers,Algiers
+SA,231.0,4.51,5.71,Algiers,Algiers
+Tabu,226.0,3.78,7.76,Algiers,Algiers
+Genetic,224.0,8.93,8.57,Algiers,Algiers
+CPLEX,245.0,312.6,0.0,Algiers,Algiers
