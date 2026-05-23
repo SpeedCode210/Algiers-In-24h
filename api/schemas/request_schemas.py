@@ -32,11 +32,12 @@ VALID_ALGORITHMS: set[str] = set(ALGORITHM_LABELS.keys())
 # Algorithms included in the /api/solve/all comparison.
 # One representative per conceptual family.
 COMPARISON_ALGORITHMS: list[str] = [
-    "greedy",
+    "greedy_ratio",
     "sa",
     "grasp",
     "tabu",
-    "ga",
+    "ga_tailored",
+    "cplex",
 ]
 
 VALID_CATEGORIES: set[str] = {
@@ -49,8 +50,8 @@ VALID_CATEGORIES: set[str] = {
 
 MIN_TIME_BUDGET = 60     # 1 hour
 MAX_TIME_BUDGET = 1440   # 24 hours
-MIN_WEIGHT      = 0.4
-MAX_WEIGHT      = 1.6
+MIN_WEIGHT      = 1
+MAX_WEIGHT      = 5
 
 
 # ---------------------------------------------------------------------------

@@ -468,19 +468,12 @@ async function runOptimizer() {
   var budget = budgetEnd - budgetStart; // duration in hours
   var hotel = hotels[+document.getElementById('hotel-select').value];
 
-  // Build category weights from active categories + priority order
+  // Build category ranks from active categories + priority order
   var categoryWeights = {};
-  var numCats = categoryOrder.filter(c => activeCategories[c]).length;
+  var activeOrdered = categoryOrder.filter(function (cat) { return activeCategories[cat]; });
 
-  categoryOrder.forEach(function (cat, idx) {
-    if (activeCategories[cat]) {
-      // Map priority index to range [1.6 (highest) → 0.4 (lowest)]
-      // e.g. 5 active cats → 1.6, 1.36, 1.12, 0.88, 0.64, 0.4
-      var normalized = numCats > 1
-        ? 1.6 - ((categoryOrder.indexOf(cat)) / (numCats - 1)) * 1.2
-        : 1.0; // only one category → neutral weight
-      categoryWeights[cat] = parseFloat(normalized.toFixed(2));
-    }
+  activeOrdered.forEach(function (cat, idx) {
+    categoryWeights[cat] = idx + 1; // rank from 1 (highest priority) to n
   });
 
 

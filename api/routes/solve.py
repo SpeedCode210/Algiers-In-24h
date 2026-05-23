@@ -185,7 +185,7 @@ def solve():
         time_budget      int  required   minutes, 60–1440
         tour_day         str  required   e.g. "saturday"
         start_time       str  optional   "HH:MM", default "09:00"
-        category_weights obj  optional   {"historical": 1.5, ...}
+        category_weights obj  optional   {"historical": 1, ...}
         algorithm_params obj  optional   {"iterations": 50, ...}
  
     Responses:
