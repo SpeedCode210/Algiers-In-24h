@@ -70,8 +70,8 @@ def _make_ga(problem: Problem, params: dict):
     return GeneticSolver(
         problem,
         fitness_function=ScoreFitnessFunction(),
-        regenerations=int(params.get("regenerations", 1000)),
-        population_size=int(params.get("population_size", 1075)),
+        regenerations=int(params.get("regenerations", 500)),
+        population_size=int(params.get("population_size", 400)),
         mutation_rate=float(params.get("mutation_rate", 0.8)),
         crossover_method="order",
     )
@@ -80,8 +80,8 @@ def _make_ga_tailored(problem: Problem, params: dict):
     return TailoredGeneticSolver(
         problem,
         fitness_function=FeasibilityFitnessFunction(),
-        regenerations=int(params.get("regenerations", 1000)),
-        population_size=int(params.get("population_size", 1075)),
+        regenerations=int(params.get("regenerations", 500)),
+        population_size=int(params.get("population_size", 400)),
         mutation_rate=float(params.get("mutation_rate", 0.8)),
         crossover_method="tailored",
     )

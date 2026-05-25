@@ -59,17 +59,24 @@ OUT.mkdir(parents=True, exist_ok=True)
 # Plotting style constants
 # ---------------------------------------------------------------------------
 ALGO_ORDER = [
-    "Greedy", "GRASP", "SA", "Tabu",
+    "Greedy-Ratio", "Greedy-Score", "Greedy-Random",
+    "GRASP", 
+    "SA-Boltzmann", "SA-Cauchy",
+    "Tabu", "Tabu-Random",
     "Genetic-Tailored", "Genetic-Score",
 ]
 
 PALETTE = {
-    "Greedy":           "#4C72B0",
-    "GRASP":            "#DD8452",
-    "SA":               "#55A868",
-    "Tabu":             "#C44E52",
-    "Genetic-Tailored": "#8172B3",
-    "Genetic-Score":    "#A78DC4",
+    "Greedy-Ratio":      "#4C72B0",
+    "Greedy-Score":      "#2E5BA8",
+    "Greedy-Random":     "#1E42A0",
+    "GRASP":             "#DD8452",
+    "SA-Boltzmann":      "#55A868",
+    "SA-Cauchy":         "#3D8B54",
+    "Tabu":              "#C44E52",
+    "Tabu-Random":       "#B0394A",
+    "Genetic-Tailored":  "#8172B3",
+    "Genetic-Score":     "#A78DC4",
 }
 
 plt.rcParams.update({
@@ -123,7 +130,7 @@ def plot_bar_scores(agg: pd.DataFrame, title: str, fname: str):
     errs = agg["std_score"].fillna(0)
     mask = errs > 0
     if mask.any():
-        ax.errorbar(x[mask], agg["mean_score"].iloc[mask], yerr=errs[mask],
+        ax.errorbar(x[mask.values], agg["mean_score"].loc[mask], yerr=errs.loc[mask],
                     fmt="none", color="black", capsize=4, linewidth=1.2, zorder=4)
     for bar, v in zip(bars, agg["mean_score"]):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + errs.max() * 0.05,
@@ -149,7 +156,7 @@ def plot_bar_times(agg: pd.DataFrame, title: str, fname: str):
     errs = agg["std_time"].fillna(0)
     mask = errs > 0
     if mask.any():
-        ax.errorbar(x[mask], agg["mean_time"].iloc[mask], yerr=errs[mask],
+        ax.errorbar(x[mask.values], agg["mean_time"].loc[mask], yerr=errs.loc[mask],
                     fmt="none", color="black", capsize=4, linewidth=1.2, zorder=4)
     for bar, v in zip(bars, agg["mean_time"]):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() * 1.02,
@@ -159,6 +166,57 @@ def plot_bar_times(agg: pd.DataFrame, title: str, fname: str):
     ax.set_ylabel("Mean Execution Time (s)")
     ax.set_title(title, fontweight="bold")
     ax.set_ylim(0, agg["mean_time"].max() * 1.25)
+    fig.tight_layout()
+    fig.savefig(OUT / fname, bbox_inches="tight", dpi=150)
+    plt.close(fig)
+    print(f"  Saved: {fname}")
+
+
+def plot_box_gap(df: pd.DataFrame, title: str, fname: str):
+    """Box plot of optimality gap distribution for each algorithm."""
+    fig, ax = plt.subplots(figsize=(10, 5))
+    
+    # Prepare data for box plot
+    solvers_ordered = [s for s in ALGO_ORDER if s in df["solver"].unique()]
+    box_data = []
+    solvers_filtered = []
+    
+    for solver in solvers_ordered:
+        solver_data = df[df["solver"] == solver]["optimality_gap_pct"].dropna()
+        # Only include solvers with actual data
+        if len(solver_data) > 0 and not solver_data.isna().all():
+            box_data.append(solver_data.values)
+            solvers_filtered.append(solver)
+    
+    if not box_data:
+        print(f"  [WARN] No gap data available for {fname}")
+        return
+    
+    # Create box plot
+    colors = [PALETTE.get(s, "#888888") for s in solvers_filtered]
+    bp = ax.boxplot(box_data, labels=solvers_filtered, patch_artist=True,
+                    notch=True, showmeans=True)
+    
+    # Color the boxes
+    for patch, color in zip(bp["boxes"], colors):
+        patch.set_facecolor(color)
+        patch.set_alpha(0.7)
+    
+    # Style whiskers and caps
+    for whisker in bp["whiskers"]:
+        whisker.set(linewidth=1.2)
+    for cap in bp["caps"]:
+        cap.set(linewidth=1.2)
+    for median in bp["medians"]:
+        median.set(color="darkred", linewidth=1.5)
+    for mean in bp["means"]:
+        mean.set(marker="D", markerfacecolor="green", markeredgecolor="darkgreen",
+                markersize=6)
+    
+    ax.set_xticklabels(solvers_filtered, rotation=45, ha="right")
+    ax.set_ylabel("Optimality Gap (%)")
+    ax.set_title(title, fontweight="bold")
+    ax.grid(axis="y", alpha=0.3, linestyle="--")
     fig.tight_layout()
     fig.savefig(OUT / fname, bbox_inches="tight", dpi=150)
     plt.close(fig)
@@ -244,7 +302,7 @@ def main():
     # Load instances
     from benchmarks.runner import _HERE as _RUNNER_HERE
     s100_dir = _RUNNER_HERE / "datasets" / "c_r_rc_100_100"
-    instances_100 = load_solomon_group(s100_dir, MAX_PER_GROUP.get("Solomon-100"))
+    instances_100 = load_solomon_group(s100_dir, max_instances=None)  # Load ALL instances
     print(f"  Loaded {len(instances_100)} instances from {s100_dir.name}")
 
     # Load R&S ground truth
@@ -272,10 +330,12 @@ def main():
     print(f"{'='*60}")
 
     print("\n  -- Solomon-100 --")
-    plot_bar_scores(agg_100, "Solomon-100 -- Average Score (5 instances)",
+    plot_bar_scores(agg_100, "Solomon-100 -- Average Score",
                     "solomon100_scores.png")
-    plot_bar_times(agg_100, "Solomon-100 -- Average Execution Time (5 instances)",
+    plot_bar_times(agg_100, "Solomon-100 -- Average Execution Time",
                    "solomon100_times.png")
+    plot_box_gap(df_100, "Solomon-100 -- Optimality Gap Distribution",
+                 "solomon100_gap_boxplot.png")
 
     # ==================================================================
     # Generate LaTeX table

@@ -1,6 +1,6 @@
 \begin{table}[htbp]
 \centering
-\caption{Algorithm performance on Algiers and Solomon-50 datasets. Stochastic solvers: 5 runs. Algiers: no ground truth (CPLEX as regular solver). Solomon-50: CPLEX ground truth on 25 instances where CPLEX terminated ($\leq$5 min). $^{*}$\textit{INVALID}: solver exceeded time limit (200\,s).}
+\caption{Algorithm performance on Algiers and Solomon-50 datasets. Stochastic solvers: 5 runs. Algiers: no ground truth (CPLEX as regular solver). Solomon-50: CPLEX ground truth on 25 instances where CPLEX terminated ($\leq$5 min).}
 \label{tab:results_algiers_s50}
 \footnotesize
 \setlength{\tabcolsep}{3.5pt}
@@ -13,16 +13,18 @@
 & \textbf{Score} & \textbf{Std} & \textbf{Gap (\%)} & \textbf{Time (s)}
 & \textbf{Score} & \textbf{Std} & \textbf{Gap (\%)} & \textbf{Time (s)} \\
 \midrule
-  Greedy & 32.4 & -- & -- & 0.00 & 88.2 & 12.5 & 53.48 & 0.00 \\
-  GRASP & 90.0 & -- & -- & 50.21 & 197.9 & 67.5 & 3.47 & 3.76 \\
-  SA-Boltzmann & 51.3 & 5.5 & -- & 0.11 & 133.0 & 52.3 & 35.86 & 0.12 \\
-  SA-Cauchy & 58.6 & 7.1 & -- & 0.08 & 150.1 & 60.0 & 27.77 & 0.14 \\
-  SA & 46.3 & 11.5 & -- & 0.09 & -- & -- & -- & -- \\
-  Tabu & 90.0 & -- & -- & 1.38 & 193.0 & 59.0 & 4.02 & 0.76 \\
-  Tabu-Random & 89.6 & 0.3 & -- & 1.56 & 193.5 & 53.8 & 3.79 & 0.78 \\
-  Genetic-Tailored & 89.9 & 0.3 & -- & 18.36 & 201.7 & 62.9 & 0.73 & 5.46 \\
-  Genetic-Score & 420.3$^{*}$ & -- & -- & 367.42 & 817.3$^{*}$ & 108.2 & -- & 283.31 \\
-  CPLEX & 69.9 & -- & -- & 61.32 & 203.0 & 68.6 & 0.00 & 2.24 \\
+  Greedy-Ratio & 42.3 & -- & -- & 0.00 & 88.2 & 12.5 & 53.48 & 0.01 \\
+  Greedy-Score & 19.0 & -- & -- & 0.00 & 108.4 & 72.0 & 51.34 & 0.01 \\
+  Greedy-Random & 39.8 & 18.2 & -- & 0.00 & 62.7 & 32.3 & 67.51 & 0.00 \\
+  GRASP & 98.7 & -- & -- & 12.67 & 199.0 & 66.6 & 2.79 & 5.24 \\
+  SA-Boltzmann & 46.2 & 8.7 & -- & 0.03 & 131.1 & 51.5 & 36.33 & 0.14 \\
+  SA-Cauchy & 59.2 & 19.0 & -- & 0.03 & 153.0 & 63.8 & 26.64 & 0.15 \\
+  SA & 58.4 & 8.2 & -- & 0.03 & -- & -- & -- & -- \\
+  Tabu & 97.9 & -- & -- & 0.59 & 195.0 & 58.2 & 2.91 & 0.96 \\
+  Tabu-Random & 97.9 & -- & -- & 0.55 & 193.1 & 53.3 & 3.91 & 1.18 \\
+  Genetic-Tailored & 98.0 & 0.2 & -- & 5.28 & 201.5 & 63.5 & 0.97 & 6.47 \\
+  Genetic-Score & 97.7 & 0.3 & -- & 24.81 & 203.0 & 62.6 & 0.00 & 28.15 \\
+  CPLEX & 79.9 & -- & -- & 60.54 & 203.0 & 68.6 & 0.00 & 1.62 \\
 \bottomrule
 \end{tabular}
 \end{table}

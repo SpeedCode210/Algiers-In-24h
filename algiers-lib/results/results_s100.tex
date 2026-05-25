@@ -1,0 +1,24 @@
+\begin{table}[htbp]
+\centering
+\caption{Algorithm performance on Solomon-100 dataset. Scores and times shown as mean $\pm$ std over 5 runs. Ground truth: Righini \& Salani bestPossible.}
+\label{tab:results_s100}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{l rrr}
+\toprule
+\textbf{Algorithm}
+& \textbf{Score} & \textbf{Time (s)} & \textbf{Gap (\%)} \\
+\midrule
+  Greedy-Ratio & 148.5 $\pm$ 45.0 & 0.02 $\pm$ 0.00 & 54.17 \\
+  Greedy-Score & 186.4 $\pm$ 66.6 & 0.02 $\pm$ 0.01 & 43.00 \\
+  Greedy-Random & 71.4 $\pm$ 30.3 & 0.01 $\pm$ 0.00 & 77.77 \\
+  GRASP & 292.4 $\pm$ 52.9 & 20.43 $\pm$ 8.11 & 8.88 \\
+  SA-Boltzmann & 192.8 $\pm$ 63.0 & 0.18 $\pm$ 0.04 & 40.80 \\
+  SA-Cauchy & 215.6 $\pm$ 64.7 & 0.19 $\pm$ 0.04 & 33.61 \\
+  Tabu & 282.8 $\pm$ 45.6 & 2.33 $\pm$ 0.38 & 11.59 \\
+  Tabu-Random & 277.1 $\pm$ 49.9 & 2.36 $\pm$ 0.41 & 13.54 \\
+  Genetic-Tailored & 289.2 $\pm$ 52.9 & 21.58 $\pm$ 10.25 & 9.85 \\
+  Genetic-Score & 299.0 $\pm$ 52.7 & 97.80 $\pm$ 30.08 & 6.69 \\
+\bottomrule
+\end{tabular}
+\end{table}
