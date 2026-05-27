@@ -3,6 +3,8 @@
 
 A tour planning system that helps you plan your day as a tourist in Algiers, based on visitors preferred destinations and your availability.
 
+You can try it at [https://speedcode.pythonanywhere.com/algiers-24/](https://speedcode.pythonanywhere.com/algiers-24/)
+
 ---
 
 Made as a project for the Introduction to AI course of the National Higher School in Artificial Intelligence.
