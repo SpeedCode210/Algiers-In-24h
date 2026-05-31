@@ -5,6 +5,7 @@ A tour planning system that helps you plan your day as a tourist in Algiers, bas
 
 You can try it at [https://speedcode.pythonanywhere.com/algiers-24/](https://speedcode.pythonanywhere.com/algiers-24/)
 
+![](https://github.com/SpeedCode210/Algiers-In-24h/blob/main/report/Appendix-A/first-interface.png?raw=true)
 ---
 
 Made as a project for the Introduction to AI course of the National Higher School in Artificial Intelligence.
