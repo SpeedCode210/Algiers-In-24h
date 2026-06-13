@@ -4,7 +4,7 @@ var CAT_COLORS = ['#c47a2e', '#7eb8f7', '#226d68', '#78adb5', '#a78bfa'];
 
 var MAP_STYLES = { dark: 'mapbox://styles/mapbox/navigation-night-v1', light: 'mapbox://styles/mapbox/streets-v12' };
 
-const MAPBOX_API_KEY = "pk.eyJ1IjoibW9oYW1lZGVnaGJvdWRqIiwiYSI6ImNtb24ybnZsaTBrOXMycHF5MGc3d2dmcXAifQ.0QWaEMordbNjiOwJD7ZqMA";
+const MAPBOX_API_KEY = "pk.eyJ1Ijoic3BlZWRjb2RlIiwiYSI6ImNtcWI5YnRtcTBhY28yc3F5OWloM2c4M28ifQ.OmH9FnFAgu613rEx-49_JQ";
 const API_LINK = "http://127.0.0.1:5000/api/";
 
 const SOLVERS = new Map([
