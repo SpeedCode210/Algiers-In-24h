@@ -777,3 +777,536 @@ body.panel-collapsed #lm-drawer { left: 20px; }
   line-height: 1.4;
   color: var(--text-main, #e0e0e0);
 }
+/* ═══════════════════════════════════════════════════════════════════
+   COMPARE ALL — new styles only (no existing rules modified)
+   ═══════════════════════════════════════════════════════════════════ */
+
+#compare-btn {
+  width:100%; padding:9px;
+  background:rgba(30,144,144,0.10);
+  border:1px solid rgba(30,144,144,0.30);
+  border-radius:10px; color:var(--teal);
+  font-family:'Nunito',sans-serif; font-size:11px;
+  font-weight:700; letter-spacing:0.8px; text-transform:uppercase;
+  cursor:pointer; transition:all .2s;
+}
+#compare-btn:hover { background:rgba(30,144,144,0.22); border-color:var(--teal); transform:translateY(-1px); }
+#compare-btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+[data-theme="light"] #compare-btn { background:rgba(26,107,107,.08); border-color:rgba(26,107,107,.28); }
+
+/* Overlay backdrop */
+#cmp-overlay {
+  position:absolute; inset:0; z-index:60;
+  background:rgba(0,0,0,0.68); backdrop-filter:blur(7px);
+  display:none; align-items:center; justify-content:center;
+  padding:24px;
+}
+#cmp-overlay.open { display:flex; animation:cmpFadeIn .3s ease; }
+@keyframes cmpFadeIn { from{opacity:0;} to{opacity:1;} }
+
+/* Modal panel */
+.cmp-panel {
+  background:var(--panel-bg); border:1px solid var(--glass-border);
+  border-radius:20px; width:100%; max-width:860px; max-height:88vh;
+  display:flex; flex-direction:column; overflow:hidden;
+  box-shadow:0 40px 120px rgba(0,0,0,.72), inset 0 1px 0 rgba(255,255,255,0.08);
+  animation:cmpSlideUp .38s cubic-bezier(.22,1,.36,1);
+}
+@keyframes cmpSlideUp { from{transform:translateY(22px);opacity:0;} to{transform:none;opacity:1;} }
+
+/* Header */
+.cmp-header {
+  padding:20px 24px 14px; border-bottom:1px solid var(--glass-border);
+  display:flex; align-items:flex-start; justify-content:space-between; flex-shrink:0;
+}
+.cmp-header-left { flex:1; min-width:0; }
+.cmp-eyebrow  { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--teal); font-weight:500; margin-bottom:4px; }
+.cmp-title    { font-family:'Playfair Display',serif; font-size:21px; font-weight:700; color:var(--text); line-height:1.2; }
+.cmp-title span { color:var(--gold); font-style:italic; }
+#cmp-subtitle { font-size:11px; color:var(--text-muted); margin-top:5px; }
+.cmp-close-btn {
+  background:var(--glass); border:1px solid var(--glass-border); color:var(--text-muted);
+  border-radius:8px; cursor:pointer; padding:6px 10px; font-size:16px; line-height:1;
+  transition:all .15s; margin-left:14px; flex-shrink:0;
+}
+.cmp-close-btn:hover { color:var(--text); border-color:var(--gold); background:var(--glass-hover); }
+
+/* Scrollable body */
+#cmp-body {
+  overflow-y:auto; flex:1; padding:16px 20px;
+  display:flex; flex-direction:column; gap:9px;
+  scrollbar-width:thin; scrollbar-color:rgba(196,122,46,.2) transparent; min-height:0;
+}
+#cmp-body::-webkit-scrollbar { width:4px; }
+#cmp-body::-webkit-scrollbar-thumb { background:rgba(196,122,46,.2); border-radius:2px; }
+
+/* Footer */
+.cmp-footer {
+  padding:12px 20px; border-top:1px solid var(--glass-border);
+  display:flex; align-items:center; gap:12px; flex-shrink:0; background:rgba(0,0,0,.10);
+}
+#cmp-cancel-btn {
+  padding:7px 18px;
+  background:rgba(224,82,82,.10); border:1px solid rgba(224,82,82,.30);
+  border-radius:8px; color:var(--danger);
+  font-family:'Nunito',sans-serif; font-size:11px; font-weight:700; letter-spacing:.5px;
+  cursor:pointer; transition:all .2s; display:none;
+}
+#cmp-cancel-btn:hover { background:rgba(224,82,82,.22); border-color:var(--danger); }
+#cmp-footer-info { font-size:11px; color:var(--text-muted); margin-left:auto; }
+
+/* Running-phase rows — fixed min-height + true vertical centering.
+   The mascot, label/score block, and the right-side action slot
+   (status icon OR per-row stop button) all align on one flex row.
+   The shimmer progress bar is absolutely positioned along the
+   bottom edge so it never affects row height or centering. */
+.cmp-algo-row {
+  position: relative;
+  min-height: 64px;
+  background:var(--glass); border:1px solid var(--glass-border);
+  border-radius:12px; padding:10px 14px; transition:border-color .2s;
+  overflow:hidden;
+}
+.cmp-row-inner { display:flex; align-items:center; gap:12px; width:100%; height:100%; }
+.cmp-status-running   { border-color:rgba(245,201,122,.32); }
+.cmp-status-done      { border-color:rgba(82,192,122,.28); }
+.cmp-status-error     { border-color:rgba(224,82,82,.28); }
+.cmp-status-cancelled,.cmp-status-skipped { opacity:.5; }
+
+.cmp-row-left { display:flex; align-items:center; gap:12px; flex:1; min-width:0; }
+.cmp-mascot-img { width:42px; height:42px; object-fit:contain; flex-shrink:0; border-radius:7px; }
+.cmp-mascot-placeholder { background:var(--glass); border:1px solid var(--glass-border); border-radius:7px; }
+.cmp-row-info {
+  flex:1; min-width:0;
+  display:flex; flex-direction:column; justify-content:center; gap:3px;
+}
+.cmp-row-label { font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; color:var(--text); line-height:1.2; }
+.cmp-row-score { font-size:11px; color:var(--text-muted); line-height:1.2; }
+.cmp-row-pts { font-family:'Nunito',sans-serif; font-size:17px; font-weight:800; color:var(--gold); }
+.cmp-row-err { color:var(--danger) !important; }
+
+/* Right-side action slot — fixed square, holds either the status
+   icon (pending/done/error/cancelled) or the stop button (running) */
+.cmp-row-action {
+  flex-shrink:0; width:32px; height:32px;
+  display:flex; align-items:center; justify-content:center;
+}
+.cmp-row-status-icon { font-size:18px; font-weight:700; line-height:1; }
+
+.cmp-row-stop-btn {
+  width:30px; height:30px; border-radius:8px; padding:0;
+  background:rgba(224,82,82,.12); border:1px solid rgba(224,82,82,.32);
+  color:var(--danger); font-size:13px; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all .15s;
+}
+.cmp-row-stop-btn:hover { background:rgba(224,82,82,.26); border-color:var(--danger); }
+
+/* Shimmer progress bar — absolutely positioned, never affects layout */
+.cmp-row-pbar {
+  position:absolute; left:0; right:0; bottom:0;
+  height:3px; background:var(--glass-border); overflow:hidden;
+}
+.cmp-row-pbar-fill {
+  height:100%; width:38%;
+  background:linear-gradient(90deg,var(--gold),var(--teal));
+  animation:cmpShimmer 1.4s ease-in-out infinite;
+}
+@keyframes cmpShimmer { 0%{transform:translateX(-120%);} 100%{transform:translateX(380%);} }
+
+/* Results-phase cards — same min-height as running rows for a
+   seamless transition between the two states */
+.cmp-result-card {
+  display:flex; align-items:center; gap:14px;
+  min-height:64px;
+  background:var(--glass); border:1px solid var(--glass-border);
+  border-radius:13px; padding:10px 16px;
+  cursor:pointer; transition:all .2s;
+  animation:cmpCardIn .4s both;
+}
+.cmp-result-card:hover { background:var(--glass-hover); border-color:var(--gold); transform:translateX(3px); }
+.cmp-result-best { border-color:rgba(196,122,46,.52) !important; }
+@keyframes cmpCardIn { from{opacity:0;transform:translateX(-10px);} to{opacity:1;transform:none;} }
+
+.cmp-res-rank {
+  font-family:'Playfair Display',serif; font-size:19px; font-weight:700;
+  flex-shrink:0; width:36px; height:36px; border:1.5px solid;
+  border-radius:8px; display:flex; align-items:center; justify-content:center;
+}
+.cmp-res-mascot { width:46px; height:46px; object-fit:contain; flex-shrink:0; }
+.cmp-res-info { flex:1; min-width:0; }
+.cmp-res-label { font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; color:var(--text); margin-bottom:7px; }
+.cmp-res-stats { display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+.cmp-res-score { font-family:'Nunito',sans-serif; font-size:21px; font-weight:800; color:var(--gold); margin-right:2px; }
+.cmp-res-chip { font-size:10px; color:var(--text-muted); background:var(--glass); border:1px solid var(--glass-border); border-radius:12px; padding:2px 9px; white-space:nowrap; }
+.cmp-res-view-btn {
+  padding:7px 14px; background:rgba(30,144,144,.12); border:1px solid rgba(30,144,144,.30);
+  border-radius:8px; color:var(--teal); font-size:10px; font-weight:700; letter-spacing:.5px;
+  cursor:pointer; font-family:'Nunito',sans-serif; transition:all .2s; flex-shrink:0; white-space:nowrap;
+}
+.cmp-res-view-btn:hover { background:rgba(30,144,144,.26); border-color:var(--teal); }
+
+.cmp-empty { padding:36px 24px; text-align:center; color:var(--text-muted); font-size:13px; line-height:1.8; }
+
+/* Light mode overrides */
+[data-theme="light"] .cmp-panel {
+  background:rgba(255,255,255,0.26) !important;
+  backdrop-filter:blur(48px) saturate(1.2) brightness(1.08) !important;
+  -webkit-backdrop-filter:blur(48px) saturate(1.2) brightness(1.08) !important;
+  border-color:rgba(255,255,255,0.62) !important;
+  box-shadow:0 8px 40px rgba(60,80,140,.16),inset 0 1px 0 rgba(255,255,255,0.85) !important;
+}
+[data-theme="light"] .cmp-algo-row,
+[data-theme="light"] .cmp-result-card {
+  background:rgba(255,255,255,0.28) !important; border-color:rgba(255,255,255,0.55) !important;
+}
+[data-theme="light"] .cmp-algo-row:hover,
+[data-theme="light"] .cmp-result-card:hover { background:rgba(255,255,255,0.44) !important; }
+[data-theme="light"] .cmp-res-chip { background:rgba(255,255,255,0.36) !important; border-color:rgba(255,255,255,0.60) !important; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE LAYOUT
+   Breakpoints:
+     Tablet  : 641px – 900px  → narrower sidebar, scaled stats
+     Mobile  : ≤ 640px        → bottom-sheet panel, top stats bar
+     Tiny    : ≤ 360px        → compact everything
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ──────────────────────────────────────────
+   TABLET  641px – 900px
+   Panel shrinks to 300px, everything shifts
+   ────────────────────────────────────────── */
+@media (min-width: 641px) and (max-width: 900px) {
+  #panel {
+    width: 300px;
+    left: 16px;
+    top: 16px;
+    bottom: 16px;
+  }
+
+  /* Toggle button flush to right edge of narrower panel */
+  #panel-toggle         { left: 16px; top: 60px; }
+  #panel-toggle.panel-open { left: 315px; }
+
+  /* Stats, indicator, drawer shift with narrower panel */
+  #stats         { left: 332px !important; right: 16px !important; bottom: 16px !important; }
+  #algo-indicator{ left: 332px !important; right: 16px !important; bottom: 78px  !important; }
+  #lm-drawer     { left: 332px !important; right: 16px !important; }
+  #lm-drawer.open{ bottom: 98px !important; }
+
+  /* When panel collapses on tablet */
+  body.panel-collapsed #stats         { left: 16px !important; }
+  body.panel-collapsed #algo-indicator{ left: 16px !important; }
+  body.panel-collapsed #lm-drawer     { left: 16px !important; }
+
+  /* Tour guide and compare overlays use full width naturally */
+  .tg-panel  { max-width: 680px; }
+  .cmp-panel { max-width: 680px; }
+}
+
+/* ──────────────────────────────────────────
+   MOBILE  ≤ 640px
+   Panel → bottom sheet
+   Stats  → top bar
+   All overlays → slide from bottom
+   ────────────────────────────────────────── */
+@media (max-width: 640px) {
+
+  /* ── Token screen ── */
+  #token-screen { padding: 28px 20px; gap: 14px; }
+  .ts-title     { font-size: 20px; }
+  .ts-sub       { font-size: 12px; max-width: 100%; line-height: 1.6; }
+  .ts-input     { max-width: 100%; font-size: 12px; }
+  .ts-btn       { padding: 11px 28px; }
+
+  /* ── Panel: bottom sheet with persistent handle ──
+     #panel-handle (added in HTML, last flex child, 64px tall) stays
+     visible in BOTH states. Open → translateY(0). Collapsed →
+     translateY(calc(100% - 64px)) so only the handle peeks above the
+     screen edge. The map is fully visible whenever .collapsed is set. */
+  #panel {
+    left: 0      !important;
+    right: 0     !important;
+    top: auto    !important;
+    bottom: 0    !important;
+    width: 100%  !important;
+    height: 82vh !important;
+    max-height: 82vh !important;
+    border-radius: 20px 20px 0 0 !important;
+    border-bottom: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    transform: translateY(0) !important;
+    transition: transform .38s cubic-bezier(.22,1,.36,1) !important;
+  }
+
+  /* Collapsed: panel drops down, only the 64px handle remains visible */
+  #panel.collapsed {
+    transform: translateY(calc(100% - 64px)) !important;
+    opacity: 1          !important;  /* override desktop's fade-out */
+    pointer-events: auto !important; /* handle must stay tappable   */
+  }
+  /* While collapsed, content above the handle shouldn't intercept
+     stray touches (it's off-screen, this is just a safety net) */
+  #panel.collapsed #panel-header,
+  #panel.collapsed #panel-tabs,
+  #panel.collapsed .tab-pane {
+    pointer-events: none;
+  }
+
+  /* Panel header tighter on mobile */
+  #panel-header   { padding: 22px 16px 10px; flex-shrink: 0; }
+  h1              { font-size: 15px; }
+  .subtitle       { font-size: 10px; }
+  #controls       { padding: 10px 14px; gap: 8px; }
+  #optimize-btn-area { padding: 10px 14px; gap: 6px; flex-shrink: 0; }
+
+  /* ── Panel toggle: fixed top-left always, never jumps right ── */
+  #panel-toggle {
+    position: fixed !important;
+    left: 16px  !important;
+    top:  16px  !important;
+    display: flex !important;        /* always shown after map loads */
+    z-index: 20 !important;
+    border-radius: 10px !important;
+    border-left: 1px solid var(--glass-border) !important;
+  }
+  /* Override the desktop 'panel-open' repositioning */
+  #panel-toggle.panel-open {
+    left:          16px !important;
+    border-radius: 10px !important;
+    border-left:   1px solid var(--glass-border) !important;
+  }
+
+  /* ── Bottom-sheet handle (last child of #panel, 64px) ──
+     Always visible: tap or swipe to open/close the panel. */
+  #panel-handle {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 64px;
+    flex-shrink: 0;
+    border-top: 1px solid var(--glass-border);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+  }
+  .panel-handle-bar {
+    width: 38px; height: 4px; border-radius: 2px;
+    background: var(--glass-border);
+    transition: background .2s;
+  }
+  #panel-handle:active .panel-handle-bar { background: var(--gold); }
+  #panel-handle-label {
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text-muted); font-weight: 600;
+  }
+
+  /* ── Stats: fixed top bar, true grid so every cell matches ──
+     5 equal columns (4 metrics + Tour Guide) — same height, same
+     gap, same vertical centering for every box. */
+  #stats {
+    position: fixed       !important;
+    top:    16px          !important;
+    bottom: auto          !important;
+    left:   64px          !important;   /* clear the 36px toggle btn + gap */
+    right:  16px          !important;
+    display: grid         !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 6px               !important;
+    z-index: 11            !important;
+    animation: none        !important;
+  }
+  /* Stats stay top-left regardless of panel state on mobile */
+  body.panel-collapsed #stats { left: 64px !important; }
+
+  .stat-card {
+    display: flex            !important;
+    flex-direction: column   !important;
+    align-items: center      !important;
+    justify-content: center  !important;
+    height: 50px              !important;
+    padding: 0 2px            !important;
+    gap: 2px;
+  }
+  .stat-val { font-size: 14px; line-height: 1.15; }
+  .stat-lbl { font-size: 7.5px; letter-spacing: 1px; text-align: center; }
+
+  /* Tour guide button becomes the 5th grid cell — identical height,
+     centered content, same as every .stat-card */
+  #tour-guide-btn {
+    height: 50px       !important;
+    min-height: 50px   !important;
+    padding: 0 6px     !important;
+    margin: 0          !important;
+    display: flex      !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px            !important;
+    font-size: 9px      !important;
+    letter-spacing: 0.4px !important;
+    border-radius: 12px !important;
+    white-space: nowrap;
+  }
+  .tg-btn-dot { width: 6px; height: 6px; flex-shrink: 0; }
+
+  /* ── Algo indicator: sits just above the bottom-sheet handle ──
+     Note: JS sets display:'block' on map load (matches desktop
+     behaviour — visible immediately, showing "Last run: —"). We only
+     override position/sizing here, not display. */
+  #algo-indicator {
+    position: fixed  !important;
+    bottom: 76px     !important;  /* 64px handle + 12px gap */
+    left:   16px     !important;
+    right:  16px     !important;
+    top: auto        !important;
+    z-index: 5       !important;
+  }
+  body.panel-collapsed #algo-indicator { left: 16px !important; bottom: 76px !important; }
+
+
+  /* ── Landmark drawer: full-width from bottom ── */
+  #lm-drawer {
+    position: fixed  !important;
+    left:   0        !important;
+    right:  0        !important;
+    bottom: -400px   !important;
+    top: auto        !important;
+    z-index: 35      !important;  /* sit above the panel + its handle */
+  }
+  #lm-drawer.open    { bottom: 0 !important; }
+  body.panel-collapsed #lm-drawer { left: 0 !important; }
+  .lm-drawer-inner   { border-radius: 20px 20px 0 0 !important; padding: 22px 18px 20px !important; }
+  .lm-drawer-grid    { grid-template-columns: repeat(2, 1fr); }
+  .lm-drawer-name    { font-size: 14px; }
+  .lm-drawer-close   { top: 14px; right: 14px; }
+
+  /* ── Tour Guide Overlay: full-width bottom sheet ── */
+  #tour-guide-overlay { padding: 0 !important; align-items: flex-end !important; }
+  .tg-panel {
+    border-radius: 20px 20px 0 0 !important;
+    max-height: 92vh !important;
+    max-width: 100%  !important;
+  }
+  .tg-header    { padding: 20px 18px 14px; }
+  .tg-title     { font-size: 18px; }
+  .tg-subtitle  { font-size: 10px; }
+  .tg-summary-bar { padding: 8px 16px; gap: 0; }
+  .tg-sum-val   { font-size: 15px; }
+  .tg-sum-lbl   { font-size: 8px; }
+  .tg-scroll    { padding: 14px 16px; gap: 10px; }
+  .tg-stop-img  { width: 52px; height: 52px; font-size: 20px; }
+  .tg-stop-name { font-size: 14px; margin-bottom: 6px; }
+  .tg-stop-num  { width: 28px; height: 28px; font-size: 13px; }
+  .tg-stop-cat  { font-size: 8px; }
+
+  /* ── Compare All Overlay: full-width bottom sheet ── */
+  #cmp-overlay { padding: 0 !important; align-items: flex-end !important; }
+  .cmp-panel {
+    border-radius: 20px 20px 0 0 !important;
+    max-height: 92vh !important;
+    max-width: 100%  !important;
+  }
+  .cmp-header   { padding: 18px 18px 12px; }
+  .cmp-title    { font-size: 17px; }
+  #cmp-subtitle { font-size: 10px; }
+  .cmp-res-mascot  { width: 36px; height: 36px; }
+  .cmp-mascot-img  { width: 34px; height: 34px; }
+  .cmp-res-score   { font-size: 17px; }
+  .cmp-res-rank    { width: 30px; height: 30px; font-size: 15px; }
+  .cmp-res-chip    { font-size: 9px; padding: 2px 7px; }
+
+  /* ── Solver tooltip: anchored to bottom of screen ── */
+  .solver-tooltip-card {
+    position: fixed !important;
+    left:   16px  !important;
+    right:  16px  !important;
+    top:    auto  !important;
+    bottom: 16px  !important;
+    max-width: 100% !important;
+    width: auto !important;
+  }
+
+  /* ── Ranking tab ── */
+  #ranking-list   { padding: 8px 10px; }
+  .rank-card      { padding: 10px 11px; margin-bottom: 6px; }
+  .rank-stats-row { gap: 4px; }
+  .rank-score-big { font-size: 18px; }
+  .rank-algo      { font-size: 9px; }
+  .rank-stop-chip { font-size: 8px; padding: 2px 5px; }
+
+  /* ── Algo selector row: wrap to 2 columns ── */
+  .algo-row { gap: 5px; }
+  .algo-btn { font-size: 9px; padding: 6px 3px; min-width: 0; }
+
+  /* ── Category reordering: HTML5 drag-and-drop doesn't work on
+         touch devices, so swap to tap-based up/down arrows ── */
+  .cat-drag-handle { display: none; }
+  .cat-arrow-group { display: flex !important; }
+  .cat-arrow-btn   { width: 26px; height: 19px; font-size: 11px; }
+  .cat-row         { cursor: default; }
+
+  /* ── Range labels ── */
+  .range-tick-label { font-size: 8px; }
+
+  /* ── Progress bar ── */
+  #progress-bar-wrap { margin-bottom: 0; }
+  .progress-label    { font-size: 9px; }
+
+  /* ── Mapbox controls ── */
+  .mapboxgl-ctrl-top-right { top: 72px !important; right: 16px !important; }
+  .mapboxgl-ctrl-group { border-radius: 8px !important; }
+
+  /* ── Toast ── */
+  #toast { width: calc(100% - 32px); white-space: normal; text-align: center; bottom: 80px; }
+}
+
+/* ──────────────────────────────────────────
+   TINY  ≤ 360px  — extra compactness
+   ────────────────────────────────────────── */
+@media (max-width: 360px) {
+  .stat-card  { padding: 0 1px; }
+  .stat-val   { font-size: 12px; }
+  .stat-lbl   { display: none; }
+  #tour-guide-btn .tg-label { display: none; }   /* icon + dot only, still fills its grid cell */
+  #tour-guide-btn { gap: 0 !important; }
+
+  #panel { height: 85vh !important; }
+  .tg-summary-bar { flex-wrap: wrap; }
+  .tg-sum-divider { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Category reorder arrows — touch-friendly alternative to drag handle
+   Hidden on desktop (drag-and-drop works there); shown on mobile via
+   the .cat-arrow-group rule inside the ≤640px media query above.
+   ═══════════════════════════════════════════════════════════════════ */
+.cat-arrow-group {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 6px;
+  flex-shrink: 0;
+}
+.cat-arrow-btn {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  border-radius: 4px;
+  width: 20px; height: 15px;
+  font-size: 9px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0;
+  transition: all .15s;
+}
+.cat-arrow-btn:hover:not(:disabled) { color: var(--gold); border-color: var(--gold); background: var(--glass-hover); }
+.cat-arrow-btn:disabled { opacity: .22; cursor: not-allowed; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   Mobile bottom-sheet handle — hidden on desktop/tablet, shown only
+   inside the ≤640px media query above.
+   ═══════════════════════════════════════════════════════════════════ */
+#panel-handle { display: none; }

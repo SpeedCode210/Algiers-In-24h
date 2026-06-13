@@ -122,6 +122,7 @@
           <div class="progress-label" id="progress-label">Initializing…</div>
         </div>
         <button id="optimize-btn">Optimize Tour</button>
+        <button id="compare-btn">⚡ Compare All Algorithms</button>
       </div>
     </div>
 
@@ -136,6 +137,12 @@
           All</button>
       </div>
       <div id="ranking-list"></div>
+    </div>
+
+    <!-- MOBILE BOTTOM-SHEET HANDLE — hidden on desktop, tap/swipe to open/close panel -->
+    <div id="panel-handle">
+      <div class="panel-handle-bar"></div>
+      <span id="panel-handle-label">Configure Tour</span>
     </div>
   </div>
 
@@ -159,7 +166,7 @@
     </div>
     <button id="tour-guide-btn" title="View tour itinerary">
       <div class="tg-btn-dot"></div>
-      🗺 Tour Guide
+      🗺 <span class="tg-label">Tour Guide</span>
     </button>
   </div>
 
@@ -243,6 +250,26 @@
         </div>
       </div>
       <div class="tg-scroll" id="tg-stops-list"></div>
+    </div>
+  </div>
+
+
+  <!-- COMPARE ALL OVERLAY -->
+  <div id="cmp-overlay">
+    <div class="cmp-panel">
+      <div class="cmp-header">
+        <div class="cmp-header-left">
+          <div class="cmp-eyebrow">Algorithm Battle</div>
+          <div class="cmp-title">⚡ Compare <span>All</span></div>
+          <div id="cmp-subtitle">Running all algorithms simultaneously…</div>
+        </div>
+        <button class="cmp-close-btn" id="cmp-close-btn">✕</button>
+      </div>
+      <div id="cmp-body"></div>
+      <div class="cmp-footer">
+        <button id="cmp-cancel-btn">⏹ Stop</button>
+        <div id="cmp-footer-info"></div>
+      </div>
     </div>
   </div>
 

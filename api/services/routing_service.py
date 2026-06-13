@@ -21,7 +21,7 @@ from __future__ import annotations
 import requests
 
 
-MAPBOX_ACCESS_TOKEN: str = "pk.eyJ1IjoibW9oYW1lZGVnaGJvdWRqIiwiYSI6ImNtb24ybnZsaTBrOXMycHF5MGc3d2dmcXAifQ.0QWaEMordbNjiOwJD7ZqMA"
+MAPBOX_ACCESS_TOKEN: str = "pk.eyJ1Ijoic3BlZWRjb2RlIiwiYSI6ImNtcWI5YnRtcTBhY28yc3F5OWloM2c4M28ifQ.OmH9FnFAgu613rEx-49_JQ"
 
 MAPBOX_BASE_URL: str = "https://api.mapbox.com/directions/v5/mapbox/driving"
 

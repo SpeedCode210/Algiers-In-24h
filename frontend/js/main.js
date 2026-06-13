@@ -4,7 +4,7 @@ var CAT_COLORS = ['#c47a2e', '#7eb8f7', '#226d68', '#78adb5', '#a78bfa'];
 
 var MAP_STYLES = { dark: 'mapbox://styles/mapbox/navigation-night-v1', light: 'mapbox://styles/mapbox/streets-v12' };
 
-const MAPBOX_API_KEY = "pk.eyJ1IjoibW9oYW1lZGVnaGJvdWRqIiwiYSI6ImNtb24ybnZsaTBrOXMycHF5MGc3d2dmcXAifQ.0QWaEMordbNjiOwJD7ZqMA";
+const MAPBOX_API_KEY = "pk.eyJ1Ijoic3BlZWRjb2RlIiwiYSI6ImNtcWI5YnRtcTBhY28yc3F5OWloM2c4M28ifQ.OmH9FnFAgu613rEx-49_JQ";
 const API_LINK = "http://127.0.0.1:5000/api/";
 
 const SOLVERS = new Map([
@@ -256,37 +256,49 @@ function setupAlgoButtons() {
   const tlDesc = document.getElementById('tl-desc');
 
   // Attach event handlers
+  function showTooltipFor(btn) {
+    const algoKey = btn.dataset.algo;
+    const data = SOLVERS.get(algoKey);
+    if (!data) return;
+    const [algoFullName, mascotName, description] = data;
+
+    // Populate Tooltip Data
+    tlName.textContent = mascotName;
+    tlAlgo.textContent = algoFullName;
+    tlDesc.textContent = description;
+    tlImg.src = `img/${mascotName}.png`; // Accesses files from your existing ./img directory
+
+    // Show tooltip card
+    tooltip.classList.add('visible');
+  }
+
   document.querySelectorAll('.algo-btn').forEach(function (btn) {
     // Click active behavior
     btn.addEventListener('click', function () {
       document.querySelectorAll('.algo-btn').forEach(function (b) { b.classList.remove('active'); });
       btn.classList.add('active');
       selectedAlgo = btn.dataset.algo;
+
+      // Touch devices have no hover — show the description on tap too.
+      // (Harmless on desktop: hover already showed it, this just re-confirms.)
+      showTooltipFor(btn);
     });
 
-    // Hover Enter
-    btn.addEventListener('mouseenter', function () {
-      const algoKey = btn.dataset.algo;
-      const data = SOLVERS.get(algoKey);
-      
-      if (data) {
-        const [algoFullName, mascotName, description] = data;
-        
-        // Populate Tooltip Data
-        tlName.textContent = mascotName;
-        tlAlgo.textContent = algoFullName;
-        tlDesc.textContent = description;
-        tlImg.src = `img/${mascotName}.png`; // Accesses files from your existing ./img directory
-        
-        // Show tooltip card
-        tooltip.classList.add('visible');
-      }
-    });
+    // Hover Enter (desktop/mouse)
+    btn.addEventListener('mouseenter', function () { showTooltipFor(btn); });
 
-    // Hover Exit
+    // Hover Exit (desktop/mouse)
     btn.addEventListener('mouseleave', function () {
       tooltip.classList.remove('visible');
     });
+  });
+
+  // Touch devices: mouseleave never fires, so close the tooltip when the
+  // user taps anywhere outside the algo buttons and outside the card itself.
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.algo-btn') && !e.target.closest('.solver-tooltip-card')) {
+      tooltip.classList.remove('visible');
+    }
   });
 }
 
@@ -315,11 +327,17 @@ function renderCategoryRows() {
     row.dataset.cat = cat;
 
     var priorityLabels = ['1st', '2nd', '3rd', '4th', '5th'];
+    var isFirst = idx === 0;
+    var isLast  = idx === categoryOrder.length - 1;
     row.innerHTML =
       '<span class="cat-drag-handle">⠿</span>' +
       '<span class="cat-order-num">' + (idx + 1) + '</span>' +
       '<span class="cat-chip-inline" data-cat="' + cat + '" style="border-color:' + color + ';color:' + color + ';background:' + color + (activeCategories[cat] ? '33' : '10') + ';">' + categoryMap[cat].label + '</span>' +
-      '<span class="cat-priority-badge">' + priorityLabels[idx] + '</span>';
+      '<span class="cat-priority-badge">' + priorityLabels[idx] + '</span>' +
+      '<div class="cat-arrow-group">' +
+        '<button class="cat-arrow-btn cat-arrow-up" type="button" aria-label="Move up"' + (isFirst ? ' disabled' : '') + '>▲</button>' +
+        '<button class="cat-arrow-btn cat-arrow-down" type="button" aria-label="Move down"' + (isLast ? ' disabled' : '') + '>▼</button>' +
+      '</div>';
 
     // Chip click = toggle
     row.querySelector('.cat-chip-inline').addEventListener('click', function (e) {
@@ -357,6 +375,31 @@ function renderCategoryRows() {
       }
     });
 
+    // Up/down arrows — touch-friendly alternative to drag-and-drop
+    // (HTML5 DnD does not fire on touch devices).
+    var upBtn   = row.querySelector('.cat-arrow-up');
+    var downBtn = row.querySelector('.cat-arrow-down');
+    upBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (idx > 0) {
+        var tmp = categoryOrder[idx - 1];
+        categoryOrder[idx - 1] = categoryOrder[idx];
+        categoryOrder[idx] = tmp;
+        renderCategoryRows();
+        renderList();
+      }
+    });
+    downBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (idx < categoryOrder.length - 1) {
+        var tmp = categoryOrder[idx + 1];
+        categoryOrder[idx + 1] = categoryOrder[idx];
+        categoryOrder[idx] = tmp;
+        renderCategoryRows();
+        renderList();
+      }
+    });
+
     cont.appendChild(row);
   });
 }
@@ -375,6 +418,14 @@ function renderMarkers() {
     wrap.appendChild(dot);
     wrap.addEventListener('mouseenter', function () { dot.style.transform = 'scale(2)'; dot.style.boxShadow = '0 0 ' + (size + 8) + 'px ' + color; });
     wrap.addEventListener('mouseleave', function () { dot.style.transform = 'scale(1)'; dot.style.boxShadow = '0 0 ' + size + 'px ' + color + '66'; });
+    // Touch devices fire mouseenter on tap but never mouseleave — without
+    // this the dot stays permanently enlarged after the first tap.
+    wrap.addEventListener('touchend', function () {
+      setTimeout(function () {
+        dot.style.transform = 'scale(1)';
+        dot.style.boxShadow = '0 0 ' + size + 'px ' + color + '66';
+      }, 300);
+    });
     wrap.addEventListener('click', function () { showPopup(lm); });
     new mapboxgl.Marker({ element: wrap, anchor: 'center' }).setLngLat([lm.longitude, lm.latitude]).addTo(map);
     markers[lm.id] = { wrap: wrap, dot: dot, lm: lm };
@@ -469,15 +520,16 @@ async function runOptimizer() {
   var hotel = hotels[+document.getElementById('hotel-select').value];
 
   // Build category ranks from active categories + priority order
+  // Rank 1 = highest priority, n = lowest (matches scoring_service expectation)
   var categoryWeights = {};
   var activeOrdered = categoryOrder.filter(function (cat) { return activeCategories[cat]; });
-
   activeOrdered.forEach(function (cat, idx) {
-    categoryWeights[cat] = idx + 1; // rank from 1 (highest priority) to n
+    categoryWeights[cat] = idx + 1;
   });
 
 
   runningOptimizer = true;
+  collapsePanelOnMobile();
   document.getElementById('optimize-btn').disabled = true;
   document.getElementById('progress-bar-wrap').style.display = 'block';
 
@@ -890,3 +942,430 @@ function drawRoute(route, hotel, roadGeometry) {
     pitch: 45
   });
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   COMPARE ALL — every algorithm in SOLVERS runs independently and
+   in parallel via POST /api/solve. Each gets its own AbortController
+   so it can be stopped individually without affecting the others.
+   ═══════════════════════════════════════════════════════════════════ */
+
+var compareRunning = false;
+var compareEntries = [];   // [{algo,label,mascot,status,data,elapsed,error,controller}]
+
+/* ── DOM wiring ── */
+document.getElementById('compare-btn').addEventListener('click', runCompareAll);
+document.getElementById('cmp-close-btn').addEventListener('click', closeCmpOverlay);
+document.getElementById('cmp-cancel-btn').addEventListener('click', stopAllCompare);
+document.getElementById('cmp-overlay').addEventListener('click', function (e) {
+  if (e.target === this && !compareRunning) closeCmpOverlay();
+});
+
+function openCmpOverlay()  { document.getElementById('cmp-overlay').classList.add('open'); }
+function closeCmpOverlay() {
+  if (compareRunning) return;
+  document.getElementById('cmp-overlay').classList.remove('open');
+}
+
+function stopAllCompare() {
+  compareEntries.forEach(function (e) {
+    if (e.status === 'running' && e.controller) e.controller.abort();
+  });
+}
+
+/* ── Main entry point ────────────────────────────────────────────── */
+async function runCompareAll() {
+  if (runningOptimizer || compareRunning) {
+    showToast('Please wait for the current run to finish.');
+    return;
+  }
+
+  collapsePanelOnMobile();
+
+  /* Current panel settings — identical payload shape to runOptimizer() */
+  var budgetStart = parseFloat(document.getElementById('budget-start').value);
+  var budgetEnd   = parseFloat(document.getElementById('budget-end').value);
+  var budget      = budgetEnd - budgetStart;
+  var hotel       = hotels[+document.getElementById('hotel-select').value];
+
+  var categoryWeights = {};
+  var activeOrdered = categoryOrder.filter(function (cat) { return activeCategories[cat]; });
+  activeOrdered.forEach(function (cat, idx) { categoryWeights[cat] = idx + 1; });
+
+  var basePayload = {
+    hotel_id:         hotel.id,
+    time_budget:      Math.round(budget * 60),
+    tour_day:         getTourDay(),
+    start_time:       fmtHour(budgetStart),
+    category_weights: categoryWeights,
+    algorithm_params: {}
+  };
+
+  /* Build one entry per SOLVERS item — full set, no subset */
+  compareEntries = Array.from(SOLVERS.entries()).map(function (entry) {
+    return {
+      algo: entry[0], label: entry[1][0], mascot: entry[1][1],
+      status: 'running', data: null, elapsed: 0, error: null,
+      controller: new AbortController()
+    };
+  });
+
+  compareRunning = true;
+  document.getElementById('compare-btn').disabled = true;
+  openCmpOverlay();
+
+  document.getElementById('cmp-subtitle').textContent =
+    'Running ' + compareEntries.length + ' algorithms in parallel — stop any one independently';
+  document.getElementById('cmp-footer-info').textContent = '';
+  document.getElementById('cmp-cancel-btn').style.display = 'block';
+  document.getElementById('cmp-cancel-btn').textContent = '⏹ Stop All';
+  _renderCmpRows();
+
+  /* Fire every algorithm independently — do NOT await sequentially.
+     Each promise updates its own entry + re-renders as soon as it
+     settles, giving live per-algorithm progress. */
+  var jobs = compareEntries.map(function (entry) {
+    return _runOneCompareAlgo(entry, basePayload);
+  });
+
+  await Promise.allSettled(jobs);
+
+  /* ── Wrap-up ── */
+  compareRunning = false;
+  document.getElementById('compare-btn').disabled = false;
+  document.getElementById('cmp-cancel-btn').style.display = 'none';
+
+  var done = compareEntries.filter(function (e) { return e.status === 'done'; });
+  done.sort(function (a, b) { return b.data.total_score - a.data.total_score; });
+  done.forEach(function (e, i) { e.rank = i + 1; });
+
+  done.forEach(function (entry) {
+    var d = entry.data;
+    addToRanking({
+      id:           Date.now() + Math.random(),
+      algo:         entry.label,
+      algoKey:      entry.algo,
+      hotel:        hotel.name,
+      hotelObj:     hotel,
+      stops:        d.route.length,
+      score:        parseFloat(d.total_score.toFixed(1)),
+      time:         parseFloat((d.total_duration_minutes / 60).toFixed(1)),
+      km:           parseFloat((d.total_distance_km || 0).toFixed(1)),
+      budget:       budget,
+      budgetRange:  fmtHour(budgetStart) + '–' + fmtHour(budgetEnd),
+      elapsed:      entry.elapsed,
+      timeLimitUsed: false,
+      route:        d.route,
+      timestamp:    Date.now(),
+      geometry:     d.road_geometry
+    });
+  });
+
+  if (done.length > 0) {
+    var best  = done[0];
+    var route = best.data.route;
+    selectedRouteIds = {};
+    route.forEach(function (l) { selectedRouteIds[l.id] = true; });
+    lastRoute    = route;
+    lastHotel    = hotel;
+    lastGeometry = best.data.road_geometry;
+    drawRoute(route, hotel, best.data.road_geometry);
+
+    var totalMins = Math.round(best.data.total_duration_minutes);
+    var hh = Math.floor(totalMins / 60), mm = totalMins % 60;
+    document.getElementById('s-count').textContent       = route.length;
+    document.getElementById('s-time').textContent        = hh + 'h ' + (mm ? mm + 'min' : '');
+    document.getElementById('s-score').textContent       = best.data.total_score;
+    document.getElementById('s-km').textContent          = (best.data.total_distance_km || 0).toFixed(1);
+    document.getElementById('algo-ind-name').textContent = best.label;
+    document.getElementById('algo-ind-time').textContent = best.elapsed + 'ms';
+    document.getElementById('tour-guide-btn').classList.add('visible');
+    Object.keys(markers).forEach(function (id) {
+      markers[id].dot.style.opacity = selectedRouteIds[id] ? '1' : '0.2';
+    });
+  }
+
+  _renderCmpResults(done, hotel, budgetStart, budgetEnd);
+}
+
+/* ── One algorithm's full lifecycle: fetch → update entry → re-render ── */
+async function _runOneCompareAlgo(entry, basePayload) {
+  var t0 = Date.now();
+  try {
+    var payload  = Object.assign({}, basePayload, { algorithm: entry.algo });
+    var response = await fetch(API_LINK + 'solve', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+      signal:  entry.controller.signal
+    });
+    entry.elapsed = Date.now() - t0;
+
+    if (!response.ok) {
+      var errJson = await response.json().catch(function () { return { error: response.statusText }; });
+      entry.status = 'error';
+      entry.error  = errJson.error || ('HTTP ' + response.status);
+    } else {
+      var data = await response.json();
+      data.route = (data.stops || []).map(function (stop) {
+        var local = landmarks.find(function (l) { return l.id === stop.id; });
+        return local ? Object.assign({}, local, stop) : stop;
+      });
+      entry.status = 'done';
+      entry.data   = data;
+    }
+  } catch (err) {
+    entry.elapsed = Date.now() - t0;
+    if (err.name === 'AbortError') {
+      entry.status = 'cancelled';
+    } else {
+      entry.status = 'error';
+      entry.error  = err.message;
+    }
+  }
+
+  /* Only re-render the running view while the overall run is still
+     in progress — once everything settles, runCompareAll() switches
+     to the results view itself. */
+  if (compareRunning) _renderCmpRows();
+}
+
+/* ── Render: live progress rows — each running row has its own
+       stop button; finished rows show their result inline. ── */
+function _renderCmpRows() {
+  var ICON  = { pending:'⏳', done:'✓', error:'✗', cancelled:'—', skipped:'○' };
+  var COLOR = {
+    pending:   'var(--text-muted)',
+    done:      'var(--success)',
+    error:     'var(--danger)',
+    cancelled: 'var(--text-muted)',
+    skipped:   'var(--text-muted)'
+  };
+
+  if (compareRunning) {
+    var stillRunning = compareEntries.filter(function (e) { return e.status === 'running'; }).length;
+    var settled      = compareEntries.length - stillRunning;
+    document.getElementById('cmp-footer-info').textContent =
+      settled + ' / ' + compareEntries.length + ' finished';
+  }
+
+  var body = document.getElementById('cmp-body');
+  body.innerHTML = '';
+
+  compareEntries.forEach(function (entry) {
+    var wrap = document.createElement('div');
+    wrap.className = 'cmp-algo-row cmp-status-' + entry.status;
+
+    var imgSrc = entry.mascot ? 'img/' + entry.mascot + '.png' : '';
+
+    var scoreHtml = '';
+    if (entry.status === 'done' && entry.data) {
+      scoreHtml =
+        '<div class="cmp-row-score">' +
+        '<span class="cmp-row-pts">' + entry.data.total_score + '</span> pts' +
+        ' · <b>' + (entry.data.num_landmarks || 0) + '</b> stops' +
+        ' · ' + entry.elapsed + 'ms' +
+        '</div>';
+    } else if (entry.status === 'error') {
+      scoreHtml = '<div class="cmp-row-score cmp-row-err">' + (entry.error || 'Error') + '</div>';
+    } else if (entry.status === 'skipped') {
+      scoreHtml = '<div class="cmp-row-score" style="font-style:italic;">Not run by backend</div>';
+    } else if (entry.status === 'running') {
+      scoreHtml = '<div class="cmp-row-score">Running…</div>';
+    } else if (entry.status === 'cancelled') {
+      scoreHtml = '<div class="cmp-row-score">Stopped</div>';
+    }
+
+    /* Right-side action: stop button while running, status icon otherwise */
+    var actionHtml;
+    if (entry.status === 'running') {
+      actionHtml = '<button class="cmp-row-stop-btn" title="Stop ' + entry.label + '">✕</button>';
+    } else {
+      var icon  = ICON[entry.status]  || '?';
+      var color = COLOR[entry.status] || 'var(--text-muted)';
+      actionHtml = '<div class="cmp-row-status-icon" style="color:' + color + ';">' + icon + '</div>';
+    }
+
+    var inner = document.createElement('div');
+    inner.className = 'cmp-row-inner';
+    inner.innerHTML =
+      '<div class="cmp-row-left">' +
+        (imgSrc
+          ? '<img class="cmp-mascot-img" src="' + imgSrc + '" alt="">'
+          : '<div class="cmp-mascot-img cmp-mascot-placeholder"></div>') +
+        '<div class="cmp-row-info">' +
+          '<div class="cmp-row-label">' + entry.label + '</div>' +
+          scoreHtml +
+        '</div>' +
+      '</div>' +
+      '<div class="cmp-row-action">' + actionHtml + '</div>';
+
+    if (entry.status === 'running') {
+      inner.querySelector('.cmp-row-stop-btn').addEventListener('click', function () {
+        entry.controller.abort();
+      });
+    }
+
+    wrap.appendChild(inner);
+
+    if (entry.status === 'running') {
+      var pbar = document.createElement('div');
+      pbar.className = 'cmp-row-pbar';
+      pbar.innerHTML = '<div class="cmp-row-pbar-fill"></div>';
+      wrap.appendChild(pbar);
+    }
+
+    body.appendChild(wrap);
+  });
+}
+
+/* ── Render: ranked result cards ─────────────────────────────────── */
+var CMP_MEDALS     = ['🥇','🥈','🥉','4','5','6','7','8','9','10'];
+var CMP_MEDAL_COLS = ['#c9a84c','#9eaabb','#a07850',
+                      'var(--text-muted)','var(--text-muted)','var(--text-muted)',
+                      'var(--text-muted)','var(--text-muted)','var(--text-muted)','var(--text-muted)'];
+
+function _renderCmpResults(done, hotel, budgetStart, budgetEnd) {
+  document.getElementById('cmp-subtitle').textContent = done.length
+    ? '🏆 ' + done[0].label + ' ranked #1 — tap any row to view its route'
+    : 'No algorithms completed successfully.';
+  document.getElementById('cmp-footer-info').textContent = '';
+
+  var body = document.getElementById('cmp-body');
+  body.innerHTML = '';
+
+  if (!done.length) {
+    body.innerHTML = '<div class="cmp-empty">No algorithms completed successfully.</div>';
+  }
+
+  done.forEach(function (entry, idx) {
+    var d        = entry.data;
+    var posColor = CMP_MEDAL_COLS[idx] || 'var(--text-muted)';
+    var medal    = CMP_MEDALS[idx]     || String(idx + 1);
+    var imgSrc   = entry.mascot ? 'img/' + entry.mascot + '.png' : '';
+    var execSec  = (entry.elapsed / 1000).toFixed(3);
+
+    var card = document.createElement('div');
+    card.className = 'cmp-result-card' + (idx === 0 ? ' cmp-result-best' : '');
+    card.style.animationDelay = (idx * 0.06) + 's';
+
+    card.innerHTML =
+      '<div class="cmp-res-rank" style="color:' + posColor + ';border-color:' + posColor + '44;">' + medal + '</div>' +
+      (imgSrc ? '<img class="cmp-res-mascot" src="' + imgSrc + '" alt="">' : '') +
+      '<div class="cmp-res-info">' +
+        '<div class="cmp-res-label">' + entry.label + '</div>' +
+        '<div class="cmp-res-stats">' +
+          '<span class="cmp-res-score">' + d.total_score + '</span>' +
+          '<span class="cmp-res-chip">🏛 ' + (d.num_landmarks || 0) + ' stops</span>' +
+          '<span class="cmp-res-chip">⏱ ' + Math.round(d.total_duration_minutes) + ' min</span>' +
+          '<span class="cmp-res-chip">⚡ ' + execSec + 's</span>' +
+          '<span class="cmp-res-chip">📍 ' + (d.total_distance_km || 0) + ' km</span>' +
+        '</div>' +
+      '</div>' +
+      '<button class="cmp-res-view-btn" title="View route on map">🗺 View</button>';
+
+    function loadThisRoute(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      var route = d.route;
+      selectedRouteIds = {};
+      route.forEach(function (l) { selectedRouteIds[l.id] = true; });
+      lastRoute    = route;
+      lastHotel    = hotel;
+      lastGeometry = d.road_geometry;
+      drawRoute(route, hotel, d.road_geometry);
+
+      var tmins = Math.round(d.total_duration_minutes);
+      var hh = Math.floor(tmins / 60), mm = tmins % 60;
+      document.getElementById('s-count').textContent       = route.length;
+      document.getElementById('s-time').textContent        = hh + 'h ' + (mm ? mm + 'min' : '');
+      document.getElementById('s-score').textContent       = d.total_score;
+      document.getElementById('s-km').textContent          = (d.total_distance_km || 0).toFixed(1);
+      document.getElementById('algo-ind-name').textContent = entry.label;
+      document.getElementById('algo-ind-time').textContent = entry.elapsed + 'ms';
+      document.getElementById('tour-guide-btn').classList.add('visible');
+      Object.keys(markers).forEach(function (id) {
+        markers[id].dot.style.opacity = selectedRouteIds[id] ? '1' : '0.2';
+      });
+      closeCmpOverlay();
+      showToast(entry.label + ' route loaded on map');
+    }
+
+    card.addEventListener('click', loadThisRoute);
+    card.querySelector('.cmp-res-view-btn').addEventListener('click', loadThisRoute);
+    body.appendChild(card);
+  });
+
+  /* Cancelled / errored algorithms shown below results as a compact list */
+  var notDone = compareEntries.filter(function (e) { return e.status !== 'done'; });
+  if (notDone.length) {
+    var sep = document.createElement('div');
+    sep.style.cssText = 'font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);padding:10px 4px 4px;font-weight:600;';
+    sep.textContent = 'Not compared';
+    body.appendChild(sep);
+
+    notDone.forEach(function (entry) {
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;background:var(--glass);border:1px solid var(--glass-border);opacity:.6;';
+      var imgSrc = entry.mascot ? 'img/' + entry.mascot + '.png' : '';
+      row.innerHTML =
+        (imgSrc ? '<img style="width:28px;height:28px;object-fit:contain;" src="' + imgSrc + '" alt="">' : '') +
+        '<span style="font-size:12px;font-weight:600;color:var(--text);flex:1;">' + entry.label + '</span>' +
+        '<span style="font-size:10px;color:var(--text-muted);">' + (entry.error || entry.status) + '</span>';
+      body.appendChild(row);
+    });
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE BOTTOM-SHEET PANEL — tap or swipe #panel-handle to toggle.
+   Reuses the existing togglePanel() so desktop's #stats/#algo-indicator
+   left-offset logic stays in sync (harmless on mobile — overridden by
+   the !important rules in the responsive CSS).
+   ═══════════════════════════════════════════════════════════════════ */
+
+function isMobileLayout() { return window.innerWidth <= 640; }
+
+/* Collapse the panel (if open) on mobile so the map is visible —
+   called when Optimize / Compare All starts. No-op on desktop and
+   no-op if already collapsed. */
+function collapsePanelOnMobile() {
+  if (isMobileLayout() && panelVisible) togglePanel();
+}
+
+(function setupMobilePanelHandle() {
+  var handle = document.getElementById('panel-handle');
+  if (!handle) return;
+
+  /* Start collapsed on mobile so the map is visible on first load.
+     togglePanel() keeps panelVisible / classes / icon all in sync. */
+  if (isMobileLayout() && panelVisible) togglePanel();
+
+  /* Tap the handle to toggle open/closed */
+  handle.addEventListener('click', function () { togglePanel(); });
+
+  /* Swipe up/down on the handle as an alternative to tapping */
+  var startY = 0, tracking = false;
+  handle.addEventListener('touchstart', function (e) {
+    startY = e.touches[0].clientY;
+    tracking = true;
+  }, { passive: true });
+
+  handle.addEventListener('touchmove', function (e) {
+    if (!tracking) return;
+    e.preventDefault(); // prevent page scroll while dragging the handle
+  }, { passive: false });
+
+  handle.addEventListener('touchend', function (e) {
+    if (!tracking) return;
+    tracking = false;
+    var endY = e.changedTouches[0].clientY;
+    var deltaY = endY - startY;
+    var THRESHOLD = 30; // px
+
+    if (deltaY < -THRESHOLD && !panelVisible) {
+      togglePanel();      // swiped up while collapsed → open
+    } else if (deltaY > THRESHOLD && panelVisible) {
+      togglePanel();      // swiped down while open → collapse
+    }
+    // small movements (taps) are handled by the 'click' listener above
+  });
+})();
