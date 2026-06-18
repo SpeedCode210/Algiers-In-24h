@@ -74,7 +74,8 @@ OUT.mkdir(parents=True, exist_ok=True)
 # ---------------------------------------------------------------------------
 # Algiers has 10 algorithms
 ALGIERS_ALGO_ORDER = [
-    "Greedy", "GRASP",
+    "Greedy-Ratio", "Greedy-Score", "Greedy-Random",
+    "GRASP",
     "SA-Boltzmann", "SA-Cauchy", "SA",
     "Tabu", "Tabu-Random",
     "Genetic-Tailored", "Genetic-Score",
@@ -82,7 +83,9 @@ ALGIERS_ALGO_ORDER = [
 ]
 
 ALGIERS_PALETTE = {
-    "Greedy":           "#4C72B0",
+    "Greedy-Ratio":     "#4C72B0",
+    "Greedy-Score":     "#2E5BA8",
+    "Greedy-Random":    "#1E42A0",
     "GRASP":            "#DD8452",
     "SA-Boltzmann":     "#2ca02c",
     "SA-Cauchy":        "#55A868",
@@ -94,9 +97,10 @@ ALGIERS_PALETTE = {
     "CPLEX":            "#937860",
 }
 
-# S50 has 9 algorithms: Boltzmann + Cauchy instead of SA
+# S50 has 11 algorithms: Greedy (3 variants), GRASP, SA-Boltzmann, SA-Cauchy, Tabu (2 variants), Genetic (2 variants), CPLEX
 S50_ALGO_ORDER = [
-    "Greedy", "GRASP",
+    "Greedy-Ratio", "Greedy-Score", "Greedy-Random",
+    "GRASP",
     "SA-Boltzmann", "SA-Cauchy",
     "Tabu", "Tabu-Random",
     "Genetic-Tailored", "Genetic-Score",
@@ -104,7 +108,9 @@ S50_ALGO_ORDER = [
 ]
 
 S50_PALETTE = {
-    "Greedy":           "#4C72B0",
+    "Greedy-Ratio":     "#4C72B0",
+    "Greedy-Score":     "#2E5BA8",
+    "Greedy-Random":    "#1E42A0",
     "GRASP":            "#DD8452",
     "SA-Boltzmann":     "#2ca02c",
     "SA-Cauchy":        "#55A868",
@@ -814,7 +820,11 @@ def main():
                 ground_truths={}, group_label="Solomon-50",
             )
 
-    agg_50 = aggregate(df_50, S50_ALGO_ORDER)
+    # Safely aggregate only if df_50 has data and "solver" column
+    if not df_50.empty and "solver" in df_50.columns:
+        agg_50 = aggregate(df_50, S50_ALGO_ORDER)
+    else:
+        agg_50 = pd.DataFrame()
     print(f"\n  Solomon-50 results ({len(df_50)} total rows):")
 
     for solver_name in agg_50.index:

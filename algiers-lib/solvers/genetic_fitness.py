@@ -73,7 +73,7 @@ class FitnessFunction:
 
         return_travel_time = tour.problem.travel_time(current_position, tour.problem.hotel)
         total_duration = float((current_time + return_travel_time) - tour.problem.start_time)
-        return invalid_count, total_duration
+        return  invalid_count, total_duration
 
 
 class ScoreFitnessFunction(FitnessFunction):
@@ -94,7 +94,9 @@ class ScoreFitnessFunction(FitnessFunction):
         total_reward = sum(
             float(landmark.interest_score) for landmark in tour.visited_landmarks
         )
-        return total_reward**3/ (1 + duration) # Penalize by dividing by (1 + number of invalid visits)
+        return total_reward**3/ (1 + duration) - invalid
+
+
 
 # this is used in the Tailored genetic solver 
 class FeasibilityFitnessFunction(FitnessFunction):

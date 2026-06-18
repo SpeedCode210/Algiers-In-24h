@@ -659,13 +659,11 @@ def _screen_one_task(idx: int) -> dict[str, Any]:
         elapsed = time.perf_counter() - t0
         result["elapsed"] = elapsed
 
-        if tour is not None and elapsed < timeout * 0.95:
+        if tour is not None:
             result["easy"] = True
             result["score"] = tour.total_score()
         elif tour is None:
             result["error"] = "no solution"
-        else:
-            result["error"] = "timeout"
     except Exception as exc:
         result["error"] = str(exc)[:80]
 

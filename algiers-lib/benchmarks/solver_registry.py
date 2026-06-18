@@ -22,6 +22,7 @@ from typing import Callable, Any
 
 from models.problem import Problem
 from solvers.greedy_solver import GreedySolver
+from solvers.greedy_for_app import RandomGreedy
 from solvers.grasp_solver import GraspSolver
 from solvers.simulated_annealing_solver import (
     SimulatedAnnealingSolver, AcceptanceFunction, DecayFunction
@@ -115,7 +116,9 @@ if _HAS_CPLEX:
 # A2. ALGIERS -- one best variant per solver family (for benchmark comparison)
 # ---------------------------------------------------------------------------
 ALGIERS_BEST_VARIANTS: list[SolverEntry] = [
-    _deterministic("Greedy",   lambda p: GreedySolver(p, use_ratio=True)),
+    _deterministic("Greedy-Ratio",  lambda p: GreedySolver(p, use_ratio=True)),
+    _deterministic("Greedy-Score",  lambda p: GreedySolver(p, use_ratio=False)),
+    _stochastic("Greedy-Random",    lambda p: RandomGreedy(p)),
     _stochastic("GRASP",       lambda p: GraspSolver(p, iterations=50, alpha=0.3)),
     _stochastic("SA-Boltzmann", lambda p: SimulatedAnnealingSolver(
         p, acceptance_criterion=AcceptanceFunction.BOLTZMANN,
@@ -146,7 +149,9 @@ if _HAS_CPLEX:
 #    Genetic-Tailored + Genetic-Score(200s), CPLEX (ground truth)
 # ---------------------------------------------------------------------------
 SOLOMON_50_VARIANTS: list[SolverEntry] = [
-    _deterministic("Greedy",   lambda p: GreedySolver(p, use_ratio=True)),
+    _deterministic("Greedy-Ratio",  lambda p: GreedySolver(p, use_ratio=True)),
+    _deterministic("Greedy-Score",  lambda p: GreedySolver(p, use_ratio=False)),
+    _stochastic("Greedy-Random",    lambda p: RandomGreedy(p)),
     _stochastic("GRASP",       lambda p: GraspSolver(p, iterations=50, alpha=0.3)),
     _stochastic("SA-Boltzmann", lambda p: SimulatedAnnealingSolver(
         p, acceptance_criterion=AcceptanceFunction.BOLTZMANN,
@@ -175,11 +180,20 @@ if _HAS_CPLEX:
 #    Uses Righini & Salani bestPossible ground truth files.
 # ---------------------------------------------------------------------------
 SOLOMON_100_VARIANTS: list[SolverEntry] = [
-    _deterministic("Greedy",   lambda p: GreedySolver(p, use_ratio=True)),
+    _deterministic("Greedy-Ratio",  lambda p: GreedySolver(p, use_ratio=True)),
+    _deterministic("Greedy-Score",  lambda p: GreedySolver(p, use_ratio=False)),
+    _stochastic("Greedy-Random",    lambda p: RandomGreedy(p)),
     _stochastic("GRASP",    lambda p: GraspSolver(p, iterations=50, alpha=0.3)),
-    _stochastic("SA",       lambda p: SimulatedAnnealingSolver(
-        p, initial_temperature=70, cooling_rate=0.97, max_iterations=60_000)),
-    _stochastic("Tabu",     lambda p: TabuSolver(p)),
+    _stochastic("SA-Boltzmann", lambda p: SimulatedAnnealingSolver(
+        p, acceptance_criterion=AcceptanceFunction.BOLTZMANN,
+        initial_temperature=70, cooling_rate=0.97,
+        reheating_rate=0, max_iterations=80_000)),
+    _stochastic("SA-Cauchy",    lambda p: SimulatedAnnealingSolver(
+        p, acceptance_criterion=AcceptanceFunction.CAUCHY,
+        initial_temperature=70, cooling_rate=0.97,
+        reheating_rate=0, max_iterations=80_000)),
+    _deterministic("Tabu",     lambda p: TabuSolver(p)),
+    _stochastic("Tabu-Random",     lambda p: TabuSolver(p, tabu_tenure=None)),
     _stochastic("Genetic-Tailored",   lambda p: TailoredGeneticSolver(
         p, FeasibilityFitnessFunction())),
     _stochastic("Genetic-Score",      lambda p: GeneticSolver(
